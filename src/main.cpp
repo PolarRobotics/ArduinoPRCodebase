@@ -440,87 +440,87 @@ void loop() {
   //Step 1: Verify that this robot actually is the QB
 
   if (robotType == quarterback) {    
-    if (PS3.getButtonClick(TRIANGLE) && targetElevation + 1 < 3) {
-      targetElevation = targetElevation + 1;
-    } else if (PS3.getButtonClick(CROSS) && targetElevation - 1 >= 0) {
-      targetElevation = targetElevation - 1;
-    } else if (PS3.getButtonClick(DOWN)) {
-      targetElevation = 0;
-    }
+    // if (PS3.getButtonClick(TRIANGLE) && targetElevation + 1 < 3) {
+    //   targetElevation = targetElevation + 1;
+    // } else if (PS3.getButtonClick(CROSS) && targetElevation - 1 >= 0) {
+    //   targetElevation = targetElevation - 1;
+    // } else if (PS3.getButtonClick(DOWN)) {
+    //   targetElevation = 0;
+    // }
 
-    int maxCounter = 13000;
+    // int maxCounter = 13000;
 
-    if ((counter > maxCounter || counter < 0) && (aimingup == true || aimingdown == true)) {
-      aimingup = false;
-      aimingdown = false;
-      ElevationMotor.write(getSpeedStop());
-      if (counter == -1) {
-        counter = 0;
-      } else {
-        counter = maxCounter;
-      }
-      Serial.println("im stuck");
-    } else if (targetElevation > currentElevation) {
-      ElevationMotor.write(getSpeedUp());
-      currentElevation = targetElevation;
-      aimingup = true;
-      aimingdown = false;
-    } else if (targetElevation < currentElevation) {
-      ElevationMotor.write(getSpeedDown());
-      currentElevation = targetElevation;
-      aimingdown = true;
-      aimingup = false;
-    } else if (aimingup == true) {
-      counter = counter + 1;
-    } else if (aimingdown == true) {
-      counter = counter - 1;
-    }
+    // if ((counter > maxCounter || counter < 0) && (aimingup == true || aimingdown == true)) {
+    //   aimingup = false;
+    //   aimingdown = false;
+    //   ElevationMotor.write(getSpeedStop());
+    //   if (counter == -1) {
+    //     counter = 0;
+    //   } else {
+    //     counter = maxCounter;
+    //   }
+    //   Serial.println("im stuck");
+    // } else if (targetElevation > currentElevation) {
+    //   ElevationMotor.write(getSpeedUp());
+    //   currentElevation = targetElevation;
+    //   aimingup = true;
+    //   aimingdown = false;
+    // } else if (targetElevation < currentElevation) {
+    //   ElevationMotor.write(getSpeedDown());
+    //   currentElevation = targetElevation;
+    //   aimingdown = true;
+    //   aimingup = false;
+    // } else if (aimingup == true) {
+    //   counter = counter + 1;
+    // } else if (aimingdown == true) {
+    //   counter = counter - 1;
+    // }
 
-    if (targetElevation == 1 && counter == maxCounter/2) {
-      aimingup = false;
-      aimingdown = false;
-      ElevationMotor.write(getSpeedStop());
-    }
+    // if (targetElevation == 1 && counter == maxCounter/2) {
+    //   aimingup = false;
+    //   aimingdown = false;
+    //   ElevationMotor.write(getSpeedStop());
+    // }
 
-    if (PS3.getButtonClick(LEFT)) {
-      ElevationMotor.write(getSpeedDown());
-      delay(8000);
-      ElevationMotor.write(getSpeedStop());
-      counter = 0;
-      currentElevation = 0;
-      targetElevation = 0;
-    }
+    // if (PS3.getButtonClick(LEFT)) {
+    //   ElevationMotor.write(getSpeedDown());
+    //   delay(8000);
+    //   ElevationMotor.write(getSpeedStop());
+    //   counter = 0;
+    //   currentElevation = 0;
+    //   targetElevation = 0;
+    // }
 
-    if (PS3.getButtonPress(CIRCLE)) {
-      conveyor.write(145);
-    } else {
-      conveyor.write(30);
-    }
+    // if (PS3.getButtonPress(CIRCLE)) {
+    //   conveyor.write(145);
+    // } else {
+    //   conveyor.write(30);
+    // }
 
-    // flywheels.write(60);
+    // // flywheels.write(60);
     
-    if (PS3.getButtonClick(SQUARE)) {
-      flywheelstate = flywheelstate + 1;
-      if (flywheelstate == 1) {
-        flywheels.write(100);
-        //flywheelstatis = true;
-        //Serial.print("ran line 1");
-        //Serial.println("  ");
-      } else if (flywheelstate == 2) {
-        flywheels.write(145);
-        //flywheelstatis = true;
-        //Serial.print("ran line 1");
-        //Serial.println("  ");
-      } else if (flywheelstate==3){
-        flywheels.write(93);
-        //flywheelstatis = false;
-        flywheelstate = 0;
-        //Serial.print("ran line 2");
-        //Serial.println("  ");
-      }
-        //Serial.print("ran line 3");
-        //Serial.println("  ");
-    }
+    // if (PS3.getButtonClick(SQUARE)) {
+    //   flywheelstate = flywheelstate + 1;
+    //   if (flywheelstate == 1) {
+    //     flywheels.write(100);
+    //     //flywheelstatis = true;
+    //     //Serial.print("ran line 1");
+    //     //Serial.println("  ");
+    //   } else if (flywheelstate == 2) {
+    //     flywheels.write(145);
+    //     //flywheelstatis = true;
+    //     //Serial.print("ran line 1");
+    //     //Serial.println("  ");
+    //   } else if (flywheelstate==3){
+    //     flywheels.write(93);
+    //     //flywheelstatis = false;
+    //     flywheelstate = 0;
+    //     //Serial.print("ran line 2");
+    //     //Serial.println("  ");
+    //   }
+    //     //Serial.print("ran line 3");
+    //     //Serial.println("  ");
+    // }
   }
 
   /*
@@ -534,29 +534,28 @@ void loop() {
   //Version: 2.0
   //Step 1: Verify that this robot actually is the Center
   if (robotType == center) {
+    // //Raise the Center Arm
+    // if (CenterArmMoveStatus == "" && (PS3.getButtonPress(UP)) && CenterArmStatus != 1) {
+    //   //The user wants to raise the Center arm up
+    //   CenterArmMoveStatus = "High";
+    //   CenterArmMoveTimer = millis();
+    //   CenterArmStatus = centerUp(ST, CenterArmMoveStatus);
+    // } else if (CenterArmMoveStatus == "High" && (millis() - CenterArmMoveTimer) > 5000) {
+    //   CenterArmMoveStatus = "Stop";
+    //   centerUp(ST, CenterArmMoveStatus);
+    //   CenterArmMoveStatus = "";
+    // }
 
-    //Raise the Center Arm
-    if (CenterArmMoveStatus == "" && (PS3.getButtonPress(UP)) && CenterArmStatus != 1) {
-      //The user wants to raise the Center arm up
-      CenterArmMoveStatus = "High";
-      CenterArmMoveTimer = millis();
-      CenterArmStatus = centerUp(ST, CenterArmMoveStatus);
-    } else if (CenterArmMoveStatus == "High" && (millis() - CenterArmMoveTimer) > 5000) {
-      CenterArmMoveStatus = "Stop";
-      centerUp(ST, CenterArmMoveStatus);
-      CenterArmMoveStatus = "";
-    }
-
-    //Lower the Center Arm
-    if (CenterArmMoveStatus == "" && (PS3.getButtonPress(DOWN)) && CenterArmStatus != 2) {
-      //The user wants to raise the Center arm up
-      CenterArmMoveStatus = "Lower";
-      CenterArmMoveTimer = millis();
-      CenterArmStatus = centerDown(ST, CenterArmMoveStatus);
-    } else if (CenterArmMoveStatus == "Lower" && (millis() - CenterArmMoveTimer) > 5000) {
-      CenterArmMoveStatus = "Stop";
-      centerUp(ST, CenterArmMoveStatus);
-      CenterArmMoveStatus = "";
-    }
+    // //Lower the Center Arm
+    // if (CenterArmMoveStatus == "" && (PS3.getButtonPress(DOWN)) && CenterArmStatus != 2) {
+    //   //The user wants to raise the Center arm up
+    //   CenterArmMoveStatus = "Lower";
+    //   CenterArmMoveTimer = millis();
+    //   CenterArmStatus = centerDown(ST, CenterArmMoveStatus);
+    // } else if (CenterArmMoveStatus == "Lower" && (millis() - CenterArmMoveTimer) > 5000) {
+    //   CenterArmMoveStatus = "Stop";
+    //   centerUp(ST, CenterArmMoveStatus);
+    //   CenterArmMoveStatus = "";
+    // }
   }
 }
