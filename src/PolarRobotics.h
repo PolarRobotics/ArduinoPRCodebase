@@ -8,13 +8,13 @@
 // the number of motors associated with driving, default: 2
 #define NUM_MOTORS 2 
 // rate of change of power with respect to time when accelerating %power/10th of sec
-#define ACCELERATION_RATE = .0375 
+#define ACCELERATION_RATE .0375 
 // rate of deceleration/braking
-#define BRAKE_PERCENTAGE = -0.25 
+#define BRAKE_PERCENTAGE -0.25 
 // was 2000, for 2000ms. needs to be way faster
-#define timeIncrement = 25 
+#define timeIncrement 25 
 // DO NOT CHANGE THIS EVER!!!!!
-#define PWM_CONVERSION_FACTOR = 0.3543307087 
+#define PWM_CONVERSION_FACTOR 0.3543307087 
 
 class Drive {
 private:
@@ -31,11 +31,11 @@ public:
 };
 
 // All functions below this need to be moved to a parent Robot class or other name
-void updateLEDS(BOT_STATE status); //private
-void setRobotState(BOT_STATE state);
+// void updateLEDS(BOT_STATE status); //private
+// void setRobotState(BOT_STATE state);
 struct LEDS {
   uint32_t m_color;
-  BOT_STATE m_state;
+  int m_state;
 };
 
 enum BOT_STATE {
