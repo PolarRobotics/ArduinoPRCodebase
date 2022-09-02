@@ -5,8 +5,13 @@
 
 
 /* Drive constructor for the drive class
+    Intended to help consolidate code associated 
+    with diving the robots
+
     @todo add the ability to pass the servo objects in, this class 
     should store all variables and constants related to the drive code
+
+    @future manages driving of mechanum wheels as well as normal wheels 
 
     @future need to rewrite the servo class to work correctly with the sabertooth
 */
@@ -21,8 +26,6 @@ Drive::Drive() {
 
 // mtr: pass 0 for left and 1 for right
 float Drive::ramp(float requestedPower, byte mtr) {
-    // Serial.print("millis() ");
-    // Serial.print(millis());
     // Serial.print("  lastRampTime ");
     // Serial.print(lastRampTime[mtr]);
     // Serial.print("  requestedPower ");
@@ -85,49 +88,3 @@ float Drive::Convert2PWMVal(float rampPwr) {
     }
     return temp_PWMVal;
 }
-
-
-/*
-    class Drive: a class intended to help consolidate code associated 
-    with the two motors responsible for driving a robot
-
-*/
-
-// class Drive {
-//     private:
-//     uint8_t m_Lmotorpin, m_Rmotorpin;
-//     bool tankmode;
-//     uint8_t m_maxpower;
-//     //Servo m_L, m_R;
-
-//     public:
-//         Drive(uint8_t Lmotorpin, uint8_t RmotorPin);
-//         void forward();
-//         void reverse();
-//         void left();
-//         void right();
-// }
-
-// Drive::Drive(uint8_t Lmotorpin, uint8_t RmotorPin) {
-//     m_Lmotorpin = Lmotorpin, m_Rmotorpin = RmotorPin;
-//     m_L.attach(m_Lmotorpin);
-//     m_R.attach(m_Rmotorpin);
-// }
-
-// void Drive::forward() {
-
-// }
-    
-// void Drive::reverse() {
-
-// }
-
-// void Drive::left() {
-//     if (tankmode) {
-
-//     }
-// }
-
-// void Drive::right() {
-
-// }
