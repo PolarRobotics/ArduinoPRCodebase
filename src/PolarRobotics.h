@@ -4,20 +4,32 @@
 #define POLAR_ROBOTICS_H_
 
 #include <Arduino.h>
+#include <Servo.h>
 
-// the number of motors associated with driving, default: 2
-#define NUM_MOTORS 2 
+#ifndef NUM_MOTORS
+// the number of motors associated with driving, usually multiples of 2, default: 2
+#define NUM_MOTORS 2 // 4 for mechanum wheels
+#endif
+
+// #TODO move this to the robot parent class
+// #ifndef MECHANUM
+// // determine if the motors are in a mechanum configuration or the standard config. default: false
+// #define MECHANUM false
+// #endif
+
 // rate of change of power with respect to time when accelerating %power/10th of sec
 #define ACCELERATION_RATE .0375 
 // rate of deceleration/braking
 #define BRAKE_PERCENTAGE -0.25 
 // was 2000, for 2000ms. needs to be way faster
-#define timeIncrement 25 
+#define TIME_INCREMENT 25 
 // DO NOT CHANGE THIS EVER!!!!!
 #define PWM_CONVERSION_FACTOR 0.3543307087 
 
 class Drive {
 private:
+  uint8_t motorPins[NUM_MOTORS];
+  float motorPower[NUM_MOTORS];
   double CLOSE_ENOUGH; 
   unsigned long lastRampTime[NUM_MOTORS];
   float currentPower[NUM_MOTORS];
@@ -26,8 +38,11 @@ private:
 
 public:
   Drive();
-  float ramp(float requestedPower, byte mtr);
+  float getTurnScalar();
+  float ramp(float requestedPower, uint8_t mtr);
   float Convert2PWMVal(float rampPwr);
+  float getMotorPwr(uint8_t mtr);
+  void setMotors();
 };
 
 // All functions below this need to be moved to a parent Robot class or other name

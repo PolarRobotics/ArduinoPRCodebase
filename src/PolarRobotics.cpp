@@ -25,7 +25,7 @@ Drive::Drive() {
 }
 
 // mtr: pass 0 for left and 1 for right
-float Drive::ramp(float requestedPower, byte mtr) {
+float Drive::ramp(float requestedPower, uint8_t mtr) {
     // Serial.print("  lastRampTime ");
     // Serial.print(lastRampTime[mtr]);
     // Serial.print("  requestedPower ");
@@ -34,7 +34,7 @@ float Drive::ramp(float requestedPower, byte mtr) {
     // Serial.print(currentPower[mtr]);
     // Serial.print("  requestedPower - currentPower ");
     // Serial.println(requestedPower - currentPower[mtr], 10);
-    if (millis() - lastRampTime[mtr] >= timeIncrement) {
+    if (millis() - lastRampTime[mtr] >= TIME_INCREMENT) {
         if (abs(requestedPower) < CLOSE_ENOUGH) { // if the input is effectively zero
         // Experimental Braking Code
             if (abs(currentPower[mtr]) < 0.1) { // if the current power is very small just set it to zero
@@ -88,3 +88,16 @@ float Drive::Convert2PWMVal(float rampPwr) {
     }
     return temp_PWMVal;
 }
+
+/** float getMotorPwr returns the stored motor value in the class
+ * @param mtr the motor number to get, an array index, so 0 -> mtr 1, etc...
+ * @return returns the stored motor power for a given motor        
+*/
+float Drive::getMotorPwr(uint8_t mtr) {
+    return motorPower[mtr];
+}
+
+void Drive::setMotors() {
+    
+}
+
