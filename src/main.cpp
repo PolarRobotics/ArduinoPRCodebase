@@ -63,11 +63,11 @@ Servo getElevationMotor() { return ElevationMotor; }
  * * * * * * * * * * * * * * */
 
 // Drive V2 Constants
-const float STICK_DEADZONE = 8.0 / 127.0, // should be a value from (-1, 1) but close to zero
+const float  // should be a value from (-1, 1) but close to zero
              BOOST_PCT = 1.0, // this is 1.0, the maximum power possible to the motors.
              NORMAL_PCT = 0.4, // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
              SLOW_PCT = 0.15; // should be a value less than NORMAL_PCT, to slow down for precision maneuvering
-const double THRESHOLD = pow(10, -5);
+// const double THRESHOLD = pow(10, -5);
 
 // DO NOT CHANGE THIS CONSTANT UNLESS YOU KNOW WHAT YOU ARE DOING
 /*
@@ -296,22 +296,8 @@ void loop() {
   Usb.Task();
 
   if (usbConnected) {
-    stickForwardPower = (0 - (PS3.getAnalogHat(LeftHatY) / 127.0 - 1)); // +: forward, -: backward. needs to be negated so that forward is forward and v.v. subtracting 1 bumps into correct range
-    stickTurnPower = (PS3.getAnalogHat(RightHatX) / 127.0 - 1); // +: right turn, -: left turn. subtracting 1 bumps into correct range
-    // Serial.print("Stick_Forward: ");
-    // Serial.print(stickForwardPower);
-    // Serial.print("  Stick_Turn: ");
-    // Serial.print(stickTurnPower);
-
-    // stick deadzones
-    // set to zero (no input) if within the set deadzone
-    if (fabs(stickForwardPower) < STICK_DEADZONE) {
-      stickForwardPower = 0;
-    }
-    if (fabs(stickTurnPower) < STICK_DEADZONE) {
-      stickTurnPower = 0;
-    }
-
+    Robot.setStickPwr(PS3.getAnalogHat(LeftHatY), PS3.getAnalogHat(RightHatX));
+    
     // if the inputs are zero, just stop and don't do any unnecessary calculations
     // helps prevent divide by zero errors
     if (stickForwardPower == 0 && stickTurnPower == 0) {

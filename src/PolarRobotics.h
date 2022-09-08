@@ -26,19 +26,26 @@
 // DO NOT CHANGE THIS EVER!!!!!
 #define PWM_CONVERSION_FACTOR 0.3543307087 
 
+// Controller Defines
+#define STICK_DEADZONE 8.0 / 127.0
+#define THRESHOLD 0.00001
+
 class Drive {
 private:
+  float stickForwardPower, stickTurnPower;
+
+  // motor variables
   uint8_t motorPins[NUM_MOTORS];
   float motorPower[NUM_MOTORS];
-  double CLOSE_ENOUGH; 
   unsigned long lastRampTime[NUM_MOTORS];
   float currentPower[NUM_MOTORS];
   // float inputPower[NUM_MOTORS];
   // float rampedPower[NUM_MOTORS];
-
 public:
   Drive();
-  float getTurnScalar();
+  Drive(uint8_t &pinarr);
+  void setStickPwr(uint8_t leftY, uint8_t rightX);
+  void generateTurnScalar(uint8_t mtr1, uint8_t mtr2);
   float ramp(float requestedPower, uint8_t mtr);
   float Convert2PWMVal(float rampPwr);
   float getMotorPwr(uint8_t mtr);

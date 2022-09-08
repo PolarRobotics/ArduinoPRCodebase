@@ -16,12 +16,21 @@
     @future need to rewrite the servo class to work correctly with the sabertooth
 */
 Drive::Drive() {
-    // !!! DO NOT CHANGE THIS VALUE EVER
-    CLOSE_ENOUGH = pow(10, -5);
-    // lastRampTime = {0, 0};
-    // currentPower = {0, 0};
-    // inputPower = {0, 0};
-    // rampedPower = {0, 0};
+
+}
+
+void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
+    stickForwardPower = (0 - (leftY / 127.0 - 1)); // +: forward, -: backward. needs to be negated so that forward is forward and v.v. subtracting 1 bumps into correct range
+    stickTurnPower = (rightX / 127.0 - 1); // +: right turn, -: left turn. subtracting 1 bumps into correct range
+
+    // stick deadzones
+    // set to zero (no input) if within the set deadzone
+    if (fabs(stickForwardPower) < STICK_DEADZONE) {
+      stickForwardPower = 0;
+    }
+    if (fabs(stickTurnPower) < STICK_DEADZONE) {
+      stickTurnPower = 0;
+    }
 }
 
 // mtr: pass 0 for left and 1 for right
@@ -35,7 +44,7 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
     // Serial.print("  requestedPower - currentPower ");
     // Serial.println(requestedPower - currentPower[mtr], 10);
     if (millis() - lastRampTime[mtr] >= TIME_INCREMENT) {
-        if (abs(requestedPower) < CLOSE_ENOUGH) { // if the input is effectively zero
+        if (abs(requestedPower) < THRESHOLD) { // if the input is effectively zero
         // Experimental Braking Code
             if (abs(currentPower[mtr]) < 0.1) { // if the current power is very small just set it to zero
                 currentPower[mtr] = 0;
