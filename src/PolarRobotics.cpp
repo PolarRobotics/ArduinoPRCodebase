@@ -8,14 +8,14 @@
     Intended to help consolidate code associated 
     with diving the robots
 
-    @todo add the ability to pass the servo objects in, this class 
-    should store all variables and constants related to the drive code
+    @todo this class should store all variables and constants related to the drive code, 
+    other than controller stuff
 
     @future manages driving of mechanum wheels as well as normal wheels 
 
     @future need to rewrite the servo class to work correctly with the sabertooth
 */
-Drive::Drive() {
+Drive::Drive(int &pins) {
 
 }
 
@@ -107,6 +107,7 @@ float Drive::getMotorPwr(uint8_t mtr) {
 }
 
 void Drive::setMotors() {
-    
+    for (int i = 0; i < NUM_MOTORS; i++)
+
 }
 

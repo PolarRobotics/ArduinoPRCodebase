@@ -43,7 +43,6 @@ private:
   // float rampedPower[NUM_MOTORS];
 public:
   Drive();
-  Drive(uint8_t &pinarr);
   void setStickPwr(uint8_t leftY, uint8_t rightX);
   void generateTurnScalar(uint8_t mtr1, uint8_t mtr2);
   float ramp(float requestedPower, uint8_t mtr);
