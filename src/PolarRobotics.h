@@ -13,4 +13,13 @@ enum TYPE {
   kicker
 };
 
+enum BOT_STATE {
+  PAIRING,
+  CONNECTED,
+  DISCONNECTED,
+  OFFENSE,
+  DEFENSE,
+  TACKLED
+};
+
 #endif
