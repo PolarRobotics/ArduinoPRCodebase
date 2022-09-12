@@ -1,10 +1,13 @@
 
-#include "PolarRobotics.h"
+#include "Drive/Drive.h"
 #include <Arduino.h>
 #include <Servo.h> //Built in
 
 
 /* Drive constructor for the drive class
+    **NOTE: Only for two motors, this is a temporary solution, 
+    future iterations should use vecotor
+    
     Intended to help consolidate code associated 
     with diving the robots
 
@@ -12,11 +15,10 @@
     other than controller stuff
 
     @future manages driving of mechanum wheels as well as normal wheels 
-
-    @future need to rewrite the servo class to work correctly with the sabertooth
 */
-Drive::Drive(int &pins) {
-
+Drive::Drive(int leftmotorpin, int rightmotorpin) {
+    M1.attach(leftmotorpin);
+    M2.attach(rightmotorpin);
 }
 
 void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
@@ -71,6 +73,18 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
     return currentPower[mtr];
 }
 
+/*  generateTurnScalar takes the input stick power and scales the max turning power allowed with the forward power input
+
+
+*/
+
+void Drive::generateTurnScalar() {
+    if(stickForwardPower > 0 && stickTurnPower > 0) {
+        
+    } 
+
+
+}
 
 /* float Convert2PWMVal normalizes the signed power value from the ramp function to an unsigned value that the servo function can take
 
