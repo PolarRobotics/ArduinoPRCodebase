@@ -97,7 +97,11 @@ void Drive::generateMotionValues() {
         motorPower[0] = 0, motorPower[1] = 0;
 
     else {
-        
+        if(stickTurn > 0) { // turn left
+
+        } else if(stickTurn < 0) { // turn Right
+
+        }
 
     }
 
