@@ -90,28 +90,17 @@ void Drive::generateTurnScalar() {
 
 /* float Convert2PWMVal normalizes the signed power value from the ramp function to an unsigned value that the servo function can take
 
-    input: not entirely sure what the values are
-
-    output: for the 24v motors, the sabertooth takes values roughly between 45-120
-        where 45 would be the slowest speed in one direction and 90 would be the max speed in that same direction
-        values between 91 and 95 are in the dead zone, no motor spin.
-        values between 96 and 120 are the values for the other direction, 96 being the max and 120 being the min
-
+    input: a float containing a value with a range of [-1, 1]
+    
+    output: a float containing a value between 1000 to 2000
+    
     @param rampPwr : float the value to be normalized
     @return normalized PWM value
 */
 float Drive::Convert2PWMVal(float rampPwr) {
-    float temp_PWMVal;
-    if (rampPwr < 0) {
-        // temp_PWMVal = map(rampPwr, 0, 1, 96, 120);
-        temp_PWMVal = 90 + PWM_CONVERSION_FACTOR * 127 * rampPwr; // maybe we should use the map function instead of this???
-    } else if (rampPwr > 0 ) {
-        // temp_PWMVal = map(rampPwr, -1, 0, 40, 90);
-        temp_PWMVal = 100 + PWM_CONVERSION_FACTOR * 127 * rampPwr;
-    } else {
-        temp_PWMVal = 93;
-    }
-    return temp_PWMVal;
+//original variable's range = [-1,1]
+//converted variable's range = [1000, 2000]
+    return map(rampPwr, -1, 1, 1000, 2000);
 }
 
 /** float getMotorPwr returns the stored motor value in the class
