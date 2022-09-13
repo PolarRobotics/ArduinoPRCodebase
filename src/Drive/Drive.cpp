@@ -3,18 +3,20 @@
 #include <Arduino.h>
 #include <Servo.h> //Built in
 
+/*
+
+Class Drive:
+Implements robot drive functions.
+Base class for specialized drivebases.
+
+*/
+
 
 /* Drive constructor for the drive class
-    **NOTE: Only for two motors, this is a temporary solution, 
-    future iterations should use vecotor
-    
-    Intended to help consolidate code associated 
-    with diving the robots
+    Consolidates code associated with driving the robots
 
-    @todo this class should store all variables and constants related to the drive code, 
+    @todo this class should store all variables and constants related to the drive code,
     other than controller stuff
-
-    @future manages driving of mechanum wheels as well as normal wheels 
 */
 Drive::Drive(int leftmotorpin, int rightmotorpin) {
     M1.attach(leftmotorpin);
@@ -50,25 +52,25 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
         // Experimental Braking Code
             if (abs(currentPower[mtr]) < 0.1) { // if the current power is very small just set it to zero
                 currentPower[mtr] = 0;
-            } 
+            }
             else {
                 currentPower[mtr] *= BRAKE_PERCENTAGE;
             }
             //currentPower[mtr] = 0;
             lastRampTime[mtr] = millis();
-        } 
+        }
         else if (abs(requestedPower - currentPower[mtr]) < ACCELERATION_RATE) { // if the input is effectively at the current power
             return requestedPower;
-        } 
+        }
         else if (requestedPower > currentPower[mtr]) { // if we need to increase speed
             currentPower[mtr] = currentPower[mtr] + ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
-        } 
+        }
         else if (requestedPower < currentPower[mtr]) { // if we need to decrease speed
             currentPower[mtr] = currentPower[mtr] - ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
         }
-        
+
     }
     return currentPower[mtr];
 }
@@ -80,8 +82,8 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
 
 void Drive::generateTurnScalar() {
     if(stickForwardPower > 0 && stickTurnPower > 0) {
-        
-    } 
+
+    }
 
 
 }
@@ -103,7 +105,7 @@ float Drive::Convert2PWMVal(float rampPwr) {
 
 /** float getMotorPwr returns the stored motor value in the class
  * @param mtr the motor number to get, an array index, so 0 -> mtr 1, etc...
- * @return returns the stored motor power for a given motor        
+ * @return returns the stored motor power for a given motor
 */
 float Drive::getMotorPwr(uint8_t mtr) {
     return motorPower[mtr];
@@ -113,4 +115,3 @@ void Drive::setMotors() {
     for (int i = 0; i < NUM_MOTORS; i++)
 
 }
-

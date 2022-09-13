@@ -7,7 +7,6 @@
 #include <Sabertooth.h>
 #include <PS3BT.h>
 #include <SoftwareSerial.h> 
-#include <TaskScheduler.h>
 #include "PolarRobotics.h"
 
 Drive Robot;
@@ -18,45 +17,6 @@ Servo servoObj;   // Initialize a servo object for the connected servo
 
 Servo M1; //initialize Motor 1 as a servo
 Servo M2; //initialize Motor 2 as a servo
-
-Servo flywheels;
-Servo conveyor;
-
-SabertoothSimplified ST; // We'll name the Sabertooth object ST.
-
-// Pin and Servo for quarterback flywheels
-int rightFlywheelPin = 18;
-int leftFlywheelPin = 19;
-Servo rightFlywheelMotor;
-Servo leftFlywheelMotor;
-
-// Pin and Servo for quarterback firing mechanism
-int FirePin = 16;
-Servo FireMotor;
-
-// Pin and Servo for quarterback aiming mechanism
-int ElevationPin = 14;
-Servo ElevationMotor;
-
-// Tasks + Scheduler
-void t1Callback(); // First instance of function to be ran
-Scheduler taskRunner; // Name the scheduler
-Task task1(500, TASK_FOREVER, &t1Callback); // time in milliseconds, amount of iterations, function to run
-
-Servo getElevationMotor() { return ElevationMotor; }
-
-// For how to configure the Sabertooth, see the DIP Switch Wizard for
-//   http://www.dimensionengineering.com/datasheets/SabertoothDIPWizard/start.htm
-// Be sure to select Simplified Serial Mode for use with this library.
-// This sample uses a baud rate of 9600.
-//
-// Connections to make:
-//   Arduino TX->1  ->  Sabertooth S1
-//   Arduino GND    ->  Sabertooth 0V
-//   Arduino VIN    ->  Sabertooth 5V (OPTIONAL, if you want the Sabertooth to power the Arduino)
-//
-// If you want to use a pin other than TX->1, see the SoftwareSerial example.
-
 
 /* * * * * * * * * * * * * * *
  * Linemen/General Variables *
@@ -173,8 +133,6 @@ int servoAngle = 0;
 
 /* Setup Function
 
-   Define the function that will repeat on the task scheduler
-
    Start Serial Port
    Connect to Sabertooth
    Connect USB and make sure it stays connected
@@ -183,27 +141,12 @@ int servoAngle = 0;
    Print out any errors and continue to main loop function
 */
 
-void t1Callback() {
-  // your code to refresh here
-  if (PS3.PS3Connected) {
-    usbConnected = true;  // The USB receiver is still receiving information
-  } else {
-    usbConnected = false; // Makes sure the function doesn't run again
-    ST.motor(1, 0);       // Stops the Motors
-    ST.motor(2, 0);
-  }
-}
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  //SabertoothTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
 
   M1.attach(5);
   M2.attach(3);
-
-  flywheels.attach(4);
-  conveyor.attach(2);
   
   if (Usb.Init() == -1) {
     while (Usb.Init() == -1); //Wait until reconnect
@@ -240,14 +183,6 @@ void setup() {
 
     delay(1000);
 
-  } else if (robotType == quarterback) {     // Quarterback Setup
-    rightFlywheelMotor.attach(rightFlywheelPin);
-    leftFlywheelMotor.attach(leftFlywheelPin);
-    FireMotor.attach(FirePin);
-    ElevationMotor.attach(ElevationPin);
-    conveyor.write(30);
-    M1.write(93);
-    M2.write(93);
   }
 
   /* * * * * * * * * * * * * *
@@ -273,12 +208,6 @@ void setup() {
   Serial.println(robotType);
   Serial.print("age");
   Serial.println(robotAge);*/
-
-  // Enable the Tasks
-  taskRunner.init();
-  taskRunner.addTask(task1); // Add task to scheduler
-
-  task1.enable();
 }
 
 /*
@@ -291,7 +220,6 @@ void setup() {
 void loop() {
   // The main looping code, controls driving and any actions during a game
   // put your main code here, to run repeatedly:
-  taskRunner.execute();
 
   Usb.Task();
 
