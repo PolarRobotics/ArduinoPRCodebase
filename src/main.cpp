@@ -9,7 +9,7 @@
 #include <SoftwareSerial.h> 
 #include "PolarRobotics.h"
 
-Drive Robot;
+// Drive Robot;
 USB Usb;            // There is a USB port
 BTD Btd(&Usb);      // The Location of the Bluetooth port
 PS3BT PS3(&Btd);    // There is a PS3 Controller at the location of the Bluetooth port
@@ -27,7 +27,7 @@ const float  // should be a value from (-1, 1) but close to zero
              BOOST_PCT = 1.0, // this is 1.0, the maximum power possible to the motors.
              NORMAL_PCT = 0.4, // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
              SLOW_PCT = 0.15; // should be a value less than NORMAL_PCT, to slow down for precision maneuvering
-// const double THRESHOLD = pow(10, -5);
+const double THRESHOLD = pow(10, -5);
 
 // DO NOT CHANGE THIS CONSTANT UNLESS YOU KNOW WHAT YOU ARE DOING
 /*

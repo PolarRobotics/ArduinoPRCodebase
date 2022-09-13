@@ -112,6 +112,7 @@ float Drive::getMotorPwr(uint8_t mtr) {
 }
 
 void Drive::setMotors() {
-    for (int i = 0; i < NUM_MOTORS; i++)
-
+    for (int i = 0; i < NUM_MOTORS; i++) {
+        
+    }
 }
