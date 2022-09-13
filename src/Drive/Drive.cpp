@@ -3,17 +3,20 @@
 #include <Arduino.h>
 #include <Servo.h> //Built in
 
+/*
+
+Class Drive: 
+Implements robot drive functions.
+Base class for specialized drivebases.
+
+*/
+
 
 /* Drive constructor for the drive class
-    Intended to help consolidate code associated 
-    with diving the robots
+    Consolidates code associated with driving the robots
 
     @todo this class should store all variables and constants related to the drive code, 
     other than controller stuff
-
-    @future manages driving of mechanum wheels as well as normal wheels 
-
-    @future need to rewrite the servo class to work correctly with the sabertooth
 */
 Drive::Drive(int &pins) {
 

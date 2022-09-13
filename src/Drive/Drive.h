@@ -51,28 +51,12 @@ public:
   void setMotors();
 };
 
-// All functions below this need to be moved to a parent Robot class or other name
-// void updateLEDS(BOT_STATE status); //private
-// void setRobotState(BOT_STATE state);
-struct LEDS {
-  uint32_t m_color;
-  int m_state;
-};
-
 // Robot Age Enum
 // 0 for old robot, 1 for new robot
 // remove later - deprecated
 enum AGE {
   OLD,
   NEW
-};
-
-// QB Aim Enum
-// Elevation enum and variables for linear actuators
-enum ELEVATION {
-  low,
-  middle,
-  high
 };
 
 #endif /* DRIVE_H */
