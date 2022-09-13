@@ -27,28 +27,30 @@
 // #define PWM_CONVERSION_FACTOR 0.3543307087 
 
 // Controller Defines
+#define OFFSET 0.2 // the max allowable turning when the bot is traveling at full speed 
 #define STICK_DEADZONE 8.0 / 127.0
 #define THRESHOLD 0.00001
 
 class Drive {
 private:
-  float stickForward, stickTurn;
+  float stickForwardRev, stickTurn;
 
   Servo M1, M2; //temporary solution, use vector for future
   //vector<Servo> Motors;
   // motor variables
   uint8_t motorPins[NUM_MOTORS];
-  float motorPower[NUM_MOTORS];
-  float lastRampPower[NUM_MOTORS];
   unsigned long lastRampTime[NUM_MOTORS];
+  float motorPower[NUM_MOTORS];
   float currentPower[NUM_MOTORS];
+  float lastRampPower[NUM_MOTORS];
   // float inputPower[NUM_MOTORS];
   // float rampedPower[NUM_MOTORS];
+  float calcTurningMotorValue(float sticktrn, float prevPwr);
+
 public:
   Drive(int leftmotorpin, int rightmotorpin); //constructor for two motors
   void setStickPwr(uint8_t leftY, uint8_t rightX);
   void generateMotionValues();
-  float determineMotorValues();
   float ramp(float requestedPower, uint8_t mtr);
   float Convert2PWMVal(float rampPwr);
   float getMotorPwr(uint8_t mtr);
