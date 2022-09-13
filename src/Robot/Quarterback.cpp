@@ -1,4 +1,6 @@
 #include "PolarRobotics.h"
+#include <Arduino.h>
+#include <Servo.h>
 
 /*
        ___    _   _      _      ____    _____   _____   ____    ____       _       ____   _  __   ____         ___
@@ -8,11 +10,50 @@
       \___\_\ \___/  /_/   \_\ |_| \_\   |_|   |_____| |_| \_\ |____/  /_/   \_\  \____| |_|\_\  |_____| (_)  \___/
   */
 
+
+// QB Aim Enum
+// Elevation enum and variables for linear actuators
+enum ELEVATION {
+  low,
+  middle,
+  high
+};
+
+// Pin and Servo for quarterback flywheels
+int rightFlywheelPin = 18;
+int leftFlywheelPin = 19;
+Servo rightFlywheelMotor;
+Servo leftFlywheelMotor;
+
+// Pin and Servo for quarterback firing mechanism
+int FirePin = 16;
+Servo FireMotor;
+
+// Pin and Servo for quarterback aiming mechanism
+int ElevationPin = 14;
+Servo ElevationMotor;
+
+Servo flywheels;
+Servo conveyor;
+
+Servo getElevationMotor() { return ElevationMotor; }
+
+// this function contains everything related to QB from main.cpp
+void setup() {
+  flywheels.attach(4);
+  conveyor.attach(2);
+  rightFlywheelMotor.attach(rightFlywheelPin);
+  leftFlywheelMotor.attach(leftFlywheelPin);
+  FireMotor.attach(FirePin);
+  ElevationMotor.attach(ElevationPin);
+  conveyor.write(30);
+}
+
 // /* * * * * * * * * * * * * * *
 //  * Quarterback Internal Code *
 //  * * * * * * * * * * * * * * */
 
-Servo Speed Consts
+// Servo Speed Consts
 const int SERVO_SPEED_UP = 175; // this should be between 90 and 180.
 const int SERVO_SPEED_STOP = 90; // this should always be 90.
 const int SERVO_SPEED_DOWN = 5; // this should be between 0 and 90.
