@@ -1,11 +1,11 @@
 
-#include "PolarRobotics.h"
+#include "Drive/Drive.h"
 #include <Arduino.h>
 #include <Servo.h> //Built in
 
 /*
 
-Class Drive: 
+Class Drive:
 Implements robot drive functions.
 Base class for specialized drivebases.
 
@@ -15,11 +15,12 @@ Base class for specialized drivebases.
 /* Drive constructor for the drive class
     Consolidates code associated with driving the robots
 
-    @todo this class should store all variables and constants related to the drive code, 
+    @todo this class should store all variables and constants related to the drive code,
     other than controller stuff
 */
-Drive::Drive(int &pins) {
-
+Drive::Drive(int leftmotorpin, int rightmotorpin) {
+    M1.attach(leftmotorpin);
+    M2.attach(rightmotorpin);
 }
 
 void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
@@ -51,39 +52,51 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
         // Experimental Braking Code
             if (abs(currentPower[mtr]) < 0.1) { // if the current power is very small just set it to zero
                 currentPower[mtr] = 0;
-            } 
+            }
             else {
                 currentPower[mtr] *= BRAKE_PERCENTAGE;
             }
             //currentPower[mtr] = 0;
             lastRampTime[mtr] = millis();
-        } 
+        }
         else if (abs(requestedPower - currentPower[mtr]) < ACCELERATION_RATE) { // if the input is effectively at the current power
             return requestedPower;
-        } 
+        }
         else if (requestedPower > currentPower[mtr]) { // if we need to increase speed
             currentPower[mtr] = currentPower[mtr] + ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
-        } 
+        }
         else if (requestedPower < currentPower[mtr]) { // if we need to decrease speed
             currentPower[mtr] = currentPower[mtr] - ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
         }
-        
+
     }
     return currentPower[mtr];
 }
 
+/*  generateTurnScalar takes the input stick power and scales the max turning power allowed with the forward power input
+
+
+*/
+
+void Drive::generateTurnScalar() {
+    if(stickForwardPower > 0 && stickTurnPower > 0) {
+
+    }
+
+
+}
 
 /* float Convert2PWMVal normalizes the signed power value from the ramp function to an unsigned value that the servo function can take
 
     input: not entirely sure what the values are
-    
+
     output: for the 24v motors, the sabertooth takes values roughly between 45-120
         where 45 would be the slowest speed in one direction and 90 would be the max speed in that same direction
         values between 91 and 95 are in the dead zone, no motor spin.
         values between 96 and 120 are the values for the other direction, 96 being the max and 120 being the min
-    
+
     @param rampPwr : float the value to be normalized
     @return normalized PWM value
 */
@@ -103,7 +116,7 @@ float Drive::Convert2PWMVal(float rampPwr) {
 
 /** float getMotorPwr returns the stored motor value in the class
  * @param mtr the motor number to get, an array index, so 0 -> mtr 1, etc...
- * @return returns the stored motor power for a given motor        
+ * @return returns the stored motor power for a given motor
 */
 float Drive::getMotorPwr(uint8_t mtr) {
     return motorPower[mtr];
@@ -113,4 +126,3 @@ void Drive::setMotors() {
     for (int i = 0; i < NUM_MOTORS; i++)
 
 }
-
