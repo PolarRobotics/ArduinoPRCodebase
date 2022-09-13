@@ -24,7 +24,7 @@
 // was 2000, for 2000ms. needs to be way faster
 #define TIME_INCREMENT 25 
 // DO NOT CHANGE THIS EVER!!!!!
-#define PWM_CONVERSION_FACTOR 0.3543307087 
+// #define PWM_CONVERSION_FACTOR 0.3543307087 
 
 // Controller Defines
 #define STICK_DEADZONE 8.0 / 127.0
@@ -32,13 +32,14 @@
 
 class Drive {
 private:
-  float stickForwardPower, stickTurnPower;
+  float stickForward, stickTurn;
 
   Servo M1, M2; //temporary solution, use vector for future
   //vector<Servo> Motors;
   // motor variables
   uint8_t motorPins[NUM_MOTORS];
   float motorPower[NUM_MOTORS];
+  float lastRampPower[NUM_MOTORS];
   unsigned long lastRampTime[NUM_MOTORS];
   float currentPower[NUM_MOTORS];
   // float inputPower[NUM_MOTORS];
@@ -46,7 +47,8 @@ private:
 public:
   Drive(int leftmotorpin, int rightmotorpin); //constructor for two motors
   void setStickPwr(uint8_t leftY, uint8_t rightX);
-  void generateTurnScalar();
+  void generateMotionValues();
+  float determineMotorValues();
   float ramp(float requestedPower, uint8_t mtr);
   float Convert2PWMVal(float rampPwr);
   float getMotorPwr(uint8_t mtr);

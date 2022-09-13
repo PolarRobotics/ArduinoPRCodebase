@@ -24,16 +24,16 @@ Drive::Drive(int leftmotorpin, int rightmotorpin) {
 }
 
 void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
-    stickForwardPower = (0 - (leftY / 127.0 - 1)); // +: forward, -: backward. needs to be negated so that forward is forward and v.v. subtracting 1 bumps into correct range
-    stickTurnPower = (rightX / 127.0 - 1); // +: right turn, -: left turn. subtracting 1 bumps into correct range
+    stickForward = (0 - (leftY / 127.0 - 1)); // +: forward, -: backward. needs to be negated so that forward is forward and v.v. subtracting 1 bumps into correct range
+    stickTurn = (rightX / 127.0 - 1); // +: right turn, -: left turn. subtracting 1 bumps into correct range
 
     // stick deadzones
     // set to zero (no input) if within the set deadzone
-    if (fabs(stickForwardPower) < STICK_DEADZONE) {
-      stickForwardPower = 0;
+    if (fabs(stickForward) < STICK_DEADZONE) {
+      stickForward = 0;
     }
-    if (fabs(stickTurnPower) < STICK_DEADZONE) {
-      stickTurnPower = 0;
+    if (fabs(stickTurn) < STICK_DEADZONE) {
+      stickTurn = 0;
     }
 }
 
@@ -70,7 +70,6 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
             currentPower[mtr] = currentPower[mtr] - ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
         }
-
     }
     return currentPower[mtr];
 }
@@ -79,13 +78,33 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
 
 
 */
+void Drive::generateMotionValues() {
+    bool fwdPositive = (stickForward > 0);
+    bool trnPositive = (stickTurn > 0);
+    if(stickForward <= 1 && stickForward > 0 && stickTurn == 0) // move both motors forward if the left stick is all the way 
+        motorPower[0] = 1, motorPower[1] = 1;
 
-void Drive::generateTurnScalar() {
-    if(stickForwardPower > 0 && stickTurnPower > 0) {
+    else if(stickForward >= -1 && stickForward < 0 && stickTurn == 0)
+        motorPower[0] = -1, motorPower[1] = -1;
+
+    else if(stickForward == 0 && stickTurn <= 1 && stickTurn > 0)
+        motorPower[0] = 1, motorPower[1] = -1;
+
+    else if(stickForward == 0 && stickTurn >= -1 && stickTurn < 0)
+        motorPower[0] = -1, motorPower[1] = 1;
+
+    else if(stickForward == 0 && stickTurn == 0) // dont move the motors if there is no input
+        motorPower[0] = 0, motorPower[1] = 0;
+
+    else {
+        
 
     }
 
+}
 
+float Drive::determineMotorValues() {
+    
 }
 
 /* float Convert2PWMVal normalizes the signed power value from the ramp function to an unsigned value that the servo function can take
@@ -115,4 +134,18 @@ void Drive::update() {
     for (int i = 0; i < NUM_MOTORS; i++) {
 
     }
+    
+    generateTurnScalar()
+    
+    motorPower[0] = 
+    motorPower[1] =
+
+    motorPower[0] = ramp()
+    motorPower[1] = ramp()
+
+    lastRampPower[0] = motorPower[0];
+    lastRampPower[1] = motorPower[1];
+
+    M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
+    M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 }
