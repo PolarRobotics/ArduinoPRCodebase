@@ -50,7 +50,7 @@ public:
   float ramp(float requestedPower, uint8_t mtr);
   float Convert2PWMVal(float rampPwr);
   float getMotorPwr(uint8_t mtr);
-  void setMotors();
+  void update();
 };
 
 // Robot Age Enum

@@ -1,3 +1,4 @@
+
 /*
        ____   _____   _   _   _____   _____   ____
       / ___| | ____| | \ | | |_   _| | ____| |  _ \
@@ -79,7 +80,6 @@ int Center::down(Status requestedStatus) {
 
 // original code
 //Raise the Center Arm
-/*
     if (CenterArmMoveStatus == "" && (PS3.getButtonPress(UP)) && CenterArmStatus != 1) {
       //The user wants to raise the Center arm up
       CenterArmMoveStatus = "High";
@@ -102,4 +102,3 @@ int Center::down(Status requestedStatus) {
       centerUp(ST, CenterArmMoveStatus);
       CenterArmMoveStatus = "";
     }
-*/
