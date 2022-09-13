@@ -34,6 +34,8 @@ class Drive {
 private:
   float stickForwardPower, stickTurnPower;
 
+  Servo M1, M2; //temporary solution, use vector for future
+  //vector<Servo> Motors;
   // motor variables
   uint8_t motorPins[NUM_MOTORS];
   float motorPower[NUM_MOTORS];
@@ -42,9 +44,9 @@ private:
   // float inputPower[NUM_MOTORS];
   // float rampedPower[NUM_MOTORS];
 public:
-  Drive();
+  Drive(int leftmotorpin, int rightmotorpin); //constructor for two motors
   void setStickPwr(uint8_t leftY, uint8_t rightX);
-  void generateTurnScalar(uint8_t mtr1, uint8_t mtr2);
+  void generateTurnScalar();
   float ramp(float requestedPower, uint8_t mtr);
   float Convert2PWMVal(float rampPwr);
   float getMotorPwr(uint8_t mtr);
