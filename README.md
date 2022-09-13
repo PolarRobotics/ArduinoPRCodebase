@@ -2,6 +2,7 @@
 Primary Polar Robotics Codebase
 
 ## Filestructure and Inheritance
+```
 src/
 ├ Drive/
 │ ├ Drive.h             Header file for Drive.cpp
@@ -23,3 +24,4 @@ src/
 ├ Lights.cpp            Controls robot LEDs
 ├ main.cpp              Contains code that initializes the Robot and Drivebase.
 └ PolarRobotics.h       Contains globally relevant declarations and enums.
+```
