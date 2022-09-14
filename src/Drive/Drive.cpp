@@ -33,11 +33,21 @@ void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
     }
 }
 
+/**
+ * @brief setBSN sets the internal variable to the requested percent power, this is what the motor power gets multiplied by, 
+ * this is where the boost, slow and normal scalars get passed in 
+ * @param powerMultiplier the input power multiplier, between 0 and 1
+*/
+void Drive::setBSN(float powerMultiplier) {
+    // set the scalar to zero if the requested value is greater than 1, this is not entirely necessary, but is a safety
+    BSNscalar = (powerMultiplier > 1) ? 0 : powerMultiplier;
+}
 
-/**  generateTurnScalar takes the input stick power and scales the max turning power allowed with the forward power input
- *    @authors Grant Brautigam, Rhys Davies
- *    Created: 9-12-2022
- *
+
+/** 
+ * generateTurnScalar takes the input stick power and scales the max turning power allowed with the forward power input
+ * @authors Grant Brautigam, Rhys Davies
+ * Created: 9-12-2022
 */
 void Drive::generateMotionValues() {
     // bool fwdPositive = (stickForwardRev > 0);
@@ -49,35 +59,35 @@ void Drive::generateMotionValues() {
 
     // move both motors forward if the left stick is between 0 and 1 AND the right stick is 0
     else if(stickForwardRev <= 1 && stickForwardRev > 0 && stickTurn == 0) 
-        motorPower[0] = 1, motorPower[1] = 1;
+        motorPower[0] = BSNscalar, motorPower[1] = BSNscalar;
     
     // move both motors in reverse if the left stick is between -1 and 0 AND the right stick is 0
     else if(stickForwardRev >= -1 && stickForwardRev < 0 && stickTurn == 0)
-        motorPower[0] = -1, motorPower[1] = -1;
+        motorPower[0] = -BSNscalar, motorPower[1] = -BSNscalar;
 
     // tankmode turn right if the left stick is 0 AND the right stick is between 0 and 1
     else if(stickForwardRev == 0 && stickTurn <= 1 && stickTurn > 0)
-        motorPower[0] = 1, motorPower[1] = -1;
+        motorPower[0] = BSNscalar, motorPower[1] = -BSNscalar;
 
     // tankmode turn left if the left stick is 0 AND the right stick is between -1 and 0
     else if(stickForwardRev == 0 && stickTurn >= -1 && stickTurn < 0)
-        motorPower[0] = -1, motorPower[1] = 1;
+        motorPower[0] = -BSNscalar, motorPower[1] = BSNscalar;
 
     /*
     if the sticks are not in any of the edge cases tested for above (when both sticks are not 0),
-    a value must be calculated to determine how much to turn the motor that is doing the turning.
+    a value must be calculated to determine how to scale the motor that is doing the turning.
     i.e.: if the user moves the left stick all the way forward (stickFwdRev = 1), and they are attempting
     to turn right. The left motor should get set to 1 and the right motor should get set to 
-    some value less than 1
+    some value less than 1, this value is determined by the function calcTurningMotorValue
     */
     else {
         if(trnPositive) { // turn Right
             //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
-            motorPower[0] = stickForwardRev;// set the left motor
-            motorPower[1] = copysign(calcTurningMotorValue(abs(stickTurn), lastRampPower[1]), stickForwardRev); // set the right motor
+            motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
+            motorPower[1] = copysign(calcTurningMotorValue(abs(stickTurn), lastRampPower[0]), stickForwardRev); // set the right motor
         } else if(!trnPositive) { // turn Left
-            motorPower[0] = copysign(calcTurningMotorValue(abs(stickTurn), lastRampPower[0]), stickForwardRev); // set the left motor
-            motorPower[1] = stickForwardRev; // set the right motor
+            motorPower[0] = copysign(calcTurningMotorValue(abs(stickTurn), lastRampPower[1]), stickForwardRev); // set the left motor
+            motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
         }
     }
 }
@@ -97,7 +107,7 @@ void Drive::generateMotionValues() {
  * @return float - the value to get set to the turning motor (the result of the function mention above)
  */
 float Drive::calcTurningMotorValue(float sticktrn, float prevpwr) {
-    return pow(sticktrn * (1 - OFFSET) * prevpwr, 2) + (1-stickTurn) * prevpwr;
+    return sticktrn * (1 - OFFSET) * pow(prevpwr, 2) + (1-stickTurn) * prevpwr;
 }
 
 
@@ -145,12 +155,13 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
 }
 
 
-/** float Convert2PWMVal normalizes the signed power value from the ramp function to an unsigned value that the servo function can take
- *    @authors Grant Brautigam, Alex Brown  
- *   Updated: 9-13-2022
+/** 
+ * float Convert2PWMVal normalizes the signed power value from the ramp function to an unsigned value that the servo function can take
+ * @authors Grant Brautigam, Alex Brown  
+ * Updated: 9-13-2022
  *
- *    @param rampPwr the value to be normalized. Hopefully a value between [-1, 1]
- *    @return normalized PWM value (between 1000 to 2000)
+ * @param rampPwr the value to be normalized. Hopefully a value between [-1, 1]
+ * @return normalized PWM value (between 1000 to 2000)
 */
 float Drive::Convert2PWMVal(float rampPwr) {
     // Original Function: to be removed later.
@@ -181,18 +192,20 @@ float Drive::getMotorPwr(uint8_t mtr) {
     return motorPower[mtr];
 }
 
-void Drive::update() {
-    for (int i = 0; i < NUM_MOTORS; i++) {
-
-    }
-    
-    generateTurnScalar()
-    
+/**
+ * update updates the motors after calling all the functions to generate 
+ * turning and scaling motor values, the intention of this is so the 
+ * programmer doesnt have to call all the functions, this just handles it,
+ * reducing clutter in the main file
+ * @author Rhys Davies
+ * Created: 9-12-2022
+*/
+void Drive::update() {    
     motorPower[0] = 
     motorPower[1] =
 
-    motorPower[0] = ramp()
-    motorPower[1] = ramp()
+    motorPower[0] = ramp();
+    motorPower[1] = ramp();
 
     lastRampPower[0] = motorPower[0];
     lastRampPower[1] = motorPower[1];
