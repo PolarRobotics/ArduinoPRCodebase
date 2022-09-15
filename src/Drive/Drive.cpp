@@ -3,7 +3,6 @@
 #include <Arduino.h>
 #include <Servo.h> //Built in
 
-
 /** Drive constructor for the drive class
  *  Implements robot drive functions.
  *   Base class for specialized drivebases.
@@ -18,7 +17,15 @@ Drive::Drive(int leftmotorpin, int rightmotorpin) {
     M2.attach(rightmotorpin);
 }
 
-
+/**
+ * setStickPwr takes the stick values passed in and normalizes them to values between -1 and 1
+ * and sets this value to the private variables stickFwdRev and stickTurn
+ * @author Rhys Davies
+ * Created: 9-12-2022
+ *   
+ * @param leftY the forward backward value from the left stick (0 to 255)
+ * @param rightX the left right value from the right stick (0 to 255)
+*/
 void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
     stickForwardRev = (0 - (leftY / 127.0 - 1)); // +: forward, -: backward. needs to be negated so that forward is forward and v.v. subtracting 1 bumps into correct range
     stickTurn = (rightX / 127.0 - 1); // +: right turn, -: left turn. subtracting 1 bumps into correct range
@@ -36,11 +43,25 @@ void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
 /**
  * @brief setBSN sets the internal variable to the requested percent power, this is what the motor power gets multiplied by, 
  * this is where the boost, slow and normal scalars get passed in 
- * @param powerMultiplier the input power multiplier, between 0 and 1
+ * @param spd input speed choice, boost slow or normal
 */
-void Drive::setBSN(float powerMultiplier) {
+void Drive::setBSN(SPEED bsn) {
     // set the scalar to zero if the requested value is greater than 1, this is not entirely necessary, but is a safety
-    BSNscalar = (powerMultiplier > 1) ? 0 : powerMultiplier;
+    // BSNscalar = (powerMultiplier > 1) ? 0 : powerMultiplier;
+    switch (bsn) {
+        case boost: {
+            BSNscalar = BOOST_PCT;
+            break;
+        }
+        case normal: {
+            BSNscalar = NORMAL_PCT; 
+            break;
+        }
+        case slow: {
+            BSNscalar = SLOW_PCT;
+            break;
+        }
+    }
 }
 
 
@@ -192,6 +213,12 @@ float Drive::getMotorPwr(uint8_t mtr) {
     return motorPower[mtr];
 }
 
+void Drive::emergencyStop() {
+    M1.writeMicroseconds(1500);
+    M2.writeMicroseconds(1500);
+    // while(1);
+}
+
 /**
  * update updates the motors after calling all the functions to generate 
  * turning and scaling motor values, the intention of this is so the 
@@ -201,15 +228,49 @@ float Drive::getMotorPwr(uint8_t mtr) {
  * Created: 9-12-2022
 */
 void Drive::update() {    
-    motorPower[0] = 
-    motorPower[1] =
+    // DO NOT CALL THIS FUNCTION UNTIL setStickPwr and setBSN have been called before update
+    
+    // Generate turning motion
+    generateMotionValues();
 
-    motorPower[0] = ramp();
-    motorPower[1] = ramp();
+    // get the ramp value
+    motorPower[0] = ramp(motorPower[0], 0);
+    motorPower[1] = ramp(motorPower[1], 0);
 
+
+    // Set the ramp value to a function, needed for generateMotionValues
     lastRampPower[0] = motorPower[0];
     lastRampPower[1] = motorPower[1];
 
+    Serial.print("Left Motor: ");
+    Serial.print(motorPower[0]);
+    Serial.print("Right: ");
+    Serial.println(motorPower[1]);
+    // Write to the motors
     M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
     M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 }
+
+//Old functions
+
+// if the magnitude of either target power exceeds 1, calculate the difference between it and 1.
+//   if ((fabs(targetPowerLeft) - 1) > THRESHOLD) {
+//     powerDelta = 1 - targetPowerLeft;
+//   } else if ((fabs(targetPowerRight) - 1) > THRESHOLD) {
+//     powerDelta = 1 - targetPowerRight;
+//   } else {
+//     powerDelta = 0;
+//   }
+
+
+// this section keeps the ratio between powers the same when scaling down
+//   if (stickTurnPower > (0 + THRESHOLD)) {
+//     scaledBoostedPowerLeft = targetPowerLeft + (fwdSign * powerDelta);
+//     scaledBoostedPowerRight = targetPowerRight + (fwdSign * powerDelta * (targetPowerRight / targetPowerLeft));
+//   } else if (stickTurnPower < (0 - THRESHOLD)) {
+//     scaledBoostedPowerLeft = targetPowerLeft + (fwdSign * powerDelta * (targetPowerLeft / targetPowerRight));
+//     scaledBoostedPowerRight = targetPowerRight + (fwdSign * powerDelta);
+//   } else {
+//     scaledBoostedPowerLeft = targetPowerLeft;
+//     scaledBoostedPowerRight = targetPowerRight;
+//   }
