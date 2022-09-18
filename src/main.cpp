@@ -13,7 +13,7 @@ USB Usb;            // There is a USB port
 BTD Btd(&Usb);      // The Location of the Bluetooth port
 PS5BT PS5(&Btd);
 
-Drive Robot(3, 5);
+Drive DriveMotors(3, 5);
 
 // Works with lastChecked to make sure the controller is still connected (Just an added safety feature)
 bool usbConnected = false;
@@ -51,20 +51,20 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   if (usbConnected) {
-    Robot.setStickPwr(PS5.getAnalogHat(LeftHatY), PS5.getAnalogHat(RightHatX));
+    DriveMotors.setStickPwr(PS5.getAnalogHat(LeftHatY), PS5.getAnalogHat(RightHatX));
     
     // determine BSN percentage (boost, slow, or normal)
     if (PS5.getButtonPress(R1)) {
-      Robot.setBSN(Drive::boost);
+      DriveMotors.setBSN(Drive::boost);
     } else if (PS5.getButtonPress(L1)) {
-      Robot.setBSN(Drive::slow);
+      DriveMotors.setBSN(Drive::slow);
     } else {
-      Robot.setBSN(Drive::normal);
+      DriveMotors.setBSN(Drive::normal);
     }
 
-    Robot.update();
+    DriveMotors.update();
   } else {
-    Robot.emergencyStop();
+    DriveMotors.emergencyStop();
   }
   // If the button is pressed and it is not debounced then go into statement
   if (digitalRead(buttonPin) == 1 && !debounce) {

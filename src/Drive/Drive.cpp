@@ -3,14 +3,15 @@
 #include <Arduino.h>
 #include <Servo.h> //Built in
 
-/** Drive constructor for the drive class
- *  Implements robot drive functions.
- *   Base class for specialized drivebases.
+/** 
+ * Drive constructor for the drive class
+ * Implements robot drive functions.
+ * Base class for specialized drivebases.
  *
- *    Consolidates code associated with driving the robots
+ * Consolidates code associated with driving the robots
  *
- *    @todo this class should store all variables and constants related to the drive code,
- *    other than controller stuff
+ * @todo this class should store all variables and constants related to the drive code,
+ * other than controller stuff
 */
 Drive::Drive(int leftmotorpin, int rightmotorpin) {
     M1.attach(leftmotorpin);
@@ -105,9 +106,9 @@ void Drive::generateMotionValues() {
         if(trnPositive) { // turn Right
             //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
             motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
-            motorPower[1] = copysign(calcTurningMotorValue(abs(stickTurn), lastRampPower[0]), stickForwardRev); // set the right motor
+            motorPower[1] = calcTurningMotorValue(stickTurn, lastRampPower[0]); // set the right motor
         } else if(!trnPositive) { // turn Left
-            motorPower[0] = copysign(calcTurningMotorValue(abs(stickTurn), lastRampPower[1]), stickForwardRev); // set the left motor
+            motorPower[0] = calcTurningMotorValue(stickTurn, lastRampPower[1]); // set the left motor
             motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
         }
     }
@@ -115,7 +116,7 @@ void Drive::generateMotionValues() {
 
 
 /**
- * @brief getTurningMotorValue generates a value to be set to the turning motor, the motor that corresponds to the direction of travel,
+ * @brief getTurningMotorValue generates a value to be set to the turning motor, the motor that corresponds to the direction of travel
  * @authors Grant Brautigam, Rhys Davies
  * Created: 9-12-2022
  * 
@@ -128,7 +129,8 @@ void Drive::generateMotionValues() {
  * @return float - the value to get set to the turning motor (the result of the function mention above)
  */
 float Drive::calcTurningMotorValue(float sticktrn, float prevpwr) {
-    return sticktrn * (1 - OFFSET) * pow(prevpwr, 2) + (1-stickTurn) * prevpwr;
+    float temp = abs(sticktrn * (1 - OFFSET) * pow(prevpwr, 2) + (1-stickTurn) * prevpwr);
+    return copysign(temp, sticktrn);
 }
 
 
@@ -177,7 +179,7 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
 
 
 /** 
- * float Convert2PWMVal normalizes the signed power value from the ramp function to an unsigned value that the servo function can take
+ * normalizes the signed power value from the ramp function to an unsigned value that the servo function can take
  * @authors Grant Brautigam, Alex Brown  
  * Updated: 9-13-2022
  *
@@ -205,7 +207,8 @@ float Drive::Convert2PWMVal(float rampPwr) {
     return map(rampPwr, -1, 1, 1000, 2000);
 }
 
-/** float getMotorPwr returns the stored motor value in the class
+/**
+ * returns the stored motor value in the class
  * @param mtr the motor number to get, an array index, so 0 -> mtr 1, etc...
  * @return returns the stored motor power for a given motor
 */
@@ -220,7 +223,7 @@ void Drive::emergencyStop() {
 }
 
 /**
- * update updates the motors after calling all the functions to generate 
+ * updates the motors after calling all the functions to generate 
  * turning and scaling motor values, the intention of this is so the 
  * programmer doesnt have to call all the functions, this just handles it,
  * reducing clutter in the main file

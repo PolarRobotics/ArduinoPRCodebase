@@ -28,7 +28,7 @@
 
 // Controller Defines
 #define OFFSET 0.2 // the max allowable turning when the bot is traveling at full speed 
-#define STICK_DEADZONE 8.0 / 127.0
+#define STICK_DEADZONE 0.0629921259843 // 8.0 / 127.0
 #define THRESHOLD 0.00001
 
 // this is 1.0, the maximum power possible to the motors.
@@ -43,7 +43,6 @@ private:
   float stickForwardRev, stickTurn;
   float BSNscalar;
   
-
   Servo M1, M2; //temporary solution, use vector for future
   // vector<Servo> Motors;
   // motor variables
