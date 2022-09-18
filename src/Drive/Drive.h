@@ -32,31 +32,32 @@
 #define THRESHOLD 0.00001
 
 class Drive {
-private:
-  float stickForwardRev, stickTurn;
-  float BSNscalar;
+  private:
+    float stickForwardRev, stickTurn;
+    float BSNscalar;
 
-  Servo M1, M2; //temporary solution, use vector for future
-  //vector<Servo> Motors;
-  // motor variables
-  uint8_t motorPins[NUM_MOTORS];
-  unsigned long lastRampTime[NUM_MOTORS];
-  float motorPower[NUM_MOTORS];
-  float currentPower[NUM_MOTORS];
-  float lastRampPower[NUM_MOTORS];
-  // float inputPower[NUM_MOTORS];
-  // float rampedPower[NUM_MOTORS];
-  float calcTurningMotorValue(float sticktrn, float prevPwr);
+    Servo M1, M2; //temporary solution, use vector for future
+    //vector<Servo> Motors;
+    // motor variables
+    uint8_t motorPins[NUM_MOTORS];
+    unsigned long lastRampTime[NUM_MOTORS];
+    float motorPower[NUM_MOTORS];
+    float currentPower[NUM_MOTORS];
+    float lastRampPower[NUM_MOTORS];
+    // float inputPower[NUM_MOTORS];
+    // float rampedPower[NUM_MOTORS];
+    float calcTurningMotorValue(float sticktrn, float prevPwr);
 
-public:
-  Drive(int leftmotorpin, int rightmotorpin); //constructor for two motors
-  void setStickPwr(uint8_t leftY, uint8_t rightX);
-  void setBSN(float powerMultiplier);
-  void generateMotionValues();
-  float ramp(float requestedPower, uint8_t mtr);
-  float Convert2PWMVal(float rampPwr);
-  float getMotorPwr(uint8_t mtr);
-  void update();
+  public:
+    Drive(int leftmotorpin, int rightmotorpin); //constructor for two motors
+    void setStickPwr(uint8_t leftY, uint8_t rightX);
+    void setBSN(float powerMultiplier);
+    void generateMotionValues();
+    float ramp(float requestedPower, uint8_t mtr);
+    float Convert2PWMVal(float rampPwr);
+    float getMotorPwr(uint8_t mtr);
+    void update();
+    void iterate() { Serial.println("driving"); };
 };
 
 // Robot Age Enum

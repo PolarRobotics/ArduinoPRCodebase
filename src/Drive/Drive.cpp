@@ -204,8 +204,8 @@ void Drive::update() {
     motorPower[0] = 
     motorPower[1] =
 
-    motorPower[0] = ramp();
-    motorPower[1] = ramp();
+    //motorPower[0] = ramp();
+    //motorPower[1] = ramp();
 
     lastRampPower[0] = motorPower[0];
     lastRampPower[1] = motorPower[1];
