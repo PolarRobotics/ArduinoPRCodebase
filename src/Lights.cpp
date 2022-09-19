@@ -4,3 +4,5 @@ struct LEDS {
   uint32_t m_color;
   int m_state;
 };
+
+// added some documentation
