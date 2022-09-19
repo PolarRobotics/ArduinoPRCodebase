@@ -35,6 +35,7 @@ void setup() {
             Serial.println("Robot Type: Lineman");
             robot = new Lineman();
     }
+    robot->initialize();
 }
 
 void loop() {
