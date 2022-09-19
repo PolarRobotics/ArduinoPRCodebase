@@ -4,14 +4,16 @@
 #include <Servo.h> //Built in
 
 /** 
- * Drive constructor for the drive class
+ * @brief Drive constructor for the drive class
  * Implements robot drive functions.
  * Base class for specialized drivebases.
- *
- * Consolidates code associated with driving the robots
- *
- * @todo this class should store all variables and constants related to the drive code,
- * other than controller stuff
+ * 
+ * @todo 
+ *  - add a turning radius parameter, needed for the kicker
+ *  - add mechanium driving code, for the new center, needed next semester (Spring 2023)
+ * 
+ * @param leftmotorpin the arduino pin needed for the left motor, needed for servo
+ * @param rightmotorpin the arduino pin needed for the right motor, needed for servo
 */
 Drive::Drive(int leftmotorpin, int rightmotorpin) {
     M1.attach(leftmotorpin);
@@ -44,7 +46,10 @@ void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
 /**
  * @brief setBSN sets the internal variable to the requested percent power, this is what the motor power gets multiplied by, 
  * this is where the boost, slow and normal scalars get passed in 
- * @param spd input speed choice, boost slow or normal
+ * @author Rhys Davies
+ * Created: 9-12-2022
+ * 
+ * @param bsn input speed choice, boost slow or normal
 */
 void Drive::setBSN(SPEED bsn) {
     // set the scalar to zero if the requested value is greater than 1, this is not entirely necessary, but is a safety
@@ -136,6 +141,8 @@ float Drive::calcTurningMotorValue(float sticktrn, float prevpwr) {
 
 /**
  * @brief ramp
+ * @authors Max Phillips, Grant Brautigam
+ * Created: early 2022
  * 
  * @param requestedPower 
  * @param mtr pass 0 for left and 1 for right, used to help ease with storing values for multiple motors 
@@ -223,16 +230,15 @@ void Drive::emergencyStop() {
 }
 
 /**
- * updates the motors after calling all the functions to generate 
+ * @brief updates the motors after calling all the functions to generate 
  * turning and scaling motor values, the intention of this is so the 
  * programmer doesnt have to call all the functions, this just handles it,
- * reducing clutter in the main file
+ * reducing clutter in the main file.
+ * DO NOT CALL THIS FUNCTION UNTIL setStickPwr and setBSN have been called before update
  * @author Rhys Davies
  * Created: 9-12-2022
 */
 void Drive::update() {    
-    // DO NOT CALL THIS FUNCTION UNTIL setStickPwr and setBSN have been called before update
-    
     // Generate turning motion
     generateMotionValues();
 
