@@ -9,7 +9,7 @@ class Quarterback: public Robot {
     private: 
         int test;
     public:
-        Quarterback() {
-            this->setDrive(new DriveQuick(3, 5));
-        }
+        Quarterback() {}
+        void initialize();
+        void action();
 };

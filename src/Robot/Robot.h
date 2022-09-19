@@ -24,8 +24,11 @@ class Robot {
         void setType(TYPE t) { type = t; };
         void setType(uint8_t t) { type = static_cast<TYPE>(t); };
 
-        // Virtual function to perform any loop actions for special robots
+        // Virtual function that effectively acts like a constructor
         // "virtual" keyword required to enable runtime polymorphism (i.e. actually use overrides)
+        virtual void initialize() {};
+
+        // Virtual function to perform any loop actions for special robots
         virtual void action() {}; 
         
 };

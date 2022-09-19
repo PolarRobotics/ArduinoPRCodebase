@@ -9,8 +9,7 @@ class Lineman : public Robot {
     private: 
         int test;
     public:
-        Lineman() {
-            this->setDrive(new Drive(3,5));
-        }
+        Lineman() {}
+        void initialize(); // Override virtual functions
         void action();
 };
