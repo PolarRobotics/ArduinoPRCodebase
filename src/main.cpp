@@ -11,7 +11,7 @@
 bool debounce = false;
 USB Usb;            // There is a USB port
 BTD Btd(&Usb);      // The Location of the Bluetooth port
-PS5BT PS5(&Btd);
+PS5BT PS5(&Btd, 1);
 
 Drive DriveMotors(3, 5);
 
@@ -35,8 +35,9 @@ void setup() {
     while (1); // Halt
   }
 
+  pinMode(buttonPin, INPUT_PULLUP);
   delay(1000);
-
+  
 }
 
 /*
@@ -47,6 +48,7 @@ void setup() {
   |_|  |_| /_/   \_\ |___| |_| \_|   |_____|  \___/   \___/  |_|
 */
 void loop() {
+  Usb.Task();
   // The main looping code, controls driving and any actions during a game
   // put your main code here, to run repeatedly:
 
