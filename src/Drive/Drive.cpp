@@ -30,8 +30,9 @@ Drive::Drive(int leftmotorpin, int rightmotorpin) {
  * @param rightX the left right value from the right stick (0 to 255)
 */
 void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
-    stickForwardRev = (0 - (leftY / 127.0 - 1)); // +: forward, -: backward. needs to be negated so that forward is forward and v.v. subtracting 1 bumps into correct range
-    stickTurn = (rightX / 127.0 - 1); // +: right turn, -: left turn. subtracting 1 bumps into correct range
+    // left stick all the way foreward is 0, backward is 255 
+    stickForwardRev = (0 - (leftY / 127.5 - 1)); // +: forward, -: backward. needs to be negated so that forward is forward and v.v. subtracting 1 bumps into correct range
+    stickTurn = (rightX / 127.5 - 1); // +: right turn, -: left turn. subtracting 1 bumps into correct range
 
     // stick deadzones
     // set to zero (no input) if within the set deadzone
@@ -79,7 +80,7 @@ void Drive::setBSN(SPEED bsn) {
 void Drive::generateMotionValues() {
     // bool fwdPositive = (stickForwardRev > 0);
     bool trnPositive = (stickTurn > 0);
-    
+
     // dont move the motors if there is no input
     if(stickForwardRev == 0 && stickTurn == 0) 
         motorPower[0] = 0, motorPower[1] = 0;
@@ -111,9 +112,9 @@ void Drive::generateMotionValues() {
         if(trnPositive) { // turn Right
             //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
             motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
-            motorPower[1] = calcTurningMotorValue(stickTurn, lastRampPower[0]); // set the right motor
+            motorPower[1] = calcTurningMotorValue(stickTurn, lastRampPower[1]); // set the right motor
         } else if(!trnPositive) { // turn Left
-            motorPower[0] = calcTurningMotorValue(stickTurn, lastRampPower[1]); // set the left motor
+            motorPower[0] = calcTurningMotorValue(stickTurn, lastRampPower[0]); // set the left motor
             motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
         }
     }
@@ -242,6 +243,11 @@ void Drive::update() {
     // Generate turning motion
     generateMotionValues();
 
+    Serial.print("Left Input: ");
+    Serial.print(stickForwardRev);
+    Serial.print("  Right: ");
+    Serial.print(stickTurn);
+
     // get the ramp value
     motorPower[0] = ramp(motorPower[0], 0);
     motorPower[1] = ramp(motorPower[1], 0);
@@ -251,9 +257,9 @@ void Drive::update() {
     lastRampPower[0] = motorPower[0];
     lastRampPower[1] = motorPower[1];
 
-    Serial.print("Left Motor: ");
+    Serial.print("  Left Motor: ");
     Serial.print(motorPower[0]);
-    Serial.print("Right: ");
+    Serial.print("  Right: ");
     Serial.println(motorPower[1]);
     // Write to the motors
     M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));

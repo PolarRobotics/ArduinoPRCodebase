@@ -11,12 +11,9 @@
 bool debounce = false;
 USB Usb;            // There is a USB port
 BTD Btd(&Usb);      // The Location of the Bluetooth port
-PS5BT PS5(&Btd, 1);
+PS5BT PS5(&Btd);
 
 Drive DriveMotors(3, 5);
-
-// Works with lastChecked to make sure the controller is still connected (Just an added safety feature)
-bool usbConnected = false;
 
 /*
    ____    _____   _____   _   _   ____
@@ -52,9 +49,9 @@ void loop() {
   // The main looping code, controls driving and any actions during a game
   // put your main code here, to run repeatedly:
 
-  if (usbConnected) {
+  if (PS5.connected()) {
     DriveMotors.setStickPwr(PS5.getAnalogHat(LeftHatY), PS5.getAnalogHat(RightHatX));
-    
+
     // determine BSN percentage (boost, slow, or normal)
     if (PS5.getButtonPress(R1)) {
       DriveMotors.setBSN(Drive::boost);
