@@ -4,14 +4,30 @@
 #include <Servo.h> //Built in
 
 /** 
- * @brief Drive constructor for the drive class
- * Implements robot drive functions.
- * Base class for specialized drivebases.
+ * @brief Drive Class, base class for specialized drive classes, this configuration is intended for the standard linemen.
+ * this class takes the the the stick input, scales the turning value for each motor and ramps that value over time,
+ * then sets the ramped value to the motors
+ * @authors Rhys Davies (@rdavies02), Max Phillips (@RyzenFromFire) 
  * 
- * @todo 
+ * @class
+ *    2 motor configuration shown below  
+ * 
+ *               ^
+ *               | Fwd
+ *       _________________        
+ *      |        _        |       
+ *      |       |O|       |       O: represents the Omniwheel, a wheel that can turn on 2 axis       
+ *      |       |_|       |       L: represents the left Wheel, powered by the left motor via a chain
+ *      |  _           _  |            - the left motor would turn ccw to move the bot forward
+ *      | |L|         |R| |       R: represents the right Wheel, powered by the right motor via a chain
+ *      | |_|         |_| |            - the right motor would turn cw to move the bot forward
+ *      |_________________|
+ * 
+ * @todo
  *  - add a turning radius parameter, needed for the kicker
  *  - add mechanium driving code, for the new center, needed next semester (Spring 2023)
  * 
+ * Default configuration:
  * @param leftmotorpin the arduino pin needed for the left motor, needed for servo
  * @param rightmotorpin the arduino pin needed for the right motor, needed for servo
 */
@@ -22,7 +38,7 @@ Drive::Drive(int leftmotorpin, int rightmotorpin) {
 
 /**
  * setStickPwr takes the stick values passed in and normalizes them to values between -1 and 1
- * and sets this value to the private variables stickFwdRev and stickTurn
+ * and sets this value to the private variables stickFwdRev and stickTurn respectively
  * @author Rhys Davies
  * Created: 9-12-2022
  *   
@@ -50,7 +66,7 @@ void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
  * @author Rhys Davies
  * Created: 9-12-2022
  * 
- * @param bsn input speed choice, boost slow or normal
+ * @param bsn input speed choice Drive::Boost, Drive::Slow, Drive::Normal
 */
 void Drive::setBSN(SPEED bsn) {
     // set the scalar to zero if the requested value is greater than 1, this is not entirely necessary, but is a safety
@@ -196,6 +212,7 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
 */
 float Drive::Convert2PWMVal(float rampPwr) {
     // Original Function: to be removed later.
+    
     /*
     float temp_PWMVal;
     if (rampPwr < 0) {
@@ -210,9 +227,16 @@ float Drive::Convert2PWMVal(float rampPwr) {
     return temp_PWMVal;
     */
 
+    // set the motors to zero if the motor power exceeds the allowable range
+    if (abs(rampPwr + 0.5) > BOOST_PCT) {
+        return 0;
+    }
+
     //original variable's range = [-1,1]
     //converted variable's range = [1000, 2000]
-    return map(rampPwr, -1, 1, 1000, 2000);
+    // multiply the ramp power by 1000 (shift the decimal place over a bit) 
+    // to bring the number into a range that map can use
+    return map(rampPwr * 1000, -1000, 1000, 1000, 2000);
 }
 
 /**

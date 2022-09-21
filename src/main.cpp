@@ -34,7 +34,6 @@ void setup() {
 
   pinMode(buttonPin, INPUT_PULLUP);
   delay(1000);
-  
 }
 
 /*

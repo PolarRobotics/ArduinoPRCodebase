@@ -54,19 +54,19 @@ private:
   // float inputPower[NUM_MOTORS];
   // float rampedPower[NUM_MOTORS];
   float calcTurningMotorValue(float sticktrn, float prevPwr);
+  void generateMotionValues();
+  float ramp(float requestedPower, uint8_t mtr);
+  float Convert2PWMVal(float rampPwr);
 
 public:
   enum SPEED {
-    boost,
     normal,
+    boost,
     slow
   };
   Drive(int leftmotorpin, int rightmotorpin); //constructor for two motors
   void setStickPwr(uint8_t leftY, uint8_t rightX);
   void setBSN(SPEED bsn); //(float powerMultiplier);
-  void generateMotionValues();
-  float ramp(float requestedPower, uint8_t mtr);
-  float Convert2PWMVal(float rampPwr);
   float getMotorPwr(uint8_t mtr);
   void emergencyStop();
   void update();
