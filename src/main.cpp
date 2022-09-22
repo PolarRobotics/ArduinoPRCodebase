@@ -32,7 +32,7 @@ void setup() {
     while (1); // Halt
   }
 
-  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(buttonPin, INPUT);
   delay(1000);
 }
 

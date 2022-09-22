@@ -102,20 +102,29 @@ void Drive::generateMotionValues() {
         motorPower[0] = 0, motorPower[1] = 0;
 
     // move both motors forward if the left stick is between 0 and 1 AND the right stick is 0
-    else if(stickForwardRev <= 1 && stickForwardRev > 0 && stickTurn == 0) 
-        motorPower[0] = BSNscalar, motorPower[1] = BSNscalar;
-    
+    else if(stickForwardRev >= -1 && stickForwardRev <= 1 && stickTurn == 0) { 
+        motorPower[0] = BSNscalar * stickForwardRev; 
+        motorPower[1] = BSNscalar * stickForwardRev;
+    }
     // move both motors in reverse if the left stick is between -1 and 0 AND the right stick is 0
-    else if(stickForwardRev >= -1 && stickForwardRev < 0 && stickTurn == 0)
-        motorPower[0] = -BSNscalar, motorPower[1] = -BSNscalar;
+    // else if(stickForwardRev >= -1 && stickForwardRev < 0 && stickTurn == 0) {
+    //     motorPower[0] = -BSNscalar;
+    //     motorPower[1] = -BSNscalar;
+
+    // }
 
     // tankmode turn right if the left stick is 0 AND the right stick is between 0 and 1
-    else if(stickForwardRev == 0 && stickTurn <= 1 && stickTurn > 0)
-        motorPower[0] = BSNscalar, motorPower[1] = -BSNscalar;
-
+    else if(stickForwardRev == 0 && stickTurn <= 1 && stickTurn > 0 && lastTurnPwr == 0) {
+        motorPower[0] = BSNscalar * abs(stickTurn);
+        motorPower[1] = -BSNscalar * abs(stickTurn);
+    }
+        
     // tankmode turn left if the left stick is 0 AND the right stick is between -1 and 0
-    else if(stickForwardRev == 0 && stickTurn >= -1 && stickTurn < 0)
-        motorPower[0] = -BSNscalar, motorPower[1] = BSNscalar;
+    else if(stickForwardRev == 0 && stickTurn >= -1 && stickTurn < 0 && lastTurnPwr == 0) {
+        motorPower[0] = -BSNscalar * abs(stickTurn);
+        motorPower[1] = BSNscalar * abs(stickTurn);
+
+    }
 
     /*
     if the sticks are not in any of the edge cases tested for above (when both sticks are not 0),
@@ -128,9 +137,9 @@ void Drive::generateMotionValues() {
         if(trnPositive) { // turn Right
             //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
             motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
-            motorPower[1] = calcTurningMotorValue(stickTurn, lastRampPower[1]); // set the right motor
+            motorPower[1] = calcTurningMotorValue(stickForwardRev, lastRampPower[0]); // set the right motor
         } else if(!trnPositive) { // turn Left
-            motorPower[0] = calcTurningMotorValue(stickTurn, lastRampPower[0]); // set the left motor
+            motorPower[0] = calcTurningMotorValue(stickForwardRev, lastRampPower[1]); // set the left motor
             motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
         }
     }
@@ -151,8 +160,10 @@ void Drive::generateMotionValues() {
  * @return float - the value to get set to the turning motor (the result of the function mention above)
  */
 float Drive::calcTurningMotorValue(float sticktrn, float prevpwr) {
-    float temp = abs(sticktrn * (1 - OFFSET) * pow(prevpwr, 2) + (1-stickTurn) * prevpwr);
-    return copysign(temp, sticktrn);
+    float temp = abs(sticktrn) * (1 - OFFSET) * pow(prevpwr, 2) + (1-abs(stickTurn)) * abs(prevpwr);
+    temp = copysign(temp, prevpwr);
+    lastTurnPwr = temp;
+    return temp;
 }
 
 
@@ -213,7 +224,7 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
 float Drive::Convert2PWMVal(float rampPwr) {
     // Original Function: to be removed later.
     
-    /*
+    
     float temp_PWMVal;
     if (rampPwr < 0) {
         // temp_PWMVal = map(rampPwr, 0, 1, 96, 120);
@@ -225,18 +236,13 @@ float Drive::Convert2PWMVal(float rampPwr) {
         temp_PWMVal = 93;
     }
     return temp_PWMVal;
-    */
-
-    // set the motors to zero if the motor power exceeds the allowable range
-    if (abs(rampPwr + 0.5) > BOOST_PCT) {
-        return 0;
-    }
+    
 
     //original variable's range = [-1,1]
     //converted variable's range = [1000, 2000]
     // multiply the ramp power by 1000 (shift the decimal place over a bit) 
     // to bring the number into a range that map can use
-    return map(rampPwr * 1000, -1000, 1000, 1000, 2000);
+    //return map(rampPwr * 1000, -1000, 1000, 1000, 2000);
 }
 
 /**
@@ -272,22 +278,43 @@ void Drive::update() {
     Serial.print("  Right: ");
     Serial.print(stickTurn);
 
+    Serial.print("  Turn: ");
+    Serial.print(lastTurnPwr);
+
+    Serial.print("  Left ReqPwr: ");
+    Serial.print(motorPower[0]);
+    Serial.print("  Right ReqPwr: ");
+    Serial.print(motorPower[1]);
+
+    // set the motors to zero if the motor power exceeds the allowable range
+    // if (abs(rampPwr + 0.5) > BOOST_PCT) {
+    //     return 0;
+    // }
+
     // get the ramp value
     motorPower[0] = ramp(motorPower[0], 0);
-    motorPower[1] = ramp(motorPower[1], 0);
+    motorPower[1] = ramp(motorPower[1], 1);
 
 
     // Set the ramp value to a function, needed for generateMotionValues
     lastRampPower[0] = motorPower[0];
     lastRampPower[1] = motorPower[1];
 
-    Serial.print("  Left Motor: ");
-    Serial.print(motorPower[0]);
-    Serial.print("  Right: ");
-    Serial.println(motorPower[1]);
+    // Serial.print("  Left Motor: ");
+    // Serial.print(motorPower[0]);
+    // Serial.print("  Right: ");
+    // Serial.println(motorPower[1]);
     // Write to the motors
-    M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
-    M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
+    // M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
+    // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
+
+    Serial.print("  Left Motor: ");
+    Serial.print(Convert2PWMVal(-motorPower[0]));
+    Serial.print("  Right: ");
+    Serial.println(Convert2PWMVal(motorPower[1]));
+
+    M1.write(Convert2PWMVal(-motorPower[0]));
+    M2.write(Convert2PWMVal(motorPower[1]));
 }
 
 //Old functions

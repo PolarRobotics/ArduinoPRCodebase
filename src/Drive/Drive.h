@@ -24,7 +24,7 @@
 // was 2000, for 2000ms. needs to be way faster
 #define TIME_INCREMENT 25 
 // DO NOT CHANGE THIS EVER!!!!!
-// #define PWM_CONVERSION_FACTOR 0.3543307087 
+#define PWM_CONVERSION_FACTOR 0.3543307087 
 
 // Controller Defines
 #define OFFSET 0.2 // the max allowable turning when the bot is traveling at full speed 
@@ -42,6 +42,7 @@ class Drive {
 private:
   float stickForwardRev, stickTurn;
   float BSNscalar;
+  float lastTurnPwr;
   
   Servo M1, M2; //temporary solution, use vector for future
   // vector<Servo> Motors;
@@ -53,7 +54,7 @@ private:
   float lastRampPower[NUM_MOTORS];
   // float inputPower[NUM_MOTORS];
   // float rampedPower[NUM_MOTORS];
-  float calcTurningMotorValue(float sticktrn, float prevPwr);
+  float calcTurningMotorValue(float sticktrn,  float prevpwr);
   void generateMotionValues();
   float ramp(float requestedPower, uint8_t mtr);
   float Convert2PWMVal(float rampPwr);
