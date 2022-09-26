@@ -32,8 +32,8 @@
  * @param rightmotorpin the arduino pin needed for the right motor, needed for servo
 */
 Drive::Drive(int leftmotorpin, int rightmotorpin) {
-    M1.attach(leftmotorpin);
-    M2.attach(rightmotorpin);
+    M1.attach(leftmotorpin, 1000, 2000);
+    M2.attach(rightmotorpin, 1000, 2000);
 }
 
 /**
@@ -223,26 +223,25 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
 */
 float Drive::Convert2PWMVal(float rampPwr) {
     // Original Function: to be removed later.
-    
-    
-    float temp_PWMVal;
-    if (rampPwr < 0) {
-        // temp_PWMVal = map(rampPwr, 0, 1, 96, 120);
-        temp_PWMVal = 90 + PWM_CONVERSION_FACTOR * 127 * rampPwr; // maybe we should use the map function instead of this???
-    } else if (rampPwr > 0 ) {
-        // temp_PWMVal = map(rampPwr, -1, 0, 40, 90);
-        temp_PWMVal = 100 + PWM_CONVERSION_FACTOR * 127 * rampPwr;
-    } else {
-        temp_PWMVal = 93;
-    }
-    return temp_PWMVal;
+    // float temp_PWMVal;
+    // if (rampPwr < 0) {
+    //     // temp_PWMVal = map(rampPwr, 0, 1, 96, 120);
+    //     temp_PWMVal = 90 + PWM_CONVERSION_FACTOR * 127 * rampPwr; // maybe we should use the map function instead of this???
+    // } else if (rampPwr > 0 ) {
+    //     // temp_PWMVal = map(rampPwr, -1, 0, 40, 90);
+    //     temp_PWMVal = 100 + PWM_CONVERSION_FACTOR * 127 * rampPwr;
+    // } else {
+    //     temp_PWMVal = 93;
+    // }
+    // return temp_PWMVal;
     
 
     //original variable's range = [-1,1]
     //converted variable's range = [1000, 2000]
     // multiply the ramp power by 1000 (shift the decimal place over a bit) 
     // to bring the number into a range that map can use
-    //return map(rampPwr * 1000, -1000, 1000, 1000, 2000);
+    // return map(rampPwr * 1000, -1000, 1000, 1000, 2000);
+    return (rampPwr + 1) * 500 + 1000;
 }
 
 /**
@@ -278,10 +277,10 @@ void Drive::update() {
     Serial.print("  Right: ");
     Serial.print(stickTurn);
 
-    Serial.print("  Turn: ");
+    Serial.print("  |  Turn: ");
     Serial.print(lastTurnPwr);
 
-    Serial.print("  Left ReqPwr: ");
+    Serial.print("  |  Left ReqPwr: ");
     Serial.print(motorPower[0]);
     Serial.print("  Right ReqPwr: ");
     Serial.print(motorPower[1]);
@@ -308,13 +307,13 @@ void Drive::update() {
     // M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
     // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 
-    Serial.print("  Left Motor: ");
+    Serial.print("  |  Left Motor: ");
     Serial.print(Convert2PWMVal(-motorPower[0]));
     Serial.print("  Right: ");
     Serial.println(Convert2PWMVal(motorPower[1]));
 
-    M1.write(Convert2PWMVal(-motorPower[0]));
-    M2.write(Convert2PWMVal(motorPower[1]));
+    M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
+    M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 }
 
 //Old functions

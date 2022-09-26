@@ -78,5 +78,5 @@ void loop() {
       debounce = false;
     }
   }
-
+  delay(20);
 }
