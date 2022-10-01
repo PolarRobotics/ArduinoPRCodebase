@@ -9,6 +9,8 @@
 
 // The variables for PS5 and pair button
 bool debounce = false;
+
+// the USB Host shield uses pins 9 through 13, so dont use these pins
 USB Usb;            // There is a USB port
 BTD Btd(&Usb);      // The Location of the Bluetooth port
 PS5BT PS5(&Btd);
