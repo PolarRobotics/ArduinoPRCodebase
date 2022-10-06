@@ -5,6 +5,7 @@
 
 #include <Arduino.h>
 #include <Servo.h>
+// #include <Servo_Hardware_PWM.h>
 
 #ifndef NUM_MOTORS
 // the number of motors associated with driving, usually multiples of 2, default: 2

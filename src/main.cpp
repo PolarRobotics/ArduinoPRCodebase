@@ -62,8 +62,10 @@ void loop() {
       DriveMotors.setBSN(Drive::normal);
     }
 
+    // Update the motors based on the inputs from the controller  
     DriveMotors.update();
   } else {
+    // Emergency stop if the controller disconnects
     DriveMotors.emergencyStop();
   }
   // If the button is pressed and it is not debounced then go into statement
@@ -80,5 +82,5 @@ void loop() {
       debounce = false;
     }
   }
-  delay(20);
+  // delay(20);
 }

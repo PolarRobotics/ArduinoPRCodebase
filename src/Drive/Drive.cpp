@@ -2,6 +2,7 @@
 #include "Drive/Drive.h"
 #include <Arduino.h>
 #include <Servo.h> //Built in
+// #include <Servo_Hardware_PWM.h>
 
 /** 
  * @brief Drive Class, base class for specialized drive classes, this configuration is intended for the standard linemen.
@@ -32,8 +33,12 @@
  * @param rightmotorpin the arduino pin needed for the right motor, needed for servo
 */
 Drive::Drive(int leftmotorpin, int rightmotorpin) {
-    M1.attach(leftmotorpin, 1000, 2000);
-    M2.attach(rightmotorpin, 1000, 2000);
+    // M1.attach(leftmotorpin, 1000, 2000);
+    // M2.attach(rightmotorpin, 1000, 2000);
+    motorPins[0] = leftmotorpin;
+    motorPins[1] = rightmotorpin;
+    pinMode(leftmotorpin, OUTPUT);
+    pinMode(rightmotorpin, OUTPUT);
 }
 
 /**
@@ -241,7 +246,7 @@ float Drive::Convert2PWMVal(float rampPwr) {
     // multiply the ramp power by 1000 (shift the decimal place over a bit) 
     // to bring the number into a range that map can use
     // return map(rampPwr * 1000, -1000, 1000, 1000, 2000);
-    return (rampPwr + 1) * 500 + 1000;
+    return (-rampPwr + 1) * 500 + 1000;
 }
 
 /**
@@ -269,14 +274,14 @@ void Drive::emergencyStop() {
  * Created: 9-12-2022
 */
 void Drive::update() {    
-    // Generate turning motion
-    generateMotionValues();
-
     Serial.print("Left Input: ");
     Serial.print(stickForwardRev);
     Serial.print("  Right: ");
     Serial.print(stickTurn);
 
+    // Generate turning motion
+    generateMotionValues();
+    
     Serial.print("  |  Turn: ");
     Serial.print(lastTurnPwr);
 
@@ -312,8 +317,12 @@ void Drive::update() {
     Serial.print("  Right: ");
     Serial.println(Convert2PWMVal(motorPower[1]));
 
-    M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
-    M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
+    // M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
+    // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
+    digitalWrite(motorPins[0], HIGH);
+    delayMicroseconds(Convert2PWMVal(-motorPower[0]) - 170);
+    digitalWrite(motorPins[0], LOW);
+    delayMicroseconds(2000 - Convert2PWMVal(-motorPower[0]) - 170);
 }
 
 //Old functions
