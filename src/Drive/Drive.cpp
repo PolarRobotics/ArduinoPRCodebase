@@ -220,7 +220,7 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
 
 /** 
  * normalizes the signed power value from the ramp function to an unsigned value that the servo function can take
- * @authors Grant Brautigam, Alex Brown  
+ * @authors Rhys Davies, Grant Brautigam, Alex Brown  
  * Updated: 9-13-2022
  *
  * @param rampPwr the value to be normalized. Hopefully a value between [-1, 1]

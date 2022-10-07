@@ -58,7 +58,8 @@ private:
   float calcTurningMotorValue(float sticktrn,  float prevpwr);
   void generateMotionValues();
   float ramp(float requestedPower, uint8_t mtr);
-  float Convert2PWMVal(float rampPwr);
+  // use the inline keywork to ensure the function will get called again as soon as possible
+  float Convert2PWMVal(float rampPwr) __attribute__((always_inline)); 
 
 public:
   enum SPEED {

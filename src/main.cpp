@@ -73,7 +73,7 @@ void loop() {
     Serial.println("Pairing...");
     debounce = true;             
     PS5.disconnect();            // Disconnect the current PS5 controller
-    delete [] &PS5;              // Deletes the memory allocation for the PS5 controller so a new one can be created with same name
+    //delete [] &PS5;              // Deletes the memory allocation for the PS5 controller so a new one can be created with same name
     PS5 = PS5BT(&Btd, 1);        // Re-initalizes the PS5 object
     do {                         // Delay any other code from running until the PS5 controller is connected
       delay(10);
