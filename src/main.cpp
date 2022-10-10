@@ -5,7 +5,7 @@
 // #include "PolarRobotics.h"
 #include "Drive/Drive.h"
 
-#define buttonPin 4
+#define buttonPin 8
 
 // The variables for PS5 and pair button
 bool debounce = false;
@@ -28,13 +28,15 @@ Drive DriveMotors(3, 5);
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+  Serial.println("Starting...");
   
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nOSC did not start"));
     while (1); // Halt
   }
 
-  pinMode(buttonPin, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(LED_BUILTIN, OUTPUT);
   delay(1000);
 }
 
@@ -69,16 +71,18 @@ void loop() {
     DriveMotors.emergencyStop();
   }
   // If the button is pressed and it is not debounced then go into statement
-  if (digitalRead(buttonPin) == 1 && !debounce) {
+  if (digitalRead(buttonPin) == true && !debounce) {
+    digitalWrite(LED_BUILTIN, HIGH);
     Serial.println("Pairing...");
     debounce = true;             
     PS5.disconnect();            // Disconnect the current PS5 controller
-    //delete [] &PS5;              // Deletes the memory allocation for the PS5 controller so a new one can be created with same name
+    delete [] &PS5;              // Deletes the memory allocation for the PS5 controller so a new one can be created with same name
     PS5 = PS5BT(&Btd, 1);        // Re-initalizes the PS5 object
     do {                         // Delay any other code from running until the PS5 controller is connected
       delay(10);
     } while (!PS5.connected());
     if(PS5.connected()) {        // Reset the debounce when it finally connects so button can be pressed and it can run again
+      digitalWrite(LED_BUILTIN, LOW);
       debounce = false;
     }
   }

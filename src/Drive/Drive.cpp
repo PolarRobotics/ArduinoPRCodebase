@@ -63,6 +63,10 @@ void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
     if (fabs(stickTurn) < STICK_DEADZONE) {
       stickTurn = 0;
     }
+    if (stickForwardRev > 1) stickForwardRev = 1;
+    if (stickForwardRev < -1) stickForwardRev = -1;
+    if (stickTurn > 1) stickTurn = 1;
+    if (stickTurn < -1) stickTurn = -1;
 }
 
 /**
