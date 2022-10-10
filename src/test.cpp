@@ -1,5 +1,5 @@
 #include <SPI.h>
-#include <PS3BT.h>
+#include <PS5BT.h>
 #include <SabertoothSimplified.h>
 #include <SoftwareSerial.h>
 #include <Sabertooth.h>
@@ -11,7 +11,7 @@
 
 USB Usb;            // There is a USB port
 BTD Btd(&Usb);      // The Location of the Bluetooth port
-PS3BT PS3(&Btd);    // There is a PS3 Controller at the location of the Bluetooth port
+PS5BT PS5(&Btd);    // There is a PS5 Controller at the location of the Bluetooth port
 Servo servoObj;   // Initialize a servo object for the connected servo
 
 Servo M1; //initialize Motor 1 as a servo
@@ -177,7 +177,7 @@ int servoAngle = 0;
 
 void t1Callback() {
   // your code to refresh here
-  if (PS3.PS3Connected) {
+  if (PS5.connected()) {
     usbConnected = true;  // The USB receiver is still receiving information
   } else {
     usbConnected = false; // Makes sure the function doesn't run again
@@ -290,8 +290,8 @@ void loop() {
     // Get controller values
     // Motor 1 = Right
     // Motor 2 = Left
-    leftJStickY = PS3.getAnalogHat(LeftHatY);
-    rightJStickX = -127 + PS3.getAnalogHat(RightHatX); //This helps zeros the input value
+    leftJStickY = PS5.getAnalogHat(LeftHatY);
+    rightJStickX = -127 + PS5.getAnalogHat(RightHatX); //This helps zeros the input value
 
     // Drive Straight
     rightMotorValue = leftJStickY;  //left joystick controllers the right and left moter
@@ -366,11 +366,11 @@ void loop() {
     //Serial.println(leftMotorValue);
 
     // Boost Option
-    if (PS3.getButtonPress(R1)) { //Boost
+    if (PS5.getButtonPress(R1)) { //Boost
       //Serial.println("Button Clicked");
       oldMotorValueR = percentPower * rightMotorValue * motorPower * 3;
       oldMotorValueL = percentPower * leftMotorValue * motorPower * 3;
-    } else if (PS3.getButtonPress(L1)) { //Boost
+    } else if (PS5.getButtonPress(L1)) { //Boost
       //Serial.println("Button Clicked");
       oldMotorValueR = percentPower * rightMotorValue * motorPower * .3;
       oldMotorValueL = percentPower * leftMotorValue * motorPower * .3;
@@ -436,20 +436,20 @@ void loop() {
 //   if (robotType == quarterback) {
 
 //     //Aim Control
-//     if (PS3.getButtonClick(CIRCLE)) { // MANUAL RESET
+//     if (PS5.getButtonClick(CIRCLE)) { // MANUAL RESET
 //       ElevationMotor.write(getSpeedDown());
 //       currentElevation = low;
 //       targetElevation = low;
 //       delay(11000);
 //       ElevationMotor.write(getSpeedStop());
 //     } else if (!aiming) {
-//       if (PS3.getButtonClick(UP)) {
+//       if (PS5.getButtonClick(UP)) {
 //         targetElevation = high;
 //         //debug_showSelectionInfo(currentElevation, targetElevation);
-//       } else if (PS3.getButtonClick(LEFT) || PS3.getButtonClick(RIGHT)) {
+//       } else if (PS5.getButtonClick(LEFT) || PS5.getButtonClick(RIGHT)) {
 //         targetElevation = middle;
 //         //debug_showSelectionInfo(currentElevation, targetElevation);
-//       } else if (PS3.getButtonClick(DOWN)) {
+//       } else if (PS5.getButtonClick(DOWN)) {
 //         targetElevation = low;
 //         //debug_showSelectionInfo(currentElevation, targetElevation);
 //       }
@@ -471,17 +471,17 @@ void loop() {
 //     //Flywheel Control Toggle
 //     if (flywheelToggleCooldown <= millis()) {
 //       if (!flywheelOn) {
-//         if (PS3.getButtonClick(X)) { //flywheels on fast
+//         if (PS5.getButtonClick(X)) { //flywheels on fast
 //           startFlywheel(rightFlywheelMotor, leftFlywheelMotor);
 //           flywheelOn = true;
 //           flywheelToggleCooldown = millis() + BASE_TOGGLE_CD;
-//         } else if (PS3.getButtonClick(SQUARE)) { //flywheels on slow for pass
+//         } else if (PS5.getButtonClick(SQUARE)) { //flywheels on slow for pass
 //           passBall(rightFlywheelMotor, leftFlywheelMotor);
 //           flywheelOn = true;
 //           flywheelToggleCooldown = millis() + BASE_TOGGLE_CD;
 //         }
 //       } else if (flywheelOn) {
-//         if (PS3.getButtonClick(X) || PS3.getButtonClick(SQUARE)) {
+//         if (PS5.getButtonClick(X) || PS5.getButtonClick(SQUARE)) {
 //           stopFlywheel(rightFlywheelMotor, leftFlywheelMotor);
 //           flywheelOn = false;
 //         }
@@ -489,11 +489,11 @@ void loop() {
 //     }
 
 //     //Firing the Weapon
-//     if (PS3.getAnalogButton(R2) || PS3.getAnalogButton(L2)) {
+//     if (PS5.getAnalogButton(R2) || PS5.getAnalogButton(L2)) {
 //       //They want to move the motor
-//       if (PS3.getAnalogButton(R2)) {
+//       if (PS5.getAnalogButton(R2)) {
 //         fireWeapon(FireMotor, "Fire");
-//       } else if (PS3.getAnalogButton(L2)) {
+//       } else if (PS5.getAnalogButton(L2)) {
 //         fireWeapon(FireMotor, "Retract");
 //       }
 //     } else {
@@ -514,7 +514,7 @@ void loop() {
 //   if (robotType == center) {
 
 //     //Raise the Center Arm
-//     if (CenterArmMoveStatus == "" && (PS3.getButtonPress(UP)) && CenterArmStatus != 1) {
+//     if (CenterArmMoveStatus == "" && (PS5.getButtonPress(UP)) && CenterArmStatus != 1) {
 //       //The user wants to raise the Center arm up
 //       CenterArmMoveStatus = "High";
 //       CenterArmMoveTimer = millis();
@@ -526,7 +526,7 @@ void loop() {
 //     }
 
 //     //Lower the Center Arm
-//     if (CenterArmMoveStatus == "" && (PS3.getButtonPress(DOWN)) && CenterArmStatus != 2) {
+//     if (CenterArmMoveStatus == "" && (PS5.getButtonPress(DOWN)) && CenterArmStatus != 2) {
 //       //The user wants to raise the Center arm up
 //       CenterArmMoveStatus = "Lower";
 //       CenterArmMoveTimer = millis();
