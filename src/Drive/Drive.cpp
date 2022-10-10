@@ -249,6 +249,8 @@ float Drive::Convert2PWMVal(float rampPwr) {
     return (-rampPwr + 1) * 500 + 1000;
 }
 
+void setMtr(float pwr, byte mtr);
+
 /**
  * returns the stored motor value in the class
  * @param mtr the motor number to get, an array index, so 0 -> mtr 1, etc...
@@ -274,21 +276,21 @@ void Drive::emergencyStop() {
  * Created: 9-12-2022
 */
 void Drive::update() {    
-    Serial.print("Left Input: ");
-    Serial.print(stickForwardRev);
-    Serial.print("  Right: ");
-    Serial.print(stickTurn);
+    // Serial.print("Left Input: ");
+    // Serial.print(stickForwardRev);
+    // Serial.print("  Right: ");
+    // Serial.print(stickTurn);
 
     // Generate turning motion
     generateMotionValues();
     
-    Serial.print("  |  Turn: ");
-    Serial.print(lastTurnPwr);
+    // Serial.print("  |  Turn: ");
+    // Serial.print(lastTurnPwr);
 
-    Serial.print("  |  Left ReqPwr: ");
-    Serial.print(motorPower[0]);
-    Serial.print("  Right ReqPwr: ");
-    Serial.print(motorPower[1]);
+    // Serial.print("  |  Left ReqPwr: ");
+    // Serial.print(motorPower[0]);
+    // Serial.print("  Right ReqPwr: ");
+    // Serial.print(motorPower[1]);
 
     // set the motors to zero if the motor power exceeds the allowable range
     // if (abs(rampPwr + 0.5) > BOOST_PCT) {
@@ -312,17 +314,17 @@ void Drive::update() {
     // M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
     // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 
-    Serial.print("  |  Left Motor: ");
-    Serial.print(Convert2PWMVal(-motorPower[0]));
-    Serial.print("  Right: ");
-    Serial.println(Convert2PWMVal(motorPower[1]));
+    // Serial.print("  |  Left Motor: ");
+    // Serial.print(Convert2PWMVal(-motorPower[0]));
+    // Serial.print("  Right: ");
+    // Serial.println(Convert2PWMVal(motorPower[1]));
 
-    // M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
-    // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
+    //  M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
+    //  M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
     digitalWrite(motorPins[0], HIGH);
-    delayMicroseconds(Convert2PWMVal(-motorPower[0]) - 170);
+    delayMicroseconds(Convert2PWMVal(-motorPower[0])-40 );
     digitalWrite(motorPins[0], LOW);
-    delayMicroseconds(2000 - Convert2PWMVal(-motorPower[0]) - 170);
+    delayMicroseconds(2000 - Convert2PWMVal(-motorPower[0])-40 ); //-170
 }
 
 //Old functions
