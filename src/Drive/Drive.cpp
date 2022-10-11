@@ -252,8 +252,8 @@ float Drive::getMotorPwr(uint8_t mtr) {
 }
 
 void Drive::emergencyStop() {
-    M1.writeMicroseconds(1500);
-    M2.writeMicroseconds(1500);
+    M1.writeMicroseconds(1500); // change to new function
+    M2.writeMicroseconds(1500); // change to new function
     // while(1);
 }
 
@@ -305,10 +305,10 @@ void Drive::update() {
     // M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
     // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 
-    Serial.print(F("  |  Left Motor: "));
-    Serial.print(Convert2PWMVal(-motorPower[0]));
-    Serial.print(F("  Right: "));
-    Serial.println(Convert2PWMVal(motorPower[1]));
+    // Serial.print(F("  |  Left Motor: "));
+    // Serial.print(Convert2PWMVal(-motorPower[0]));
+    // Serial.print(F("  Right: "));
+    // Serial.println(Convert2PWMVal(motorPower[1]));
 
     // M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
     // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
