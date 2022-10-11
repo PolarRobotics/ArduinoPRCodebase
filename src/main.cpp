@@ -35,7 +35,7 @@ void setup() {
     while (1); // Halt
   }
 
-  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(buttonPin, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   delay(1000);
 }
@@ -71,20 +71,20 @@ void loop() {
     DriveMotors.emergencyStop();
   }
   // If the button is pressed and it is not debounced then go into statement
-  if (digitalRead(buttonPin) == true && !debounce) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    Serial.println("Pairing...");
-    debounce = true;             
-    PS5.disconnect();            // Disconnect the current PS5 controller
-    delete [] &PS5;              // Deletes the memory allocation for the PS5 controller so a new one can be created with same name
-    PS5 = PS5BT(&Btd, 1);        // Re-initalizes the PS5 object
-    do {                         // Delay any other code from running until the PS5 controller is connected
-      delay(10);
-    } while (!PS5.connected());
-    if(PS5.connected()) {        // Reset the debounce when it finally connects so button can be pressed and it can run again
-      digitalWrite(LED_BUILTIN, LOW);
-      debounce = false;
-    }
-  }
+  // if (digitalRead(buttonPin) == 1 && !debounce) {
+  //   digitalWrite(LED_BUILTIN, HIGH);
+  //   Serial.println("Pairing...");
+  //   debounce = true;             
+  //   PS5.disconnect();            // Disconnect the current PS5 controller
+  //   delete [] &PS5;              // Deletes the memory allocation for the PS5 controller so a new one can be created with same name
+  //   PS5 = PS5BT(&Btd, 1);        // Re-initalizes the PS5 object
+  //   do {                         // Delay any other code from running until the PS5 controller is connected
+  //     delay(10);
+  //   } while (!PS5.connected());
+  //   if(PS5.connected()) {        // Reset the debounce when it finally connects so button can be pressed and it can run again
+  //     digitalWrite(LED_BUILTIN, LOW);
+  //     debounce = false;
+  //   }
+  // }
   //delay(20);
 }

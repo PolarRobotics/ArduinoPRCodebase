@@ -99,57 +99,44 @@ void Drive::setBSN(SPEED bsn) {
 
 /** 
  * generateTurnScalar takes the input stick power and scales the max turning power allowed with the forward power input
- * @authors Grant Brautigam, Rhys Davies
+ * @authors Grant Brautigam, Rhys Davies, Max Phillips
  * Created: 9-12-2022
 */
 void Drive::generateMotionValues() {
     // bool fwdPositive = (stickForwardRev > 0);
     bool trnPositive = (stickTurn > 0);
 
-    // dont move the motors if there is no input
-    if(stickForwardRev == 0 && stickTurn == 0) 
-        motorPower[0] = 0, motorPower[1] = 0;
-
-    // move both motors forward if the left stick is between 0 and 1 AND the right stick is 0
-    else if(stickForwardRev >= -1 && stickForwardRev <= 1 && stickTurn == 0) { 
-        motorPower[0] = BSNscalar * stickForwardRev; 
-        motorPower[1] = BSNscalar * stickForwardRev;
-    }
-    // move both motors in reverse if the left stick is between -1 and 0 AND the right stick is 0
-    // else if(stickForwardRev >= -1 && stickForwardRev < 0 && stickTurn == 0) {
-    //     motorPower[0] = -BSNscalar;
-    //     motorPower[1] = -BSNscalar;
-
-    // }
-
-    // tankmode turn right if the left stick is 0 AND the right stick is between 0 and 1
-    else if(stickForwardRev == 0 && stickTurn <= 1 && stickTurn > 0 && lastTurnPwr == 0) {
-        motorPower[0] = BSNscalar * abs(stickTurn);
-        motorPower[1] = -BSNscalar * abs(stickTurn);
-    }
-        
-    // tankmode turn left if the left stick is 0 AND the right stick is between -1 and 0
-    else if(stickForwardRev == 0 && stickTurn >= -1 && stickTurn < 0 && lastTurnPwr == 0) {
-        motorPower[0] = -BSNscalar * abs(stickTurn);
-        motorPower[1] = BSNscalar * abs(stickTurn);
-
-    }
-
-    /*
-    if the sticks are not in any of the edge cases tested for above (when both sticks are not 0),
-    a value must be calculated to determine how to scale the motor that is doing the turning.
-    i.e.: if the user moves the left stick all the way forward (stickFwdRev = 1), and they are attempting
-    to turn right. The left motor should get set to 1 and the right motor should get set to 
-    some value less than 1, this value is determined by the function calcTurningMotorValue
-    */
-    else {
-        if(trnPositive) { // turn Right
-            //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
-            motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
-            motorPower[1] = calcTurningMotorValue(stickForwardRev, lastRampPower[0]); // set the right motor
-        } else if(!trnPositive) { // turn Left
-            motorPower[0] = calcTurningMotorValue(stickForwardRev, lastRampPower[1]); // set the left motor
-            motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
+    if (fabs(stickForwardRev) < THRESHOLD) { // fwd stick is zero
+        if (fabs(stickTurn) < THRESHOLD) { // turn stick is zero
+            motorPower[0] = 0, motorPower[1] = 0; // not moving, set motors to zero
+        } else if (trnPositive) { // turning right, but not moving forward so use tank mode
+            motorPower[0] = BSNscalar * abs(stickTurn);
+            motorPower[1] = -BSNscalar * abs(stickTurn);
+        } else { // turning left, but not moving forward so use tank mode
+            motorPower[0] = -BSNscalar * abs(stickTurn);
+            motorPower[1] = BSNscalar * abs(stickTurn);
+        }
+    } else { // fwd stick is not zero
+        if (fabs(stickTurn) < THRESHOLD) { // turn stick is zero
+            // just move forward directly
+            motorPower[0] = BSNscalar * stickForwardRev; 
+            motorPower[1] = BSNscalar * stickForwardRev;
+        } else { // moving forward and turning
+            /*
+            if the sticks are not in any of the edge cases tested for above (when both sticks are not 0),
+            a value must be calculated to determine how to scale the motor that is doing the turning.
+            i.e.: if the user moves the left stick all the way forward (stickFwdRev = 1), and they are attempting
+            to turn right. The left motor should get set to 1 and the right motor should get set to 
+            some value less than 1, this value is determined by the function calcTurningMotorValue
+            */
+            if(trnPositive) { // turn Right
+                //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
+                motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
+                motorPower[1] = calcTurningMotorValue(stickForwardRev, lastRampPower[0]); // set the right motor
+            } else if(!trnPositive) { // turn Left
+                motorPower[0] = calcTurningMotorValue(stickForwardRev, lastRampPower[1]); // set the left motor
+                motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
+            }
         }
     }
 }
@@ -164,15 +151,15 @@ void Drive::generateMotionValues() {
  *  TurningMotor = TurnStickNumber(1-offset)(CurrentPwrFwd)^2+(1-TurnStickNumber)*CurrentPwrFwd
  *   *Note: CurrentPwrFwd is the current power, not the power from the stick
  * 
- * @param sticktrn the absoulte value of the current turning stick input
- * @param prevpwr the motor value from the previous loop
+ * @param stickTurn the absoulte value of the current turning stick input
+ * @param prevPwr the motor value from the previous loop
  * @return float - the value to get set to the turning motor (the result of the function mention above)
  */
-float Drive::calcTurningMotorValue(float sticktrn, float prevpwr) {
-    float temp = abs(sticktrn) * (1 - OFFSET) * pow(prevpwr, 2) + (1-abs(stickTurn)) * abs(prevpwr);
-    temp = copysign(temp, prevpwr);
-    lastTurnPwr = temp;
-    return temp;
+float Drive::calcTurningMotorValue(float stickTurn, float prevPwr) {
+    float turnPower = abs(stickTurn) * (1 - OFFSET) * pow(prevPwr, 2) + (1-abs(stickTurn)) * abs(prevPwr);
+    turnPower = copysign(turnPower, prevPwr);
+    lastTurnPwr = turnPower;
+    return turnPower;
 }
 
 
