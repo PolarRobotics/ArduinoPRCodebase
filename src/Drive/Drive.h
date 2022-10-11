@@ -33,7 +33,7 @@
 #define THRESHOLD 0.00001
 
 // this is 1.0, the maximum power possible to the motors.
-#define BOOST_PCT 0.99
+#define BOOST_PCT 0.9
 // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
 #define NORMAL_PCT 0.4
 // should be a value less than NORMAL_PCT, to slow down for precision maneuvering 
@@ -44,6 +44,7 @@ private:
   float stickForwardRev, stickTurn;
   float BSNscalar;
   float lastTurnPwr;
+  float turnPower; 
   
   Servo M1, M2; //temporary solution, use vector for future
   // vector<Servo> Motors;
@@ -55,11 +56,12 @@ private:
   float lastRampPower[NUM_MOTORS];
   // float inputPower[NUM_MOTORS];
   // float rampedPower[NUM_MOTORS];
-  float calcTurningMotorValue(float sticktrn,  float prevpwr);
+  float calcTurningMotorValue(float stickTrn,  float prevPwr);
   void generateMotionValues();
   float ramp(float requestedPower, uint8_t mtr);
   // use the inline keywork to ensure the function will get called again as soon as possible
-  float Convert2PWMVal(float rampPwr) __attribute__((always_inline)); 
+  float Convert2PWMVal(float rampPwr); 
+  void setMotorPWM(float pwr, byte pin) __attribute__((always_inline));
 
 public:
   enum SPEED {
@@ -73,6 +75,7 @@ public:
   float getMotorPwr(uint8_t mtr);
   void emergencyStop();
   void update();
+  void printDebugInfo();
 };
 
 // Robot Age Enum

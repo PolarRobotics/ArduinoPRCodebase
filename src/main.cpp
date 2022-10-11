@@ -15,6 +15,8 @@ USB Usb;            // There is a USB port
 BTD Btd(&Usb);      // The Location of the Bluetooth port
 PS5BT PS5(&Btd);
 
+unsigned long start = 0, end = 0, delta = 0; 
+
 Drive DriveMotors(3, 5);
 
 /*
@@ -71,7 +73,7 @@ void loop() {
     DriveMotors.emergencyStop();
   }
   // If the button is pressed and it is not debounced then go into statement
-  // if (digitalRead(buttonPin) == 1 && !debounce) {
+  // if (digitalRead(buttonPin) == 0 && !debounce) {
   //   digitalWrite(LED_BUILTIN, HIGH);
   //   Serial.println("Pairing...");
   //   debounce = true;             
@@ -86,5 +88,9 @@ void loop() {
   //     debounce = false;
   //   }
   // }
-  //delay(20);
+
+  // end = millis();
+  // delta = end - start;
+  // Serial.println(delta);
+  
 }

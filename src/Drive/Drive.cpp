@@ -47,8 +47,8 @@ Drive::Drive(int leftmotorpin, int rightmotorpin) {
  * @author Rhys Davies
  * Created: 9-12-2022
  *   
- * @param leftY the forward backward value from the left stick (0 to 255)
- * @param rightX the left right value from the right stick (0 to 255)
+ * @param leftY the forward backward value from the left stick an unsigned 8-bit float (0 to 255)
+ * @param rightX the left right value from the right stick an unsigned 8-bit float (0 to 255)
 */
 void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
     // left stick all the way foreward is 0, backward is 255 
@@ -142,6 +142,7 @@ void Drive::generateMotionValues() {
 }
 
 
+
 /**
  * @brief getTurningMotorValue generates a value to be set to the turning motor, the motor that corresponds to the direction of travel
  * @authors Grant Brautigam, Rhys Davies
@@ -151,12 +152,12 @@ void Drive::generateMotionValues() {
  *  TurningMotor = TurnStickNumber(1-offset)(CurrentPwrFwd)^2+(1-TurnStickNumber)*CurrentPwrFwd
  *   *Note: CurrentPwrFwd is the current power, not the power from the stick
  * 
- * @param stickTurn the absoulte value of the current turning stick input
+ * @param stickTrn the absoulte value of the current turning stick input
  * @param prevPwr the motor value from the previous loop
  * @return float - the value to get set to the turning motor (the result of the function mention above)
  */
-float Drive::calcTurningMotorValue(float stickTurn, float prevPwr) {
-    float turnPower = abs(stickTurn) * (1 - OFFSET) * pow(prevPwr, 2) + (1-abs(stickTurn)) * abs(prevPwr);
+float Drive::calcTurningMotorValue(float stickTrn, float prevPwr) {
+    turnPower = abs(stickTrn) * (1 - OFFSET) * pow(prevPwr, 2) + (1-abs(stickTrn)) * abs(prevPwr);
     turnPower = copysign(turnPower, prevPwr);
     lastTurnPwr = turnPower;
     return turnPower;
@@ -173,14 +174,7 @@ float Drive::calcTurningMotorValue(float stickTurn, float prevPwr) {
  * @return float 
  */
 float Drive::ramp(float requestedPower, uint8_t mtr) {
-    // Serial.print("  lastRampTime ");
-    // Serial.print(lastRampTime[mtr]);
-    // Serial.print("  requestedPower ");
-    // Serial.print(requestedPower);
-    // Serial.print("  current ");
-    // Serial.print(currentPower[mtr]);
-    // Serial.print("  requestedPower - currentPower ");
-    // Serial.println(requestedPower - currentPower[mtr], 10);
+
     if (millis() - lastRampTime[mtr] >= TIME_INCREMENT) {
         if (abs(requestedPower) < THRESHOLD) { // if the input is effectively zero
         // Experimental Braking Code
@@ -218,29 +212,17 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
  * @return normalized PWM value (between 1000 to 2000)
 */
 float Drive::Convert2PWMVal(float rampPwr) {
-    // Original Function: to be removed later.
-    // float temp_PWMVal;
-    // if (rampPwr < 0) {
-    //     // temp_PWMVal = map(rampPwr, 0, 1, 96, 120);
-    //     temp_PWMVal = 90 + PWM_CONVERSION_FACTOR * 127 * rampPwr; // maybe we should use the map function instead of this???
-    // } else if (rampPwr > 0 ) {
-    //     // temp_PWMVal = map(rampPwr, -1, 0, 40, 90);
-    //     temp_PWMVal = 100 + PWM_CONVERSION_FACTOR * 127 * rampPwr;
-    // } else {
-    //     temp_PWMVal = 93;
-    // }
-    // return temp_PWMVal;
-    
-
-    //original variable's range = [-1,1]
-    //converted variable's range = [1000, 2000]
-    // multiply the ramp power by 1000 (shift the decimal place over a bit) 
-    // to bring the number into a range that map can use
-    // return map(rampPwr * 1000, -1000, 1000, 1000, 2000);
-    return (-rampPwr + 1) * 500 + 1000;
+    return (rampPwr + 1) * 500 + 1000;
 }
 
-void setMtr(float pwr, byte mtr);
+void Drive::setMotorPWM(float pwr, byte pin) {
+    // M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
+    // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
+    digitalWrite(motorPins[pin], HIGH);
+    delayMicroseconds(Convert2PWMVal(pwr) - 40);
+    digitalWrite(motorPins[pin], LOW);
+    delayMicroseconds(2000 - Convert2PWMVal(pwr) - 40); //-170
+}
 
 /**
  * returns the stored motor value in the class
@@ -252,9 +234,23 @@ float Drive::getMotorPwr(uint8_t mtr) {
 }
 
 void Drive::emergencyStop() {
-    M1.writeMicroseconds(1500); // change to new function
-    M2.writeMicroseconds(1500); // change to new function
+    // M1.writeMicroseconds(1500); // change to new function
+    // M2.writeMicroseconds(1500); // change to new function
+    setMotorPWM(0, motorPins[0]);
+    setMotorPWM(0, motorPins[1]);
     // while(1);
+}
+
+void Drive::printDebugInfo() {
+    // Serial.print("  lastRampTime ");
+    // Serial.print(lastRampTime[mtr]);
+    // Serial.print("  requestedPower ");
+    // Serial.print(requestedPower);
+    // Serial.print("  current ");
+    // Serial.print(currentPower[mtr]);
+    // Serial.print("  requestedPower - currentPower ");
+    // Serial.println(requestedPower - currentPower[mtr], 10);
+
 }
 
 /**
@@ -309,13 +305,17 @@ void Drive::update() {
     // Serial.print(Convert2PWMVal(-motorPower[0]));
     // Serial.print(F("  Right: "));
     // Serial.println(Convert2PWMVal(motorPower[1]));
+    // setMotorPWM(-motorPower[0], motorPins[0]);
+    // setMotorPWM(motorPower[1], motorPins[1]);
 
-    // M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
-    // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
     digitalWrite(motorPins[0], HIGH);
-    delayMicroseconds(Convert2PWMVal(-motorPower[0])-40 );
+    delayMicroseconds(Convert2PWMVal(motorPower[0]) - 40);
     digitalWrite(motorPins[0], LOW);
-    delayMicroseconds(2000 - Convert2PWMVal(-motorPower[0])-40 ); //-170
+    // delayMicroseconds(2000 - Convert2PWMVal(motorPower[0]) - 40); //-170
+    digitalWrite(motorPins[1], HIGH);
+    delayMicroseconds(Convert2PWMVal(motorPower[1]) - 40);
+    digitalWrite(motorPins[1], LOW);
+    // delayMicroseconds(2000 - Convert2PWMVal(motorPower[1]) - 40); //-170
 }
 
 //Old functions
