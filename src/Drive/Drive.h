@@ -19,16 +19,16 @@
 // #endif
 
 // rate of change of power with respect to time when accelerating %power/10th of sec
-#define ACCELERATION_RATE .0375 
+#define ACCELERATION_RATE .0375
 // rate of deceleration/braking
-#define BRAKE_PERCENTAGE -0.25 
+#define BRAKE_PERCENTAGE -0.25
 // was 2000, for 2000ms. needs to be way faster
-#define TIME_INCREMENT 25 
+#define TIME_INCREMENT 25
 // DO NOT CHANGE THIS EVER!!!!!
-#define PWM_CONVERSION_FACTOR 0.3543307087 
+#define PWM_CONVERSION_FACTOR 0.3543307087
 
 // Controller Defines
-#define OFFSET 0.2 // the max allowable turning when the bot is traveling at full speed 
+#define OFFSET 0.2 // the max allowable turning when the bot is traveling at full speed
 #define STICK_DEADZONE 0.0629921259843 // 8.0 / 127.0
 #define THRESHOLD 0.00001
 
@@ -36,7 +36,7 @@
 #define BOOST_PCT 0.9
 // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
 #define NORMAL_PCT 0.4
-// should be a value less than NORMAL_PCT, to slow down for precision maneuvering 
+// should be a value less than NORMAL_PCT, to slow down for precision maneuvering
 #define SLOW_PCT 0.15
 
 class Drive {
@@ -44,8 +44,8 @@ private:
   float stickForwardRev, stickTurn;
   float BSNscalar;
   float lastTurnPwr;
-  float turnPower; 
-  
+  float turnPower;
+
   Servo M1, M2; //temporary solution, use vector for future
   // vector<Servo> Motors;
   // motor variables
@@ -60,7 +60,7 @@ private:
   void generateMotionValues();
   float ramp(float requestedPower, uint8_t mtr);
   // use the inline keywork to ensure the function will get called again as soon as possible
-  float Convert2PWMVal(float rampPwr); 
+  float Convert2PWMVal(float rampPwr);
   void setMotorPWM(float pwr, byte pin); //__attribute__((always_inline));
 
 public:

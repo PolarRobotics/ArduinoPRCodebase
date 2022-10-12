@@ -2,30 +2,30 @@
 #include <Arduino.h>
 #include <Servo.h> //Built in
 
-/** 
+/**
  * @brief Drive Class, base class for specialized drive classes, this configuration is intended for the standard linemen.
  * this class takes the the the stick input, scales the turning value for each motor and ramps that value over time,
  * then sets the ramped value to the motors
- * @authors Rhys Davies (@rdavies02), Max Phillips (@RyzenFromFire) 
- * 
+ * @authors Rhys Davies (@rdavies02), Max Phillips (@RyzenFromFire)
+ *
  * @class
- *    2 motor configuration shown below  
- * 
+ *    2 motor configuration shown below
+ *
  *               ^
  *               | Fwd
- *       _________________        
- *      |        _        |       
- *      |       |O|       |       O: represents the Omniwheel, a wheel that can turn on 2 axis       
+ *       _________________
+ *      |        _        |
+ *      |       |O|       |       O: represents the Omniwheel, a wheel that can turn on 2 axis
  *      |       |_|       |       L: represents the left Wheel, powered by the left motor via a chain
  *      |  _           _  |            - the left motor would turn ccw to move the bot forward
  *      | |L|         |R| |       R: represents the right Wheel, powered by the right motor via a chain
  *      | |_|         |_| |            - the right motor would turn cw to move the bot forward
  *      |_________________|
- * 
+ *
  * @todo
  *  - add a turning radius parameter, needed for the kicker
  *  - add mechanium driving code, for the new center, needed next semester (Spring 2023)
- * 
+ *
  * Default configuration:
  * @param leftmotorpin the arduino pin needed for the left motor, needed for servo
  * @param rightmotorpin the arduino pin needed for the right motor, needed for servo
@@ -45,12 +45,12 @@ Drive::Drive(int leftmotorpin, int rightmotorpin) {
  * and sets this value to the private variables stickFwdRev and stickTurn respectively
  * @author Rhys Davies
  * Created: 9-12-2022
- *   
+ *
  * @param leftY the forward backward value from the left stick an unsigned 8-bit float (0 to 255)
  * @param rightX the left right value from the right stick an unsigned 8-bit float (0 to 255)
 */
 void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
-    // left stick all the way foreward is 0, backward is 255 
+    // left stick all the way foreward is 0, backward is 255
     stickForwardRev = (0 - (leftY / 127.5 - 1)); // +: forward, -: backward. needs to be negated so that forward is forward and v.v. subtracting 1 bumps into correct range
     stickTurn = (rightX / 127.5 - 1); // +: right turn, -: left turn. subtracting 1 bumps into correct range
 
@@ -71,11 +71,11 @@ void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
 
 
 /**
- * @brief setBSN sets the internal variable to the requested percent power, this is what the motor power gets multiplied by, 
- * this is where the boost, slow and normal scalars get passed in 
+ * @brief setBSN sets the internal variable to the requested percent power, this is what the motor power gets multiplied by,
+ * this is where the boost, slow and normal scalars get passed in
  * @author Rhys Davies
  * Created: 9-12-2022
- * 
+ *
  * @param bsn input speed choice Drive::Boost, Drive::Slow, Drive::Normal
 */
 void Drive::setBSN(SPEED bsn) {
@@ -87,7 +87,7 @@ void Drive::setBSN(SPEED bsn) {
             break;
         }
         case normal: {
-            BSNscalar = NORMAL_PCT; 
+            BSNscalar = NORMAL_PCT;
             break;
         }
         case slow: {
@@ -98,7 +98,7 @@ void Drive::setBSN(SPEED bsn) {
 }
 
 
-/** 
+/**
  * generateTurnScalar takes the input stick power and scales the max turning power allowed with the forward power input
  * @authors Grant Brautigam, Rhys Davies, Max Phillips
  * Created: 9-12-2022
@@ -117,14 +117,14 @@ void Drive::generateMotionValues() {
     } else { // fwd stick is not zero
         if (fabs(stickTurn) < THRESHOLD) { // turn stick is zero
             // just move forward directly
-            motorPower[0] = BSNscalar * stickForwardRev; 
+            motorPower[0] = BSNscalar * stickForwardRev;
             motorPower[1] = BSNscalar * stickForwardRev;
         } else { // moving forward and turning
             /*
             if the sticks are not in any of the edge cases tested for above (when both sticks are not 0),
             a value must be calculated to determine how to scale the motor that is doing the turning.
             i.e.: if the user moves the left stick all the way forward (stickFwdRev = 1), and they are attempting
-            to turn right. The left motor should get set to 1 and the right motor should get set to 
+            to turn right. The left motor should get set to 1 and the right motor should get set to
             some value less than 1, this value is determined by the function calcTurningMotorValue
             */
             if(stickTurn > 0) { // turn Right
@@ -144,11 +144,11 @@ void Drive::generateMotionValues() {
  * @brief getTurningMotorValue generates a value to be set to the turning motor, the motor that corresponds to the direction of travel
  * @authors Grant Brautigam, Rhys Davies
  * Created: 9-12-2022
- * 
+ *
  * Mathematical model:
  *  TurningMotor = TurnStickNumber(1-offset)(CurrentPwrFwd)^2+(1-TurnStickNumber)*CurrentPwrFwd
  *   *Note: CurrentPwrFwd is the current power, not the power from the stick
- * 
+ *
  * @param stickTrn the absoulte value of the current turning stick input
  * @param prevPwr the motor value from the previous loop
  * @return float - the value to get set to the turning motor (the result of the function mention above)
@@ -164,21 +164,21 @@ float Drive::calcTurningMotorValue(float stickTrn, float prevPwr) {
 /**
  * @brief ramp slowly increases the motor power each iteration of the main loop,
  * the period and amount of increase is determined by the constants TIME_INCREMENT and ACCELERATION_RATE
- * this function is critical in ensuring the bot has proper traction with the floor, 
+ * this function is critical in ensuring the bot has proper traction with the floor,
  * the smaller ACCELERATION_RATE or larger TIME_INCREMENT is, the slower the ramp will be,
  * think of it as the slope y=mx+b
- * 
- * FUTURE: combine ACCELERATION_RATE and TIME_INCREMENT into one constant, 
+ *
+ * FUTURE: combine ACCELERATION_RATE and TIME_INCREMENT into one constant,
  * to allow for better tuning of ramp, we ran into problems during the 2022 comp with this,
  * possibly finding the best values for certain surfaces and storing them into a table and pulling from
- * this to determine a comfortable range for the drivers. 
- * 
+ * this to determine a comfortable range for the drivers.
+ *
  * @authors Max Phillips, Grant Brautigam
  * Created: early 2022
- * 
- * @param requestedPower 
- * @param mtr pass 0 for left and 1 for right, used to help ease with storing values for multiple motors 
- * @return float 
+ *
+ * @param requestedPower
+ * @param mtr pass 0 for left and 1 for right, used to help ease with storing values for multiple motors
+ * @return float
  */
 float Drive::ramp(float requestedPower, uint8_t mtr) {
 
@@ -210,9 +210,9 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
 }
 
 
-/** 
+/**
  * normalizes the signed power value from the ramp function to an unsigned value that the servo function can take
- * @authors Rhys Davies, Grant Brautigam, Alex Brown  
+ * @authors Rhys Davies, Grant Brautigam, Alex Brown
  * Updated: 9-13-2022
  *
  * @param rampPwr the value to be normalized. Hopefully a value between [-1, 1]
@@ -224,18 +224,18 @@ float Drive::Convert2PWMVal(float rampPwr) {
 
 
 /**
- * a function to set the motors based on a power input (-1 to 1), 
+ * a function to set the motors based on a power input (-1 to 1),
  * manually sets the motor high for the pwm time.
  * @author Rhys Davies
  * Created: 10-5-2022
  * Updated: 10-11-2022
- * 
- * note: this is only used in the emergency scenario, 
+ *
+ * note: this is only used in the emergency scenario,
  * because this function does not operate efficiently in the main program loop (adds a bit of delay)
  * this is still used to clean up the code in main.cpp
- * 
+ *
  * @param pwr the motor power to be set
- * @param pin the motor to be set (0 for left, 1 for right) 
+ * @param pin the motor to be set (0 for left, 1 for right)
 */
 void Drive::setMotorPWM(float pwr, byte pin) {
     // M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
@@ -267,7 +267,7 @@ void Drive::emergencyStop() {
  * prints the internal variables to the serial monitor in a clean format,
  * this function exists out of pure laziness to not have to comment out all the print statments
  * @author
- * Updated: 
+ * Updated:
 */
 void Drive::printDebugInfo() {
     // Serial.print("  lastRampTime ");
@@ -282,8 +282,8 @@ void Drive::printDebugInfo() {
 }
 
 /**
- * @brief updates the motors after calling all the functions to generate 
- * turning and scaling motor values, the intention of this is so the 
+ * @brief updates the motors after calling all the functions to generate
+ * turning and scaling motor values, the intention of this is so the
  * programmer doesnt have to call all the functions, this just handles it,
  * reducing clutter in the main file.
  * DO NOT CALL THIS FUNCTION UNTIL setStickPwr and setBSN have been called before update
@@ -291,7 +291,7 @@ void Drive::printDebugInfo() {
  * Created: 9-12-2022
  * Updated: 10-11-2020
 */
-void Drive::update() {    
+void Drive::update() {
     // Serial.print(F("Left Input: "));
     // Serial.print(stickForwardRev);
     // Serial.print(F("  Right: "));
@@ -299,7 +299,7 @@ void Drive::update() {
 
     // Generate turning motion
     generateMotionValues();
-    
+
     // Serial.print(F("  |  Turn: "));
     // Serial.print(lastTurnPwr);
 
@@ -321,7 +321,7 @@ void Drive::update() {
     // Serial.print(motorPower[0]);
     // Serial.print(F("  Right: "));
     // Serial.print(motorPower[1]);
-    
+
     // Serial.print(F("  |  Left Motor: "));
     // Serial.print(Convert2PWMVal(-motorPower[0]));
     // Serial.print(F("  Right: "));
@@ -329,9 +329,9 @@ void Drive::update() {
 
     /*
     Set the motors by outputting a pulse with a period corresponding to the motor power,
-    determined by Convert2PWMVal. These calculations can not be put into a function, 
-    because it confuses the compiler as these are time critical tasks. 
-    
+    determined by Convert2PWMVal. These calculations can not be put into a function,
+    because it confuses the compiler as these are time critical tasks.
+
     FUTURE: write this so both pins are HIGH at the same time, and the one that goes low first is called,
     because the beginning of the pulse is at the same time for both pins, but this isnt entirely necessary
     considering both motors operate independently on the sabertooth
