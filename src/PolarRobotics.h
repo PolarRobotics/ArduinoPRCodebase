@@ -22,4 +22,14 @@ enum BOT_STATE {
   TACKLED
 };
 
+enum AGE {
+  OLD,
+  NEW
+};
+
+enum ELEVATION {
+  low,
+  high
+};
+
 #endif
