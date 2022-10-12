@@ -7,18 +7,12 @@
 // #include "PolarRobotics.h"
 #include "Drive/Drive.h"
 
-#define buttonPin 8
-
-// The variables for PS5 and pair button
-bool debounce = false;
-bool usbConnected = false;
 
 // the USB Host shield uses pins 9 through 13, so dont use these pins
 USB Usb;            // There is a USB port
 BTD Btd(&Usb);      // The Location of the Bluetooth port
 PS5BT PS5(&Btd);
-
-unsigned long start = 0, end = 0, delta = 0; 
+bool usbConnected = false;
 
 Drive DriveMotors(3, 5);
 
@@ -65,8 +59,6 @@ void setup() {
 
   task1.enable();
 
-  pinMode(buttonPin, INPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
   delay(1000);
 }
 
@@ -80,7 +72,8 @@ void setup() {
 void loop() {
   // this loop took 4 to 5 ms to run through on 10-10-2022
   taskRunner.execute();
-
+  
+  // clean up the usb registers, allows for new commands to be executed
   Usb.Task();
 
   // The main looping code, controls driving and any actions during a game
