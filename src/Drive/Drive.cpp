@@ -1,8 +1,6 @@
-
 #include "Drive/Drive.h"
 #include <Arduino.h>
 #include <Servo.h> //Built in
-// #include <Servo_Hardware_PWM.h>
 
 /** 
  * @brief Drive Class, base class for specialized drive classes, this configuration is intended for the standard linemen.
@@ -41,6 +39,7 @@ Drive::Drive(int leftmotorpin, int rightmotorpin) {
     pinMode(rightmotorpin, OUTPUT);
 }
 
+
 /**
  * setStickPwr takes the stick values passed in and normalizes them to values between -1 and 1
  * and sets this value to the private variables stickFwdRev and stickTurn respectively
@@ -63,11 +62,13 @@ void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
     if (fabs(stickTurn) < STICK_DEADZONE) {
       stickTurn = 0;
     }
+    // Ensure the stick values do not go above 1 or below -1
     if (stickForwardRev > 1) stickForwardRev = 1;
     if (stickForwardRev < -1) stickForwardRev = -1;
     if (stickTurn > 1) stickTurn = 1;
     if (stickTurn < -1) stickTurn = -1;
 }
+
 
 /**
  * @brief setBSN sets the internal variable to the requested percent power, this is what the motor power gets multiplied by, 
@@ -103,13 +104,10 @@ void Drive::setBSN(SPEED bsn) {
  * Created: 9-12-2022
 */
 void Drive::generateMotionValues() {
-    // bool fwdPositive = (stickForwardRev > 0);
-    bool trnPositive = (stickTurn > 0);
-
     if (fabs(stickForwardRev) < THRESHOLD) { // fwd stick is zero
         if (fabs(stickTurn) < THRESHOLD) { // turn stick is zero
             motorPower[0] = 0, motorPower[1] = 0; // not moving, set motors to zero
-        } else if (trnPositive) { // turning right, but not moving forward so use tank mode
+        } else if (stickTurn > 0) { // turning right, but not moving forward so use tank mode
             motorPower[0] = BSNscalar * abs(stickTurn);
             motorPower[1] = -BSNscalar * abs(stickTurn);
         } else { // turning left, but not moving forward so use tank mode
@@ -129,18 +127,17 @@ void Drive::generateMotionValues() {
             to turn right. The left motor should get set to 1 and the right motor should get set to 
             some value less than 1, this value is determined by the function calcTurningMotorValue
             */
-            if(trnPositive) { // turn Right
+            if(stickTurn > 0) { // turn Right
                 //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
                 motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
                 motorPower[1] = calcTurningMotorValue(stickForwardRev, lastRampPower[0]); // set the right motor
-            } else if(!trnPositive) { // turn Left
+            } else if(stickTurn < 0) { // turn Left
                 motorPower[0] = calcTurningMotorValue(stickForwardRev, lastRampPower[1]); // set the left motor
                 motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
             }
         }
     }
 }
-
 
 
 /**
@@ -165,7 +162,17 @@ float Drive::calcTurningMotorValue(float stickTrn, float prevPwr) {
 
 
 /**
- * @brief ramp
+ * @brief ramp slowly increases the motor power each iteration of the main loop,
+ * the period and amount of increase is determined by the constants TIME_INCREMENT and ACCELERATION_RATE
+ * this function is critical in ensuring the bot has proper traction with the floor, 
+ * the smaller ACCELERATION_RATE or larger TIME_INCREMENT is, the slower the ramp will be,
+ * think of it as the slope y=mx+b
+ * 
+ * FUTURE: combine ACCELERATION_RATE and TIME_INCREMENT into one constant, 
+ * to allow for better tuning of ramp, we ran into problems during the 2022 comp with this,
+ * possibly finding the best values for certain surfaces and storing them into a table and pulling from
+ * this to determine a comfortable range for the drivers. 
+ * 
  * @authors Max Phillips, Grant Brautigam
  * Created: early 2022
  * 
@@ -215,6 +222,21 @@ float Drive::Convert2PWMVal(float rampPwr) {
     return (rampPwr + 1) * 500 + 1000;
 }
 
+
+/**
+ * a function to set the motors based on a power input (-1 to 1), 
+ * manually sets the motor high for the pwm time.
+ * @author Rhys Davies
+ * Created: 10-5-2022
+ * Updated: 10-11-2022
+ * 
+ * note: this is only used in the emergency scenario, 
+ * because this function does not operate efficiently in the main program loop (adds a bit of delay)
+ * this is still used to clean up the code in main.cpp
+ * 
+ * @param pwr the motor power to be set
+ * @param pin the motor to be set (0 for left, 1 for right) 
+*/
 void Drive::setMotorPWM(float pwr, byte pin) {
     // M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
     // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
@@ -241,6 +263,12 @@ void Drive::emergencyStop() {
     // while(1);
 }
 
+/**
+ * prints the internal variables to the serial monitor in a clean format,
+ * this function exists out of pure laziness to not have to comment out all the print statments
+ * @author
+ * Updated: 
+*/
 void Drive::printDebugInfo() {
     // Serial.print("  lastRampTime ");
     // Serial.print(lastRampTime[mtr]);
@@ -261,6 +289,7 @@ void Drive::printDebugInfo() {
  * DO NOT CALL THIS FUNCTION UNTIL setStickPwr and setBSN have been called before update
  * @author Rhys Davies
  * Created: 9-12-2022
+ * Updated: 10-11-2020
 */
 void Drive::update() {    
     // Serial.print(F("Left Input: "));
@@ -279,11 +308,6 @@ void Drive::update() {
     // Serial.print(F("  Right ReqPwr: "));
     // Serial.print(motorPower[1]);
 
-    // set the motors to zero if the motor power exceeds the allowable range
-    // if (abs(rampPwr + 0.5) > BOOST_PCT) {
-    //     return 0;
-    // }
-
     // get the ramp value
     motorPower[0] = ramp(motorPower[0], 0);
     motorPower[1] = ramp(motorPower[1], 1);
@@ -297,17 +321,21 @@ void Drive::update() {
     // Serial.print(motorPower[0]);
     // Serial.print(F("  Right: "));
     // Serial.print(motorPower[1]);
-    // Write to the motors
-    // M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
-    // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
-
+    
     // Serial.print(F("  |  Left Motor: "));
     // Serial.print(Convert2PWMVal(-motorPower[0]));
     // Serial.print(F("  Right: "));
     // Serial.println(Convert2PWMVal(motorPower[1]));
-    // setMotorPWM(-motorPower[0], motorPins[0]);
-    // setMotorPWM(motorPower[1], motorPins[1]);
 
+    /*
+    Set the motors by outputting a pulse with a period corresponding to the motor power,
+    determined by Convert2PWMVal. These calculations can not be put into a function, 
+    because it confuses the compiler as these are time critical tasks. 
+    
+    FUTURE: write this so both pins are HIGH at the same time, and the one that goes low first is called,
+    because the beginning of the pulse is at the same time for both pins, but this isnt entirely necessary
+    considering both motors operate independently on the sabertooth
+    */
     digitalWrite(motorPins[0], HIGH);
     delayMicroseconds(Convert2PWMVal(motorPower[0]) - 40);
     digitalWrite(motorPins[0], LOW);

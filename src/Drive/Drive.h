@@ -61,7 +61,7 @@ private:
   float ramp(float requestedPower, uint8_t mtr);
   // use the inline keywork to ensure the function will get called again as soon as possible
   float Convert2PWMVal(float rampPwr); 
-  void setMotorPWM(float pwr, byte pin) __attribute__((always_inline));
+  void setMotorPWM(float pwr, byte pin); //__attribute__((always_inline));
 
 public:
   enum SPEED {
