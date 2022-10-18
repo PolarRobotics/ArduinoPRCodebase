@@ -31,12 +31,19 @@
  * @param rightmotorpin the arduino pin needed for the right motor, needed for servo
 */
 Drive::Drive(int leftmotorpin, int rightmotorpin) {
-    // M1.attach(leftmotorpin, 1000, 2000);
-    // M2.attach(rightmotorpin, 1000, 2000);
+    M1.attach(leftmotorpin, 1000, 2000);
+    M2.attach(rightmotorpin, 1000, 2000);
     motorPins[0] = leftmotorpin;
     motorPins[1] = rightmotorpin;
-    pinMode(leftmotorpin, OUTPUT);
-    pinMode(rightmotorpin, OUTPUT);
+    //pinMode(leftmotorpin, OUTPUT);
+    //pinMode(rightmotorpin, OUTPUT);
+}
+
+Drive::Drive() {};
+
+void Drive::setServos(Servo& left, Servo& right) {
+    M1 = left;
+    M2 = right;
 }
 
 
@@ -104,8 +111,8 @@ void Drive::setBSN(SPEED bsn) {
  * Created: 9-12-2022
 */
 void Drive::generateMotionValues() {
-    if (fabs(stickForwardRev) < THRESHOLD) { // fwd stick is zero
-        if (fabs(stickTurn) < THRESHOLD) { // turn stick is zero
+    if (fabs(stickForwardRev) < STICK_DEADZONE) { // fwd stick is zero
+        if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero
             motorPower[0] = 0, motorPower[1] = 0; // not moving, set motors to zero
         } else if (stickTurn > 0) { // turning right, but not moving forward so use tank mode
             motorPower[0] = BSNscalar * abs(stickTurn);
@@ -115,7 +122,7 @@ void Drive::generateMotionValues() {
             motorPower[1] = BSNscalar * abs(stickTurn);
         }
     } else { // fwd stick is not zero
-        if (fabs(stickTurn) < THRESHOLD) { // turn stick is zero
+        if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero
             // just move forward directly
             motorPower[0] = BSNscalar * stickForwardRev;
             motorPower[1] = BSNscalar * stickForwardRev;
@@ -127,11 +134,11 @@ void Drive::generateMotionValues() {
             to turn right. The left motor should get set to 1 and the right motor should get set to
             some value less than 1, this value is determined by the function calcTurningMotorValue
             */
-            if(stickTurn > 0) { // turn Right
+            if(stickTurn > STICK_DEADZONE) { // turn Right
                 //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
                 motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
                 motorPower[1] = calcTurningMotorValue(stickForwardRev, lastRampPower[0]); // set the right motor
-            } else if(stickTurn < 0) { // turn Left
+            } else if(stickTurn < -STICK_DEADZONE) { // turn Left
                 motorPower[0] = calcTurningMotorValue(stickForwardRev, lastRampPower[1]); // set the left motor
                 motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
             }
@@ -256,11 +263,11 @@ float Drive::getMotorPwr(uint8_t mtr) {
 }
 
 void Drive::emergencyStop() {
-    // M1.writeMicroseconds(1500); // change to new function
-    // M2.writeMicroseconds(1500); // change to new function
-    setMotorPWM(0, motorPins[0]);
-    setMotorPWM(0, motorPins[1]);
-    // while(1);
+    M1.writeMicroseconds(1500); // change to new function
+    M2.writeMicroseconds(1500); // change to new function
+    // setMotorPWM(0, motorPins[0]);
+    // setMotorPWM(0, motorPins[1]);
+    // // while(1);
 }
 
 /**
@@ -336,14 +343,16 @@ void Drive::update() {
     because the beginning of the pulse is at the same time for both pins, but this isnt entirely necessary
     considering both motors operate independently on the sabertooth
     */
-    digitalWrite(motorPins[0], HIGH);
-    delayMicroseconds(Convert2PWMVal(motorPower[0]) - 40);
-    digitalWrite(motorPins[0], LOW);
-    // delayMicroseconds(2000 - Convert2PWMVal(motorPower[0]) - 40); //-170
-    digitalWrite(motorPins[1], HIGH);
-    delayMicroseconds(Convert2PWMVal(motorPower[1]) - 40);
-    digitalWrite(motorPins[1], LOW);
+    // digitalWrite(motorPins[0], HIGH);
+    // delayMicroseconds(Convert2PWMVal(motorPower[0]) - 40);
+    // digitalWrite(motorPins[0], LOW);
+    // // delayMicroseconds(2000 - Convert2PWMVal(motorPower[0]) - 40); //-170
+    // digitalWrite(motorPins[1], HIGH);
+    // delayMicroseconds(Convert2PWMVal(motorPower[1]) - 40);
+    // digitalWrite(motorPins[1], LOW);
     // delayMicroseconds(2000 - Convert2PWMVal(motorPower[1]) - 40); //-170
+    M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
+    M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 }
 
 //Old functions

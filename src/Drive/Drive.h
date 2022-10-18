@@ -29,7 +29,7 @@
 
 // Controller Defines
 #define OFFSET 0.2 // the max allowable turning when the bot is traveling at full speed
-#define STICK_DEADZONE 0.0629921259843 // 8.0 / 127.0
+#define STICK_DEADZONE 0.02F // 8.0 / 127.0
 #define THRESHOLD 0.00001
 
 // this is 1.0, the maximum power possible to the motors.
@@ -70,6 +70,9 @@ public:
     slow
   };
   Drive(int leftmotorpin, int rightmotorpin); //constructor for two motors
+  Drive();
+  void setServos(Servo&, Servo&);
+  void attach();
   void setStickPwr(uint8_t leftY, uint8_t rightX);
   void setBSN(SPEED bsn); //(float powerMultiplier);
   float getMotorPwr(uint8_t mtr);
@@ -78,12 +81,12 @@ public:
   void printDebugInfo();
 };
 
-// Robot Age Enum
-// 0 for old robot, 1 for new robot
-// remove later - deprecated
-enum AGE {
-  OLD,
-  NEW
-};
+// // Robot Age Enum
+// // 0 for old robot, 1 for new robot
+// // remove later - deprecated
+// enum AGE {
+//   OLD,
+//   NEW
+// };
 
 #endif /* DRIVE_H */
