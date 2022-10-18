@@ -29,15 +29,15 @@
 
 // Controller Defines
 #define OFFSET 0.2 // the max allowable turning when the bot is traveling at full speed
-#define STICK_DEADZONE 0.02F // 8.0 / 127.0
+#define STICK_DEADZONE 0.0390625F // 8.0 / 127.0
 #define THRESHOLD 0.00001
 
 // this is 1.0, the maximum power possible to the motors.
-#define BOOST_PCT 0.9
+#define BOOST_PCT 1.0
 // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
 #define NORMAL_PCT 0.4
 // should be a value less than NORMAL_PCT, to slow down for precision maneuvering
-#define SLOW_PCT 0.15
+#define SLOW_PCT 0.2
 
 class Drive {
 private:
