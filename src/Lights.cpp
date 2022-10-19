@@ -3,29 +3,38 @@
 
 #include <FastLED.h>
 #define LED_PIN 7
-#define NUM_LEDS 30 
+#define NUM_LEDS 150
 
-// bool Green1 = false; // VARIABLE TO DETERMINE IF LIGHTS SHOULD BE SOLID GREEN
-// bool Green2 = false; // VARIABLE TO DETERMINE IF LIGHTS SHOULD BLINK GREEN
-// bool Blue = false; // VARIABLE TO DETERMINE IF LIGHTS SHOULD BE SOLID BLUE
-// bool Red = false; // VARIABLE TO DETERMINE IF LIGHTS SHOULD BLINK RED
-
+// MUHAMMED ENUM PRAISE BE UPON HIM
 enum LEDState {
   PAIRING,      // flash Blue
   PAIRED,       // green then fade out
   OFFENSE,      // green
   DEFENSE,      // blue
-  BALL_CARRIER, // flash red
+  BALL_CARRIER  // flash red
 };
 
-LEDState currState;
-CRGBArray<NUM_LEDS> leds;
-uint8_t iteration = 255;
+LEDState States[] = {
+  PAIRING,      // flash Blue
+  PAIRED,       // green then fade out
+  OFFENSE,      // green
+  DEFENSE,      // blue
+  BALL_CARRIER  // flash red
+};
 
+// Global Variables
+LEDState currState;
+CRGBArray <NUM_LEDS> leds;
+uint8_t iteration = 255;
+int i = 0;
+
+/// Function Definitions 
 void setLEDStatus(LEDState status);
 void updateLEDS();
+void runLoop(int count);
 
-void setup() {
+
+void setup(){
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 500); // Power Failsafe
   // Clears LEDs when code is updated
@@ -35,19 +44,29 @@ void setup() {
 
 void loop(){
   // Determining when 
-
-  /// Sets all leds to solid green when 'x'
-  // for(int i = 0; i < NUM_LEDS; i++){
-  //   while(Green1 == true){
-  //   leds[i] = CRGB(0, 255, 0);
-  //   FastLED.show();
-  // }
-  setLEDStatus(PAIRED);
+  setLEDStatus(States[i]); 
+  FastLED.delay(2000);
   updateLEDS();
-  FastLED.delay(20);
 
   iteration += 15;
+
+  if (i + 1 == 6) {
+    i = 0;
+  }
+  else {
+    i++;
+  }
+
+int updateCount = 1;
+updateCount++;
+runLoop(updateCount);
 }
+
+void runLoop(int count){
+if(count == 20)
+updateLEDS();
+}
+
 
 void setLEDStatus(LEDState status) {
   currState = status;
@@ -87,8 +106,6 @@ void updateLEDS() {
   }
   FastLED.show();
 }
-
-
 
 // // Turn lights Flashing Green
 // for(int i = 0; i < NUM_LEDS; i++){ // Flash on
