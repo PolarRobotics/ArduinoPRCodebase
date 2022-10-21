@@ -207,22 +207,22 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
             return requestedPower;
         }
         // if we need to increase speed and we are going forward
-        else if (requestedPower > currentPower[mtr] && currentPower[mtr] > 0) { 
+        else if (requestedPower > currentPower[mtr] && requestedPower > 0) { 
             currentPower[mtr] = currentPower[mtr] + ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
         }
         // if we need to decrease speed and we are going forward
-        else if (requestedPower < currentPower[mtr] && currentPower[mtr] > 0) { 
+        else if (requestedPower < currentPower[mtr] && requestedPower > 0) { 
             currentPower[mtr] = currentPower[mtr] - ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
         }
         // if we need to increase speed and we are going in reverse
-        else if (requestedPower > currentPower[mtr] && currentPower[mtr] < 0) { 
+        else if (requestedPower < currentPower[mtr] && requestedPower < 0) { 
             currentPower[mtr] = currentPower[mtr] - ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
         }
         // if we need to decrease speed and we are going in reverse
-        else if (requestedPower < currentPower[mtr] && currentPower[mtr] < 0) { 
+        else if (requestedPower > currentPower[mtr] && requestedPower < 0) { 
             currentPower[mtr] = currentPower[mtr] + ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
         }
