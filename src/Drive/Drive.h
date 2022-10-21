@@ -39,6 +39,11 @@
 // should be a value less than NORMAL_PCT, to slow down for precision maneuvering
 #define SLOW_PCT 0.2
 
+// the percent values for the old robots
+#define OLD_BOOST_PCT 1.0
+#define OLD_NORMAL_PCT 0.7
+#define OLD_SLOW_PCT 0.4
+
 class Drive {
 private:
   float stickForwardRev, stickTurn;
@@ -47,6 +52,7 @@ private:
   float turnPower;
 
   Servo M1, M2; //temporary solution, use vector for future
+  bool age;
   // vector<Servo> Motors;
   // motor variables
   uint8_t motorPins[NUM_MOTORS];
@@ -71,7 +77,7 @@ public:
   };
   Drive(int leftmotorpin, int rightmotorpin); //constructor for two motors
   Drive();
-  void setServos(Servo&, Servo&);
+  void setServos(Servo&, Servo&, int robotAge);
   void attach();
   void setStickPwr(uint8_t leftY, uint8_t rightX);
   void setBSN(SPEED bsn); //(float powerMultiplier);

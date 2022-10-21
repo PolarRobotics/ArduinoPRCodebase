@@ -41,9 +41,10 @@ Drive::Drive(int leftmotorpin, int rightmotorpin) {
 
 Drive::Drive() {};
 
-void Drive::setServos(Servo& left, Servo& right) {
+void Drive::setServos(Servo& left, Servo& right, int robotAge) {
     M1 = left;
     M2 = right;
+    age = (robotAge == 1);
 }
 
 
@@ -70,10 +71,8 @@ void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
       stickTurn = 0;
     }
     // Ensure the stick values do not go above 1 or below -1
-    if (stickForwardRev > 1) stickForwardRev = 1;
-    if (stickForwardRev < -1) stickForwardRev = -1;
-    if (stickTurn > 1) stickTurn = 1;
-    if (stickTurn < -1) stickTurn = -1;
+    stickForwardRev = constrain(stickForwardRev, -1, 1);
+    stickTurn = constrain(stickTurn, -1, 1);
 }
 
 
@@ -90,15 +89,18 @@ void Drive::setBSN(SPEED bsn) {
     // BSNscalar = (powerMultiplier > 1) ? 0 : powerMultiplier;
     switch (bsn) {
         case boost: {
-            BSNscalar = BOOST_PCT;
+            // age ? BSNscalar = BOOST_PCT : BSNscalar = OLD_BOOST_PCT;
+            BSNscalar = age ? BOOST_PCT : OLD_BOOST_PCT;
             break;
         }
         case normal: {
-            BSNscalar = NORMAL_PCT;
+            // age ? BSNscalar = NORMAL_PCT : BSNscalar = OLD_NORMAL_PCT;
+            BSNscalar = age ? NORMAL_PCT : OLD_NORMAL_PCT;
             break;
         }
         case slow: {
-            BSNscalar = SLOW_PCT;
+            // age ? BSNscalar = SLOW_PCT : BSNscalar = OLD_SLOW_PCT;
+            BSNscalar = age ? SLOW_PCT : OLD_SLOW_PCT;
             break;
         }
     }
@@ -114,12 +116,12 @@ void Drive::generateMotionValues() {
     if (fabs(stickForwardRev) < STICK_DEADZONE) { // fwd stick is zero
         if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero
             motorPower[0] = 0, motorPower[1] = 0; // not moving, set motors to zero
-        } else if (stickTurn > 0) { // turning right, but not moving forward so use tank mode
-            motorPower[0] = BSNscalar * abs(stickTurn);
-            motorPower[1] = -BSNscalar * abs(stickTurn);
-        } else { // turning left, but not moving forward so use tank mode
-            motorPower[0] = -BSNscalar * abs(stickTurn);
-            motorPower[1] = BSNscalar * abs(stickTurn);
+        } else if (stickTurn > STICK_DEADZONE) { // turning right, but not moving forward so use tank mode
+            motorPower[0] = BSNscalar * abs(stickTurn) * 0.5;
+            motorPower[1] = -BSNscalar * abs(stickTurn) * 0.5;
+        } else if (stickTurn < -STICK_DEADZONE) { // turning left, but not moving forward so use tank mode
+            motorPower[0] = -BSNscalar * abs(stickTurn) * 0.5;
+            motorPower[1] = BSNscalar * abs(stickTurn) * 0.5;
         }
     } else { // fwd stick is not zero
         if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero
@@ -204,14 +206,28 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
         else if (abs(requestedPower - currentPower[mtr]) < ACCELERATION_RATE) { // if the input is effectively at the current power
             return requestedPower;
         }
-        else if (requestedPower > currentPower[mtr]) { // if we need to increase speed
+        // if we need to increase speed and we are going forward
+        else if (requestedPower > currentPower[mtr] && currentPower[mtr] > 0) { 
             currentPower[mtr] = currentPower[mtr] + ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
         }
-        else if (requestedPower < currentPower[mtr]) { // if we need to decrease speed
+        // if we need to decrease speed and we are going forward
+        else if (requestedPower < currentPower[mtr] && currentPower[mtr] > 0) { 
             currentPower[mtr] = currentPower[mtr] - ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
         }
+        // if we need to increase speed and we are going in reverse
+        else if (requestedPower > currentPower[mtr] && currentPower[mtr] < 0) { 
+            currentPower[mtr] = currentPower[mtr] - ACCELERATION_RATE;
+            lastRampTime[mtr] = millis();
+        }
+        // if we need to decrease speed and we are going in reverse
+        else if (requestedPower < currentPower[mtr] && currentPower[mtr] < 0) { 
+            currentPower[mtr] = currentPower[mtr] + ACCELERATION_RATE;
+            lastRampTime[mtr] = millis();
+        }
+        
+
     }
     return currentPower[mtr];
 }

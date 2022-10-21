@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h> //Built in
-// #include <EEPROM.h> //Built in
+#include <EEPROM.h> //Built in
 #include <PS5BT.h>
 #include <TaskScheduler.h>
 // Custom Polar Robotics Libraries:
@@ -17,6 +17,7 @@ bool usbConnected = false;
 #define rPin 5
 Servo leftMotor;
 Servo rightMotor;
+int robotAge;
 
 Drive DriveMotors;
 
@@ -34,9 +35,10 @@ void setup() {
   Serial.begin(115200);
   Serial.print(F("\r\nStarting..."));
   // DriveMotors.attach();
+  robotAge = EEPROM.read(0);
   leftMotor.attach(lPin);
   rightMotor.attach(rPin);
-  DriveMotors.setServos(leftMotor, rightMotor);
+  DriveMotors.setServos(leftMotor, rightMotor, robotAge);
   
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nReconnecting..."));
@@ -63,7 +65,7 @@ void loop() {
   Usb.Task();
 
   // The main looping code, controls driving and any actions during a game
-  if (PS5.connected()) {
+  if ((millis() - PS5.getLastMessageTime()) < 300) {
     DriveMotors.setStickPwr(PS5.getAnalogHat(LeftHatY), PS5.getAnalogHat(RightHatX));
 
     // determine BSN percentage (boost, slow, or normal)
