@@ -45,9 +45,9 @@
 #define BIG_SLOW_PCT 0.2
 
 // BSN for Short/Small Motors
-#define SMALL_BOOST_PCT 1.0
-#define SMALL_NORMAL_PCT 0.7
-#define SMALL_SLOW_PCT 0.4
+#define SMALL_BOOST_PCT 0.9
+#define SMALL_NORMAL_PCT 0.55
+#define SMALL_SLOW_PCT 0.3
 
 class Drive {
 private:
