@@ -18,7 +18,6 @@ bool usbConnected = false;
 Servo leftMotor;
 Servo rightMotor;
 int robotAge;
-
 Drive DriveMotors;
 
 
@@ -38,7 +37,7 @@ void setup() {
   robotAge = EEPROM.read(0);
   leftMotor.attach(lPin);
   rightMotor.attach(rPin);
-  DriveMotors.setServos(leftMotor, rightMotor, robotAge);
+  DriveMotors.setServos(leftMotor, rightMotor);
   
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nReconnecting..."));
@@ -65,7 +64,7 @@ void loop() {
   Usb.Task();
 
   // The main looping code, controls driving and any actions during a game
-  if ((millis() - PS5.getLastMessageTime()) < 300) {
+  if ((millis() - PS5.getLastMessageTime()) < 300) { // checks if PS5 is connected, had response within 300 ms
     DriveMotors.setStickPwr(PS5.getAnalogHat(LeftHatY), PS5.getAnalogHat(RightHatX));
 
     // determine BSN percentage (boost, slow, or normal)
@@ -79,7 +78,7 @@ void loop() {
 
     // Update the motors based on the inputs from the controller  
     DriveMotors.update();
-  } else {
+  } else { // no response from PS5 controller within last 300 ms, so stop
     // Emergency stop if the controller disconnects
     DriveMotors.emergencyStop();
   }

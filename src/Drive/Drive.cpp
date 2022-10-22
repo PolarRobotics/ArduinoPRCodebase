@@ -30,21 +30,17 @@
  * @param leftmotorpin the arduino pin needed for the left motor, needed for servo
  * @param rightmotorpin the arduino pin needed for the right motor, needed for servo
 */
-Drive::Drive(int leftmotorpin, int rightmotorpin) {
-    M1.attach(leftmotorpin, 1000, 2000);
-    M2.attach(rightmotorpin, 1000, 2000);
-    motorPins[0] = leftmotorpin;
-    motorPins[1] = rightmotorpin;
-    //pinMode(leftmotorpin, OUTPUT);
-    //pinMode(rightmotorpin, OUTPUT);
-}
+Drive::Drive() {
+    this->motorType = MOTORS::big; // default to long motors
+};
 
-Drive::Drive() {};
-
-void Drive::setServos(Servo& left, Servo& right, int robotAge) {
+void Drive::setServos(Servo& left, Servo& right) {
     M1 = left;
     M2 = right;
-    age = (robotAge == 1);
+}
+
+void Drive::setMotorType(MOTORS motorType) {
+    this->motorType = motorType;
 }
 
 
@@ -89,18 +85,18 @@ void Drive::setBSN(SPEED bsn) {
     // BSNscalar = (powerMultiplier > 1) ? 0 : powerMultiplier;
     switch (bsn) {
         case boost: {
-            // age ? BSNscalar = BOOST_PCT : BSNscalar = OLD_BOOST_PCT;
-            BSNscalar = age ? BOOST_PCT : OLD_BOOST_PCT;
+            if (motorType == MOTORS::big) BSNscalar = BIG_BOOST_PCT;
+            else /* motorType == MOTORS::small */ BSNscalar = SMALL_BOOST_PCT;
             break;
         }
         case normal: {
-            // age ? BSNscalar = NORMAL_PCT : BSNscalar = OLD_NORMAL_PCT;
-            BSNscalar = age ? NORMAL_PCT : OLD_NORMAL_PCT;
+            if (motorType == MOTORS::big) BSNscalar = BIG_NORMAL_PCT;
+            else /* motorType == MOTORS::small */ BSNscalar = SMALL_NORMAL_PCT;
             break;
         }
         case slow: {
-            // age ? BSNscalar = SLOW_PCT : BSNscalar = OLD_SLOW_PCT;
-            BSNscalar = age ? SLOW_PCT : OLD_SLOW_PCT;
+            if (motorType == MOTORS::big) BSNscalar = BIG_SLOW_PCT;
+            else /* motorType == MOTORS::small */ BSNscalar = SMALL_SLOW_PCT;
             break;
         }
     }
@@ -117,12 +113,12 @@ void Drive::generateMotionValues() {
         if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero
             motorPower[0] = 0, motorPower[1] = 0; // not moving, set motors to zero
         } else if (stickTurn > STICK_DEADZONE) { // turning right, but not moving forward so use tank mode
-            motorPower[0] = BSNscalar * abs(stickTurn) * 0.5;
+            motorPower[0] = BSNscalar * abs(stickTurn) * 0.5; // divide by 2 since turning was too fast
             motorPower[1] = -BSNscalar * abs(stickTurn) * 0.5;
         } else if (stickTurn < -STICK_DEADZONE) { // turning left, but not moving forward so use tank mode
-            motorPower[0] = -BSNscalar * abs(stickTurn) * 0.5;
+            motorPower[0] = -BSNscalar * abs(stickTurn) * 0.5; // divide by 2 since turning was too fast
             motorPower[1] = BSNscalar * abs(stickTurn) * 0.5;
-        }
+        } // no general else since encountered infinite loop
     } else { // fwd stick is not zero
         if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero
             // just move forward directly
