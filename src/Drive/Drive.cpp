@@ -159,7 +159,12 @@ void Drive::generateMotionValues() {
  * @return float - the value to get set to the turning motor (the result of the function mention above)
  */
 float Drive::calcTurningMotorValue(float stickTrn, float prevPwr) {
-    turnPower = abs(stickTrn) * (1 - OFFSET) * pow(prevPwr, 2) + (1-abs(stickTrn)) * abs(prevPwr);
+
+    float TurnMax = (OFFSET - 1)*(prevPwr) + 1;
+    float TurnFactor = abs(stickTrn)*TurnMax;
+    turnPower = prevPwr - prevPwr*TurnFactor;
+
+    //turnPower = abs(stickTrn) * (1 - OFFSET) * pow(prevPwr, 2) + (1-abs(stickTrn)) * abs(prevPwr);
     turnPower = copysign(turnPower, prevPwr);
     lastTurnPwr = turnPower;
     return turnPower;
