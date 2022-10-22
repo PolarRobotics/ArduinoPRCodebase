@@ -113,11 +113,11 @@ void Drive::generateMotionValues() {
         if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero
             motorPower[0] = 0, motorPower[1] = 0; // not moving, set motors to zero
         } else if (stickTurn > STICK_DEADZONE) { // turning right, but not moving forward so use tank mode
-            motorPower[0] = BSNscalar * abs(stickTurn) * 0.5; // divide by 2 since turning was too fast
-            motorPower[1] = -BSNscalar * abs(stickTurn) * 0.5;
+            motorPower[0] = BSNscalar * abs(stickTurn);
+            motorPower[1] = -BSNscalar * abs(stickTurn);
         } else if (stickTurn < -STICK_DEADZONE) { // turning left, but not moving forward so use tank mode
-            motorPower[0] = -BSNscalar * abs(stickTurn) * 0.5; // divide by 2 since turning was too fast
-            motorPower[1] = BSNscalar * abs(stickTurn) * 0.5;
+            motorPower[0] = -BSNscalar * abs(stickTurn);
+            motorPower[1] = BSNscalar * abs(stickTurn);
         } // no general else since encountered infinite loop
     } else { // fwd stick is not zero
         if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero

@@ -23,7 +23,7 @@
 #define ACCELERATION_RATE .0375
 // rate of deceleration/braking
 #define BRAKE_PERCENTAGE -0.25
-// was 2000, for 2000ms. needs to be way faster
+// how often the ramp() function changes the motor power
 #define TIME_INCREMENT 25
 // DO NOT CHANGE THIS EVER!!!!!
 #define PWM_CONVERSION_FACTOR 0.3543307087
