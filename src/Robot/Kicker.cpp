@@ -1,29 +1,33 @@
-// kicker
+#include <Kicker.h>
 
-/**
-//General Framework for the Kicker Code
-
-//Manual Wind Up Arm
-//Up On D-Pad
-void manualWindUp() {
-  
+Kicker::Kicker() {
 }
 
-//Auto Wind Up
-//Triangle on Controller
-void autoWindUp() {
-
+void Kicker::setup(uint8_t KickerPin) {
+  m_kickerpin = KickerPin;
+  kickerMotor.attach(KickerPin);
 }
 
-//Slow Release Arm
-//Down on DPad
-void slowRelease() {
-
+void Kicker::Test() {
+  kickerMotor.write(50); //clockwise
+  delay(3000);
+  kickerMotor.write(90); //stop
+  delay(1000);
+  kickerMotor.write(130); //counter-clockwise
+  delay(3000);
+  kickerMotor.write(90); //stop
 }
 
-//Fire
-//X on Controller
-void fireKicker() {
-
+void Kicker::Windup() {
+  kickerMotor.write(50);
+  delay(3000);
 }
-**/
+
+void Kicker::Release() {
+  kickerMotor.write(130);
+  delay(3000);
+}
+
+void Kicker::Stop() {
+  kickerMotor.write(90);
+}
