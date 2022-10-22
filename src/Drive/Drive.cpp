@@ -135,9 +135,9 @@ void Drive::generateMotionValues() {
             if(stickTurn > STICK_DEADZONE) { // turn Right
                 //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
                 motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
-                motorPower[1] = calcTurningMotorValue(stickForwardRev, lastRampPower[0]); // set the right motor
+                motorPower[1] = calcTurningMotorValue(stickTurn, lastRampPower[0]); // set the right motor
             } else if(stickTurn < -STICK_DEADZONE) { // turn Left
-                motorPower[0] = calcTurningMotorValue(stickForwardRev, lastRampPower[1]); // set the left motor
+                motorPower[0] = calcTurningMotorValue(stickTurn, lastRampPower[1]); // set the left motor
                 motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
             }
         }
@@ -155,16 +155,16 @@ void Drive::generateMotionValues() {
  *   *Note: CurrentPwrFwd is the current power, not the power from the stick
  *
  * @param stickTrn the absoulte value of the current turning stick input
- * @param prevPwr the motor value from the previous loop
+ * @param prevPwr the non-turning motor value from the previous loop, which was actually sent to the motor
  * @return float - the value to get set to the turning motor (the result of the function mention above)
  */
 float Drive::calcTurningMotorValue(float stickTrn, float prevPwr) {
+    
+    // float TurnMax = (OFFSET - 1)*(prevPwr) + 1;
+    // float TurnFactor = abs(stickTrn)*TurnMax;
+    // turnPower = prevPwr - prevPwr*TurnFactor;
 
-    float TurnMax = (OFFSET - 1)*(prevPwr) + 1;
-    float TurnFactor = abs(stickTrn)*TurnMax;
-    turnPower = prevPwr - prevPwr*TurnFactor;
-
-    //turnPower = abs(stickTrn) * (1 - OFFSET) * pow(prevPwr, 2) + (1-abs(stickTrn)) * abs(prevPwr);
+    turnPower = abs(stickTrn) * (1 - OFFSET) * pow(prevPwr, 2) + (1-abs(stickTrn)) * abs(prevPwr);
     turnPower = copysign(turnPower, prevPwr);
     lastTurnPwr = turnPower;
     return turnPower;
