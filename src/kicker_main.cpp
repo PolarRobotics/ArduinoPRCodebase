@@ -1,4 +1,8 @@
-#include <Kicker.h>
+#include <Arduino.h>
+#include <SPI.h>
+#include <PS5BT.h>
+
+#include <Robot/Kicker.h>
 
 int pin = 9;
 Kicker foot;
