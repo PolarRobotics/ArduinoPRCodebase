@@ -5,6 +5,7 @@
 
 #include <Arduino.h>
 #include <Servo.h>
+#include <PolarRobotics.h>
 // #include <Servo_Hardware_PWM.h>
 
 #ifndef NUM_MOTORS
@@ -22,22 +23,31 @@
 #define ACCELERATION_RATE .0375
 // rate of deceleration/braking
 #define BRAKE_PERCENTAGE -0.25
-// was 2000, for 2000ms. needs to be way faster
+// how often the ramp() function changes the motor power
 #define TIME_INCREMENT 25
 // DO NOT CHANGE THIS EVER!!!!!
 #define PWM_CONVERSION_FACTOR 0.3543307087
 
 // Controller Defines
 #define OFFSET 0.2 // the max allowable turning when the bot is traveling at full speed
-#define STICK_DEADZONE 0.0629921259843 // 8.0 / 127.0
+#define STICK_DEADZONE 0.0390625F // 8.0 / 127.0
 #define THRESHOLD 0.00001
 
+/* Boost, Normal, Slow Values */
+
+// BSN for Long/Big Motors
+
 // this is 1.0, the maximum power possible to the motors.
-#define BOOST_PCT 0.9
+#define BIG_BOOST_PCT 1.0
 // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
-#define NORMAL_PCT 0.4
-// should be a value less than NORMAL_PCT, to slow down for precision maneuvering
-#define SLOW_PCT 0.15
+#define BIG_NORMAL_PCT 0.4
+// should be a value less than BIG_NORMAL_PCT, to slow down for precision maneuvering
+#define BIG_SLOW_PCT 0.2
+
+// BSN for Short/Small Motors
+#define SMALL_BOOST_PCT 0.9
+#define SMALL_NORMAL_PCT 0.55
+#define SMALL_SLOW_PCT 0.3
 
 class Drive {
 private:
@@ -47,6 +57,8 @@ private:
   float turnPower;
 
   Servo M1, M2; //temporary solution, use vector for future
+  bool age;
+  MOTORS motorType;
   // vector<Servo> Motors;
   // motor variables
   uint8_t motorPins[NUM_MOTORS];
@@ -69,7 +81,10 @@ public:
     boost,
     slow
   };
-  Drive(int leftmotorpin, int rightmotorpin); //constructor for two motors
+  Drive();
+  void setServos(Servo&, Servo&);
+  void setMotorType(MOTORS motorType);
+  void attach();
   void setStickPwr(uint8_t leftY, uint8_t rightX);
   void setBSN(SPEED bsn); //(float powerMultiplier);
   float getMotorPwr(uint8_t mtr);
@@ -78,12 +93,12 @@ public:
   void printDebugInfo();
 };
 
-// Robot Age Enum
-// 0 for old robot, 1 for new robot
-// remove later - deprecated
-enum AGE {
-  OLD,
-  NEW
-};
+// // Robot Age Enum
+// // 0 for old robot, 1 for new robot
+// // remove later - deprecated
+// enum AGE {
+//   OLD,
+//   NEW
+// };
 
 #endif /* DRIVE_H */

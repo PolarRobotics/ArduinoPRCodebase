@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h> //Built in
-// #include <EEPROM.h> //Built in
+#include <EEPROM.h> //Built in
 #include <PS5BT.h>
 #include <TaskScheduler.h>
 // Custom Polar Robotics Libraries:
@@ -13,23 +13,13 @@ USB Usb;            // There is a USB port
 BTD Btd(&Usb);      // The Location of the Bluetooth port
 PS5BT PS5(&Btd);
 bool usbConnected = false;
+#define lPin 3
+#define rPin 5
+Servo leftMotor;
+Servo rightMotor;
+int robotAge;
+Drive DriveMotors;
 
-Drive DriveMotors(3, 5);
-
-// Tasks + Scheduler
-void t1Callback(); // First instance of function to be ran
-Scheduler taskRunner; // Name the scheduler
-Task task1(500, TASK_FOREVER, &t1Callback); // time in milliseconds, amount of iterations, function to run
-
-void t1Callback() {
-  // your code to refresh here
-  if (PS5.connected()) {
-    usbConnected = true;  // The USB receiver is still receiving information
-  } else {
-    usbConnected = false; // Makes sure the function doesn't run again
-    DriveMotors.emergencyStop(); // stop the motors
-  }
-}
 
 /*
    ____    _____   _____   _   _   ____
@@ -43,6 +33,11 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.print(F("\r\nStarting..."));
+  // DriveMotors.attach();
+  robotAge = EEPROM.read(0);
+  leftMotor.attach(lPin);
+  rightMotor.attach(rPin);
+  DriveMotors.setServos(leftMotor, rightMotor);
   
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nReconnecting..."));
@@ -52,12 +47,6 @@ void setup() {
   }
 
   Serial.print(F("\r\nConnected"));
-
-  // Enable the Tasks
-  taskRunner.init();
-  taskRunner.addTask(task1); // Add task to scheduler
-
-  task1.enable();
 
   delay(1000);
 }
@@ -70,14 +59,12 @@ void setup() {
   |_|  |_| /_/   \_\ |___| |_| \_|   |_____|  \___/   \___/  |_|
 */
 void loop() {
-  // this loop took 4 to 5 ms to run through on 10-10-2022
-  taskRunner.execute();
-  
+ 
   // clean up the usb registers, allows for new commands to be executed
   Usb.Task();
 
   // The main looping code, controls driving and any actions during a game
-  if (usbConnected) {
+  if ((millis() - PS5.getLastMessageTime()) < 300) { // checks if PS5 is connected, had response within 300 ms
     DriveMotors.setStickPwr(PS5.getAnalogHat(LeftHatY), PS5.getAnalogHat(RightHatX));
 
     // determine BSN percentage (boost, slow, or normal)
@@ -91,7 +78,7 @@ void loop() {
 
     // Update the motors based on the inputs from the controller  
     DriveMotors.update();
-  } else {
+  } else { // no response from PS5 controller within last 300 ms, so stop
     // Emergency stop if the controller disconnects
     DriveMotors.emergencyStop();
   }

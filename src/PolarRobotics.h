@@ -32,4 +32,9 @@ enum ELEVATION {
   high
 };
 
+enum MOTORS {
+  big, // EEPROM value of 0 for long/big motors
+  small // EEPROM value of 1 for short/small motors
+};
+
 #endif
