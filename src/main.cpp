@@ -22,7 +22,7 @@ Robot robot;
 #define rPin 5
 Servo leftMotor;
 Servo rightMotor;
-int robotAge;
+uint8_t motorType;
 Drive DriveMotors;
 
 
@@ -40,7 +40,8 @@ void setup() {
   Serial.begin(115200);
   Serial.print(F("\r\nStarting..."));
   // DriveMotors.attach();
-  robotAge = EEPROM.read(0);
+  motorType = EEPROM.read(0);
+  DriveMotors.setMotorType((MOTORS) motorType);
   leftMotor.attach(lPin);
   rightMotor.attach(rPin);
   DriveMotors.setServos(leftMotor, rightMotor);
