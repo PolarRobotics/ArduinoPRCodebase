@@ -2,8 +2,8 @@
 #include <Drive/Drive.h>
 #include <Servo.h>
 
-// Flywheel defines 
-#define FLYWHEEL_SPEED_FULL 120 // this should be between 90 and 140. 
+// Flywheel defines
+#define FLYWHEEL_SPEED_FULL 120 // this should be between 90 and 140.
 #define FLYWHEEL_STOP_SPEED 93
 
 // Elevation (linear actuators) defines
@@ -15,7 +15,7 @@
 
 // Conveyor defines
 #define CONVEYOR_ON 140
-#define CONVEYOR_OFF 93 
+#define CONVEYOR_OFF 93
 
 // Enum for Increasing or Decreasing Flywheel Speed
 enum speedStatus {
@@ -32,7 +32,7 @@ enum qbAim {
  * @authors Rhys Davies
  */
 class Quarterback { //: public Robot
-    private: 
+    private:
         uint8_t m_FlywheelPin;
         uint8_t m_conveyorPin;
         uint8_t m_ElevationPin;
@@ -47,14 +47,16 @@ class Quarterback { //: public Robot
         unsigned long lastFlywheelToggleTime;
         float flywheelSpeedFactor;
     public:
-        Quarterback();
-        void attachMotors(uint8_t fwpin, 
+        Quarterback() {};
+        void attachMotors(uint8_t fwpin,
             uint8_t conveyorpin, uint8_t elevationpin);
         void toggleFlywheels();
         void aim(qbAim dir);
         void toggleConveyor();
         void changeFWSpeed(speedStatus speed);
         void updateAim();
+        void initialize();
+        void action();
 };
 
 Quarterback::Quarterback() {
@@ -112,7 +114,7 @@ void Quarterback::aim(qbAim dir) {
   }
 }
 
-void Quarterback::updateAim() { 
+void Quarterback::updateAim() {
     // If it is currently moving then dont go into the loop until it is done moving
     if (millis() - lastElevationTime >= ELEVATION_PERIOD) {
       if (aimingUp && currentElevation < MAX_ELEVATION) {
@@ -258,7 +260,7 @@ void Quarterback::changeFWSpeed(speedStatus speed) {
     }
 
     // flywheels.write(60);
-    
+
     if (PS3.getButtonClick(SQUARE)) {
       flywheelstate = flywheelstate + 1;
       if (flywheelstate == 1) {

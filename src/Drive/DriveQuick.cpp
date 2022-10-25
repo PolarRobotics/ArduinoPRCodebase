@@ -1,9 +1,9 @@
 
 #include "Drive/Drive.h"
 
-Drive::Drive(int m1pin, int m2pin) {
+// Drive::Drive() {
 
-}
+// }
 
 /*
 drive quick is meant for the experimental running back

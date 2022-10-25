@@ -1,6 +1,15 @@
 #include "PolarRobotics.h"
 #include <Arduino.h>
 #include <Servo.h>
+#include <Robot/Quarterback.h>
+
+// TODO: Fix
+void Quarterback::initialize() {
+    // this->setDrive(new Drive(3,5));
+}
+
+void Quarterback::action() {
+    Serial.println("Quarterback is a go");
 
 /*
        ___    _   _      _      ____    _____   _____   ____    ____       _       ____   _  __   ____         ___
@@ -120,7 +129,7 @@ void debug_showTime() {
   Serial.println(millis());
   Serial.print("\n");
   Serial.print("timestamp: ");
-  Serial.println(QBAimTimestamp);
+  // Serial.println(QBAimTimestamp);
 }
 
 /* * * * * * * * * *

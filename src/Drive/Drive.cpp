@@ -32,7 +32,7 @@
 */
 Drive::Drive() {
     this->motorType = MOTORS::big; // default to long motors
-};
+}
 
 void Drive::setServos(Servo& left, Servo& right) {
     M1 = left;
@@ -41,6 +41,10 @@ void Drive::setServos(Servo& left, Servo& right) {
 
 void Drive::setMotorType(MOTORS motorType) {
     this->motorType = motorType;
+}
+
+void Drive::setMotorType(uint8_t motorType) {
+    this->motorType = static_cast<MOTORS>(motorType);
 }
 
 

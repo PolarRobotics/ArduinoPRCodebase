@@ -87,6 +87,7 @@ public:
   Drive();
   void setServos(Servo&, Servo&);
   void setMotorType(MOTORS motorType);
+  void setMotorType(uint8_t motorType);
   void attach();
   void setStickPwr(uint8_t leftY, uint8_t rightX);
   void setBSN(SPEED bsn); //(float powerMultiplier);

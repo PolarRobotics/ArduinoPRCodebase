@@ -4,25 +4,29 @@
 #include <PS5BT.h>
 
 // Custom Polar Robotics Libraries:
-// #include "PolarRobotics.h"
-// #include <Robot/Robot.h>
+#include <PolarRobotics.h>
+#include <Robot/Robot.h>
 #include <Drive/Drive.h>
 // #include <Robot/Lights.h>
 
+#include <Robot/Lineman.h>
+#include <Robot/Quarterback.h>
+
 // USB, Bluetooth, and Controller variable initialization
 // The USB Host shield uses pins 9 through 13, so don't use those pins
-USB Usb; 
-BTD Btd(&Usb);    
+USB Usb;
+BTD Btd(&Usb);
 PS5BT PS5(&Btd);
 
-// Robot and Drivebase 
-// Robot robot;
+// Robot and Drivebase
+Robot* robot;
+Drive* drive;
 #define lPin 3
 #define rPin 5
 Servo leftMotor;
 Servo rightMotor;
 uint8_t motorType;
-Drive DriveMotors;
+Drive DriveMotors; // TODO: Replace
 
 // Lights robotLED;
 // unsigned long CURRENTTIME;
@@ -40,16 +44,38 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.print(F("\r\nStarting..."));
-//   DriveMotors.attach();
+
+  /* * * * * * * * * * * * * *
+  * Robot Type Determination *
+  * * * * * * * * * * * * * */
+
+  uint8_t type = EEPROM.read(1);
+  Serial.println("EEPROM: " + static_cast<String>(type));
+  TYPE tempType = (TYPE) type;
+
+  switch (tempType) {
+      case quarterback:
+          Serial.println("Robot Type: Quarterback");
+          robot = new Quarterback();
+          break;
+      case lineman:
+      default:
+          // Assume lineman
+          Serial.println("Robot Type: Lineman");
+          robot = new Lineman();
+  }
+  robot->initialize();
+
+  // Motors
+  // TODO: Fix this section
+  type = EEPROM.read(0);
+  drive->setMotorType(type);
   motorType = EEPROM.read(0);
-//   EEPROM.write(4, EEPROM.read(4) + 1);
-//   Serial.print(F("\r\nIteration:"));
-//   Serial.print(EEPROM.read(4));
   DriveMotors.setMotorType((MOTORS) motorType);
   leftMotor.attach(lPin);
   rightMotor.attach(rPin);
   DriveMotors.setServos(leftMotor, rightMotor);
-  
+
   // Set initial LED color state
 //   robotLED.setupLEDS();
 //   robotLED.setLEDStatus(Lights::PAIRING);
@@ -57,7 +83,7 @@ void setup() {
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nReconnecting..."));
     while (Usb.Init() == -1) { // wait until the controller connects
-      delay(5); 
+      delay(5);
     }
   } else{
     // robotLED.setLEDStatus(Lights::DEFENSE);
@@ -76,7 +102,7 @@ void setup() {
 
 */
 void loop() {
- 
+
   // clean up the usb registers, allows for new commands to be executed
   Usb.Task();
 
@@ -100,7 +126,7 @@ void loop() {
     // if(PS5.getButtonPress(UP)){
     //   robotLED.togglePosition();
     // }
-    
+
     // if (millis() - CURRENTTIME >= 200) {
     //     CURRENTTIME = millis();
     //     robotLED.togglePosition();
@@ -112,7 +138,7 @@ void loop() {
     } else {
       DriveMotors.update();
     }
-    
+
   } else { // no response from PS5 controller within last 300 ms, so stop
     // Emergency stop if the controller disconnects
     DriveMotors.emergencyStop();
