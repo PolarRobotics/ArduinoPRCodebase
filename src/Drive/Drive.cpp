@@ -113,11 +113,11 @@ void Drive::generateMotionValues() {
         if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero
             motorPower[0] = 0, motorPower[1] = 0; // not moving, set motors to zero
         } else if (stickTurn > STICK_DEADZONE) { // turning right, but not moving forward so use tank mode
-            motorPower[0] = BSNscalar * abs(stickTurn);
-            motorPower[1] = -BSNscalar * abs(stickTurn);
+            motorPower[0] = BSNscalar * abs(stickTurn)  * TANK_MODE_PCT;
+            motorPower[1] = -BSNscalar * abs(stickTurn) * TANK_MODE_PCT;
         } else if (stickTurn < -STICK_DEADZONE) { // turning left, but not moving forward so use tank mode
-            motorPower[0] = -BSNscalar * abs(stickTurn);
-            motorPower[1] = BSNscalar * abs(stickTurn);
+            motorPower[0] = -BSNscalar * abs(stickTurn) * TANK_MODE_PCT;
+            motorPower[1] = BSNscalar * abs(stickTurn)  * TANK_MODE_PCT;
         } // no general else since encountered infinite loop
     } else { // fwd stick is not zero
         if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero
@@ -146,7 +146,7 @@ void Drive::generateMotionValues() {
 
 
 /**
- * @brief getTurningMotorValue generates a value to be set to the turning motor, the motor that corresponds to the direction of travel
+ * @brief calcTurningMotorValue generates a value to be set to the turning motor, the motor that corresponds to the direction of travel
  * @authors Grant Brautigam, Rhys Davies
  * Created: 9-12-2022
  *

@@ -24,12 +24,12 @@
 // rate of deceleration/braking
 #define BRAKE_PERCENTAGE -0.25
 // how often the ramp() function changes the motor power
-#define TIME_INCREMENT 25
+#define TIME_INCREMENT 50
 // DO NOT CHANGE THIS EVER!!!!!
 #define PWM_CONVERSION_FACTOR 0.3543307087
 
 // Controller Defines
-#define OFFSET 0.2 // the max allowable turning when the bot is traveling at full speed
+#define OFFSET 0.15 // the max allowable turning when the bot is traveling at full speed
 #define STICK_DEADZONE 0.0390625F // 8.0 / 127.0
 #define THRESHOLD 0.00001
 
@@ -38,7 +38,7 @@
 // BSN for Long/Big Motors
 
 // this is 1.0, the maximum power possible to the motors.
-#define BIG_BOOST_PCT 1.0
+#define BIG_BOOST_PCT 0.9
 // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
 #define BIG_NORMAL_PCT 0.4
 // should be a value less than BIG_NORMAL_PCT, to slow down for precision maneuvering
@@ -48,6 +48,9 @@
 #define SMALL_BOOST_PCT 0.9
 #define SMALL_NORMAL_PCT 0.55
 #define SMALL_SLOW_PCT 0.3
+
+// Value for the Tank Mode Reduction Factor Percentage
+#define TANK_MODE_PCT 0.5
 
 class Drive {
 private:
