@@ -3,16 +3,21 @@
 #include <EEPROM.h> //Built in
 #include <PS5BT.h>
 #include <TaskScheduler.h>
+
 // Custom Polar Robotics Libraries:
 // #include "PolarRobotics.h"
-#include "Drive/Drive.h"
+#include <Robot/Robot.h>
+#include <Drive/Drive.h>
 
-
-// the USB Host shield uses pins 9 through 13, so dont use these pins
-USB Usb;            // There is a USB port
-BTD Btd(&Usb);      // The Location of the Bluetooth port
+// USB, Bluetooth, and Controller variable initialization
+// The USB Host shield uses pins 9 through 13, so don't use those pins
+USB Usb; 
+BTD Btd(&Usb);    
 PS5BT PS5(&Btd);
 bool usbConnected = false;
+
+// Robot and Drivebase 
+Robot robot;
 #define lPin 3
 #define rPin 5
 Servo leftMotor;
@@ -27,6 +32,7 @@ Drive DriveMotors;
   \___ \  |  _|     | |   | | | | | |_) |
    ___) | | |___    | |   | |_| | |  __/
   |____/  |_____|   |_|    \___/  |_|
+
 */
 
 void setup() {
@@ -57,6 +63,7 @@ void setup() {
   | |\/| |   / _ \    | |  |  \| |   | |     | | | | | | | | | |_) |
   | |  | |  / ___ \   | |  | |\  |   | |___  | |_| | | |_| | |  __/
   |_|  |_| /_/   \_\ |___| |_| \_|   |_____|  \___/   \___/  |_|
+
 */
 void loop() {
  
