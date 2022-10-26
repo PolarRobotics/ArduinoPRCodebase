@@ -21,21 +21,25 @@ LEDState States[] = {
   BALL_CARRIER  // flash red
 };
 
+class Lights {
+private:
+  LEDState currState;
+  CRGBArray <NUM_LEDS> leds;
+  uint8_t iteration;
+  int i, updateCount;
+public:
+  Lights();
+  void setLEDStatus(LEDState status);
+  void updateLEDS();
+  void runLoop(int count);
+};
 // Global Variables
-LEDState currState;
-CRGBArray <NUM_LEDS> leds;
-uint8_t iteration = 255;
-int i = 0;
-int updateCount = 0;
+
 
 
 /// Function Definitions 
-void setLEDStatus(LEDState status);
-void updateLEDS();
-void runLoop(int count);
 
-
-void setup(){
+Lights::Lights() {
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 500); // Power Failsafe
   // Clears LEDs when code is updated
@@ -43,36 +47,18 @@ void setup(){
   FastLED.show();
 }
 
-void loop(){
-  // Determining when 
-  setLEDStatus(States[i]); 
-  FastLED.delay(2000);
-  updateLEDS();
 
-  iteration += 15;
-
-  if (i + 1 == 6) {
-    i = 0;
-  }
-  else {
-    i++;
-  }
-
-updateCount++;
-runLoop(updateCount);
-}
-
-void runLoop(int count){
+void Lights::runLoop(int count){
 if(count == 20)
 updateLEDS();
 }
 
 
-void setLEDStatus(LEDState status) {
+void Lights::setLEDStatus(LEDState status) {
   currState = status;
 }
 
-void updateLEDS() {
+void Lights::updateLEDS() {
   switch(currState) {
     case PAIRING: {
       break;
