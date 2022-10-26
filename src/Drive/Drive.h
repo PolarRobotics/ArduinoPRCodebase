@@ -24,7 +24,8 @@
 // rate of deceleration/braking
 #define BRAKE_PERCENTAGE -0.25
 // how often the ramp() function changes the motor power
-#define TIME_INCREMENT 50
+#define TIME_INCREMENT 25
+#define BREAK_TIME_INCREMENT 12.5
 // DO NOT CHANGE THIS EVER!!!!!
 #define PWM_CONVERSION_FACTOR 0.3543307087
 
@@ -38,7 +39,7 @@
 // BSN for Long/Big Motors
 
 // this is 1.0, the maximum power possible to the motors.
-#define BIG_BOOST_PCT 0.9
+#define BIG_BOOST_PCT 1.0
 // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
 #define BIG_NORMAL_PCT 0.4
 // should be a value less than BIG_NORMAL_PCT, to slow down for precision maneuvering
