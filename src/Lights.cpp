@@ -1,16 +1,15 @@
 // void updateLEDS(BOT_STATE status); //private
 // void setRobotState(BOT_STATE state);
-
 #include <FastLED.h>
 #define LED_PIN 7
 #define NUM_LEDS 150
 
 // MUHAMMED ENUM PRAISE BE UPON HIM
 enum LEDState {
-  PAIRING,      // flash Blue
+  PAIRING,      // nothing and then red
   PAIRED,       // green then fade out
-  OFFENSE,      // green
-  DEFENSE,      // blue
+  OFFENSE,      // blue
+  DEFENSE,      // green
   BALL_CARRIER  // flash red
 };
 
@@ -27,6 +26,8 @@ LEDState currState;
 CRGBArray <NUM_LEDS> leds;
 uint8_t iteration = 255;
 int i = 0;
+int updateCount = 0;
+
 
 /// Function Definitions 
 void setLEDStatus(LEDState status);
@@ -57,7 +58,6 @@ void loop(){
     i++;
   }
 
-int updateCount = 1;
 updateCount++;
 runLoop(updateCount);
 }
