@@ -8,6 +8,7 @@
 // #include "PolarRobotics.h"
 #include <Robot/Robot.h>
 #include <Drive/Drive.h>
+#include <Robot/Edited_Center.h>
 
 // USB, Bluetooth, and Controller variable initialization
 // The USB Host shield uses pins 9 through 13, so don't use those pins
@@ -24,6 +25,13 @@ Servo rightMotor;
 uint8_t motorType;
 Drive DriveMotors;
 
+// Center Robot
+Center CenterBot;   
+Servo centerArm;
+Servo centerClaw;
+#define armPin 6
+#define clawPin 13
+
 
 /*
    ____    _____   _____   _   _   ____
@@ -38,12 +46,20 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.print(F("\r\nStarting..."));
-  // DriveMotors.attach();
+
+  // Get the bot drive type and then attach drive motors and set drive type
   motorType = EEPROM.read(0);
   DriveMotors.setMotorType((MOTORS) motorType);
   leftMotor.attach(lPin);
   rightMotor.attach(rPin);
   DriveMotors.setServos(leftMotor, rightMotor);
+
+  // Attach the center motors and set ps5 controller for center
+  centerArm.attach(armPin);
+  centerClaw.attach(clawPin);
+  CenterBot.setServos(centerArm, centerClaw);
+  PS5.leftTrigger.setTriggerForce(0, 255);
+  PS5.rightTrigger.setTriggerForce(0, 255);
   
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nReconnecting..."));
@@ -85,8 +101,33 @@ void loop() {
 
     // Update the motors based on the inputs from the controller  
     DriveMotors.update();
+
+    if (PS5.getAnalogButton(R2)) {
+        CenterBot.armControl(armStatus::Higher);
+    } else if (PS5.getAnalogButton(L2)) {
+        CenterBot.armControl(armStatus::Lower);
+    } else if (PS5.getButtonPress(TRIANGLE)) {
+        CenterBot.armControl(armStatus::Hold);
+    } else {
+        CenterBot.armControl(armStatus::Stop);
+    }
+    
+    if (PS5.getButtonPress(UP)) {
+        CenterBot.clawControl(clawStatus::Open);
+    } else if (PS5.getButtonPress(DOWN)) {
+        CenterBot.clawControl(clawStatus::Close);
+    } else {
+        CenterBot.clawControl(clawStatus::clawStop);
+    }
+
+
+
+
+
   } else { // no response from PS5 controller within last 300 ms, so stop
     // Emergency stop if the controller disconnects
     DriveMotors.emergencyStop();
   }
+
+
 }
