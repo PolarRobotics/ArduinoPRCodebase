@@ -40,7 +40,7 @@ void Center::clawControl(clawStatus reqstatus) {
   } else if(reqstatus == clawStatus::Close) {
     clawmotor.write(84);
   } else if(reqstatus == clawStatus::clawStop) {
-    clawmotor.write(89);
+    clawmotor.write(93);
   }
 }
 
@@ -50,14 +50,14 @@ void Center::clawControl(clawStatus reqstatus) {
  * Date: 9/19/22
  **/
 void Center::armControl(armStatus reqstatus) {
-  if (reqstatus == armStatus::Higher) {
+  if (reqstatus == armStatus::Lower) {
     armmotor.write(98);
-  } else if (reqstatus == armStatus::Lower) {
+  } else if (reqstatus == armStatus::Higher) {
     armmotor.write(87);
   } else if (reqstatus == armStatus::Stop) {
     armmotor.write(93);
   } else if (reqstatus == armStatus::Hold) {
-    armmotor.write(95);
+    armmotor.write(90);
   }
 
 }

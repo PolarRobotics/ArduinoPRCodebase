@@ -22,7 +22,7 @@
 // rate of change of power with respect to time when accelerating %power/10th of sec
 #define ACCELERATION_RATE .0375
 // rate of deceleration/braking
-#define BRAKE_PERCENTAGE -0.25
+#define BRAKE_PERCENTAGE 0.9
 // how often the ramp() function changes the motor power
 #define TIME_INCREMENT 25
 #define BREAK_TIME_INCREMENT 12.5
