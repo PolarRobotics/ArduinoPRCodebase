@@ -1,53 +1,33 @@
-// kicker
+#include <Robot/Kicker.h>
 
-/**
-//General Framework for the Kicker Code
-
-//Manual Wind Up Arm
-//Up On D-Pad
-void manualWindUp(Servo KickerArm, String requestedStatus) {
-  if (requestedStatus == "Wind") {
-    KickerArm.write(50);
-  }
-  else if (requestedStatus == "Stop") {
-    KickerArm.write(90);
-  }
+Kicker::Kicker() {
 }
 
-//Auto Wind Up
-//Triangle on Controller
-void autoWindUp() {
-
+void Kicker::setup(uint8_t KickerPin) {
+  m_kickerpin = KickerPin;
+  kickerMotor.attach(KickerPin);
 }
 
-//Slow Release Arm
-//Down on DPad
-void slowRelease(Servo KickerArm, String requestedStatus) {
-  if (requestedStatus == "Release") {
-    KickerArm.write(130);
-  }
-  else if (requestedStatus == "Stop") {
-    KickerArm.write(90);
-  }
+void Kicker::Test() {
+  kickerMotor.write(50); //clockwise
+  delay(3000);
+  kickerMotor.write(90); //stop
+  delay(1000);
+  kickerMotor.write(130); //counter-clockwise
+  delay(3000);
+  kickerMotor.write(90); //stop
 }
 
-//Fire
-//X on Controller
-void fireKicker() {
-
+void Kicker::Windup() {
+  kickerMotor.write(50);
+  delay(3000);
 }
 
-
-//Step 1: Verify that this robot is actually the kicker
-if (robotType == kicker) {
-    if (PS3.getAnalogButton(R2)) {
-        KickerMotor.write(75);
-    }
-    if (PS3.getAnalogButton(L2)) {
-        KickerMotor.write(107);
-    }
-    if (!PS3.getAnalogButton(R2) && !PS3.getAnalogButton(l2)) {
-        KickerMotor.write(90);
-    }
+void Kicker::Release() {
+  kickerMotor.write(130);
+  delay(3000);
 }
-**/
+
+void Kicker::Stop() {
+  kickerMotor.write(90);
+}
