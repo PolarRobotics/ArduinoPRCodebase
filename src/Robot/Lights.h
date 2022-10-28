@@ -1,5 +1,6 @@
 // void updateLEDS(BOT_STATE status); //private
 // void setRobotState(BOT_STATE state);
+
 #include <FastLED.h>
 #define LED_PIN 7
 #define NUM_LEDS 150
@@ -10,14 +11,6 @@ enum LEDState {
   PAIRED,       // green then fade out
   OFFENSE,      // blue
   DEFENSE,      // green
-  BALL_CARRIER  // flash red
-};
-
-LEDState States[] = {
-  PAIRING,      // flash Blue
-  PAIRED,       // green then fade out
-  OFFENSE,      // green
-  DEFENSE,      // blue
   BALL_CARRIER  // flash red
 };
 
