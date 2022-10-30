@@ -34,10 +34,6 @@
 #define STICK_DEADZONE 0.0390625F // 8.0 / 127.0
 #define THRESHOLD 0.00001
 
-/* Boost, Normal, Slow Values */
-
-// BSN for Long/Big Motors
-
 // this is 1.0, the maximum power possible to the motors.
 #define BIG_BOOST_PCT 1.0
 // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
@@ -50,7 +46,7 @@
 #define SMALL_NORMAL_PCT 0.55
 #define SMALL_SLOW_PCT 0.3
 
-// Value for the Tank Mode Reduction Factor Percentage
+// Value for the tank mode speed reduction percentage
 #define TANK_MODE_PCT 0.5
 
 class Drive {
@@ -61,7 +57,6 @@ private:
   float turnPower;
 
   Servo M1, M2; //temporary solution, use vector for future
-  bool age;
   MOTORS motorType;
   // vector<Servo> Motors;
   // motor variables

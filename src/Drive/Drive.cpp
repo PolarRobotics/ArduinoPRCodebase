@@ -227,8 +227,6 @@ float Drive::ramp(float requestedPower, uint8_t mtr) {
             currentPower[mtr] = currentPower[mtr] + ACCELERATION_RATE;
             lastRampTime[mtr] = millis();
         }
-        
-
     }
 
     return currentPower[mtr];
@@ -249,15 +247,19 @@ float Drive::Convert2PWMVal(float rampPwr) {
 
 
 /**
- * a function to set the motors based on a power input (-1 to 1),
+ * alternate for servos writeMicroseconds, a function to set the motors based on a power input (-1 to 1),
  * manually sets the motor high for the pwm time.
  * @author Rhys Davies
  * Created: 10-5-2022
- * Updated: 10-11-2022
+ * Updated: 10-29-2022
  *
- * note: this is only used in the emergency scenario,
- * because this function does not operate efficiently in the main program loop (adds a bit of delay)
- * this is still used to clean up the code in main.cpp
+ * Set the motors by outputting a pulse with a period corresponding to the motor power,
+ * determined by Convert2PWMVal. These calculations can not be put into a function,
+ * because it confuses the compiler as these are time critical tasks.
+ * 
+ * FUTURE: write this so both pins are HIGH at the same time, and the one that goes low first is called,
+ * because the beginning of the pulse is at the same time for both pins, but this isnt entirely necessary
+ * considering both motors operate independently on the sabertooth
  *
  * @param pwr the motor power to be set
  * @param pin the motor to be set (0 for left, 1 for right)
@@ -269,6 +271,14 @@ void Drive::setMotorPWM(float pwr, byte pin) {
     delayMicroseconds(Convert2PWMVal(pwr) - 40);
     digitalWrite(motorPins[pin], LOW);
     delayMicroseconds(2000 - Convert2PWMVal(pwr) - 40); //-170
+    // digitalWrite(motorPins[0], HIGH);
+    // delayMicroseconds(Convert2PWMVal(motorPower[0]) - 40);
+    // digitalWrite(motorPins[0], LOW);
+    // // delayMicroseconds(2000 - Convert2PWMVal(motorPower[0]) - 40); //-170
+    // digitalWrite(motorPins[1], HIGH);
+    // delayMicroseconds(Convert2PWMVal(motorPower[1]) - 40);
+    // digitalWrite(motorPins[1], LOW);
+    // delayMicroseconds(2000 - Convert2PWMVal(motorPower[1]) - 40); //-170
 }
 
 /**
@@ -295,14 +305,38 @@ void Drive::emergencyStop() {
  * Updated:
 */
 void Drive::printDebugInfo() {
-    // Serial.print("  lastRampTime ");
+    // Serial.print(F("Left Input: "));
+    // Serial.print(stickForwardRev);
+    // Serial.print(F("  Right: "));
+    // Serial.print(stickTurn);
+
+    // Serial.print(F("  |  Turn: "));
+    // Serial.print(lastTurnPwr);
+
+    // Serial.print(F("  |  Left ReqPwr: "));
+    // Serial.print(motorPower[0]);
+    // Serial.print(F("  Right ReqPwr: "));
+    // Serial.print(motorPower[1]);
+
+
+    // Serial.print(F("  lastRampTime "));
     // Serial.print(lastRampTime[mtr]);
-    // Serial.print("  requestedPower ");
+    // Serial.print(F("  requestedPower "));
     // Serial.print(requestedPower);
-    // Serial.print("  current ");
+    // Serial.print(F("  current "));
     // Serial.print(currentPower[mtr]);
-    // Serial.print("  requestedPower - currentPower ");
+    // Serial.print(F("  requestedPower - currentPower "));
     // Serial.println(requestedPower - currentPower[mtr], 10);
+
+    // Serial.print(F("  Left Motor: "));
+    // Serial.print(motorPower[0]);
+    // Serial.print(F("  Right: "));
+    // Serial.print(motorPower[1]);
+
+    // Serial.print(F("  |  Left Motor: "));
+    // Serial.print(Convert2PWMVal(-motorPower[0]));
+    // Serial.print(F("  Right: "));
+    // Serial.println(Convert2PWMVal(motorPower[1]));
 
 }
 
@@ -317,58 +351,17 @@ void Drive::printDebugInfo() {
  * Updated: 10-11-2020
 */
 void Drive::update() {
-    // Serial.print(F("Left Input: "));
-    // Serial.print(stickForwardRev);
-    // Serial.print(F("  Right: "));
-    // Serial.print(stickTurn);
-
     // Generate turning motion
     generateMotionValues();
-
-    // Serial.print(F("  |  Turn: "));
-    // Serial.print(lastTurnPwr);
-
-    // Serial.print(F("  |  Left ReqPwr: "));
-    // Serial.print(motorPower[0]);
-    // Serial.print(F("  Right ReqPwr: "));
-    // Serial.print(motorPower[1]);
 
     // get the ramp value
     motorPower[0] = ramp(motorPower[0], 0);
     motorPower[1] = ramp(motorPower[1], 1);
 
-
     // Set the ramp value to a function, needed for generateMotionValues
     lastRampPower[0] = motorPower[0];
     lastRampPower[1] = motorPower[1];
-
-    // Serial.print(F("  Left Motor: "));
-    // Serial.print(motorPower[0]);
-    // Serial.print(F("  Right: "));
-    // Serial.print(motorPower[1]);
-
-    // Serial.print(F("  |  Left Motor: "));
-    // Serial.print(Convert2PWMVal(-motorPower[0]));
-    // Serial.print(F("  Right: "));
-    // Serial.println(Convert2PWMVal(motorPower[1]));
-
-    /*
-    Set the motors by outputting a pulse with a period corresponding to the motor power,
-    determined by Convert2PWMVal. These calculations can not be put into a function,
-    because it confuses the compiler as these are time critical tasks.
-
-    FUTURE: write this so both pins are HIGH at the same time, and the one that goes low first is called,
-    because the beginning of the pulse is at the same time for both pins, but this isnt entirely necessary
-    considering both motors operate independently on the sabertooth
-    */
-    // digitalWrite(motorPins[0], HIGH);
-    // delayMicroseconds(Convert2PWMVal(motorPower[0]) - 40);
-    // digitalWrite(motorPins[0], LOW);
-    // // delayMicroseconds(2000 - Convert2PWMVal(motorPower[0]) - 40); //-170
-    // digitalWrite(motorPins[1], HIGH);
-    // delayMicroseconds(Convert2PWMVal(motorPower[1]) - 40);
-    // digitalWrite(motorPins[1], LOW);
-    // delayMicroseconds(2000 - Convert2PWMVal(motorPower[1]) - 40); //-170
+    
     M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
     M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 }

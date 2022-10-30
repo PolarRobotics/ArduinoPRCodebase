@@ -1,10 +1,9 @@
+#pragma once
+
 #ifndef KICKER_H_
 #define KICKER_H_
 
 #include <Arduino.h>
-#include <PS5BT.h>
-#include <PS3BT.h>
-#include <SPI.h>
 #include <Servo.h>
 
 /**
@@ -12,17 +11,40 @@
  * @authors Andrew Nelson 
  */
 
-class Kicker {
+class Kicker { //: public Robot
   private:
+    bool m_enabled; // safety feature
     uint8_t m_kickerpin;
-    Servo kickerMotor;
+    Servo m_windupMotor;
   public:
-    Kicker();
-    void setup(uint8_t KickerPin);
-    void Test();
-    void Windup();
-    void Release();
-    void Stop();
+    Kicker() {
+      m_enabled = false;
+    }
+    void setup(uint8_t kicker_pin) {
+      m_enabled = true;
+      m_kickerpin = kicker_pin;
+      m_windupMotor.attach(kicker_pin);
+    }
+    void Test() {
+      if (m_enabled) {
+        m_windupMotor.write(50); //clockwise
+        delay(3000);
+        m_windupMotor.write(90); //stop
+        delay(1000);
+        m_windupMotor.write(130); //counter-clockwise
+        delay(3000);
+        m_windupMotor.write(90); //stop
+      }
+    }
+    void turn() {
+      if (m_enabled)
+        m_windupMotor.writeMicroseconds(1200);
+    }
+
+    void stop() {
+      if (m_enabled)
+        m_windupMotor.writeMicroseconds(1500);
+    }
 };
 
 #endif /* KICKER_H_ */

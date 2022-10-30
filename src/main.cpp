@@ -2,7 +2,6 @@
 #include <SPI.h> //Built in
 #include <EEPROM.h> //Built in
 #include <PS5BT.h>
-#include <TaskScheduler.h>
 
 // Custom Polar Robotics Libraries:
 // #include "PolarRobotics.h"

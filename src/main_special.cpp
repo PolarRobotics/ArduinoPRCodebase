@@ -2,13 +2,16 @@
 #include <SPI.h> //Built in
 #include <EEPROM.h> //Built in
 #include <PS5BT.h>
-#include <TaskScheduler.h>
 
 // Custom Polar Robotics Libraries:
-// #include "PolarRobotics.h"
-#include <Robot/Robot.h>
+#include <PolarRobotics.h>
+
+// #include <Robot/Robot.h>
+#include <Robot/Quarterback.h>
+#include <Robot/Center.h>
+#include <Robot/Kicker.h>
+
 #include <Drive/Drive.h>
-#include <Robot/Edited_Center.h>
 
 // USB, Bluetooth, and Controller variable initialization
 // The USB Host shield uses pins 9 through 13, so don't use those pins
@@ -16,21 +19,34 @@ USB Usb;
 BTD Btd(&Usb);    
 PS5BT PS5(&Btd);
 
-// Robot and Drivebase 
-Robot robot;
+// Robot specific variables and objects
+// Robot robot;
+
+uint8_t botType;
+// Lineman lineman;
+// Receiver receiver;
+Quarterback quarterbackbot;
+
+// Center specific variables  
+Center centerbot;
+Servo centerArm;
+Servo centerClaw;
+#define armPin 6
+#define clawPin 13
+
+// Kicker specific variables
+Kicker kickerbot;
+#define windupPin 9
+Servo kickerMotor;
+
+// Drive specific variables and objects
 #define lPin 3
 #define rPin 5
 Servo leftMotor;
 Servo rightMotor;
 uint8_t motorType;
-Drive DriveMotors;
 
-// Center Robot
-Center CenterBot;   
-Servo centerArm;
-Servo centerClaw;
-#define armPin 6
-#define clawPin 13
+Drive DriveMotors;
 
 
 /*
@@ -46,20 +62,12 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.print(F("\r\nStarting..."));
-
-  // Get the bot drive type and then attach drive motors and set drive type
+  // DriveMotors.attach();
   motorType = EEPROM.read(0);
   DriveMotors.setMotorType((MOTORS) motorType);
   leftMotor.attach(lPin);
   rightMotor.attach(rPin);
   DriveMotors.setServos(leftMotor, rightMotor);
-
-  // Attach the center motors and set ps5 controller for center
-  centerArm.attach(armPin);
-  centerClaw.attach(clawPin);
-  CenterBot.setServos(centerArm, centerClaw);
-  PS5.leftTrigger.setTriggerForce(0, 255);
-  PS5.rightTrigger.setTriggerForce(0, 255);
   
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nReconnecting..."));
@@ -69,6 +77,34 @@ void setup() {
   }
 
   Serial.print(F("\r\nConnected"));
+
+  // check the EEPROM to get the bot type
+  // 0 = Lineman
+  // 1 = Recever
+  // 2 = Center
+  // 3 = Quarter Back
+  // 4 = Kicker
+  botType = EEPROM.read(1);
+  if (botType == lineman || botType == receiver) {
+    // the bot is a lineman or a receiver
+
+  }
+  else if (botType == center) {
+    // the bot is a center (old center)
+    centerArm.attach(armPin);
+    centerClaw.attach(clawPin);
+    centerbot.setServos(centerArm, centerClaw);
+    PS5.leftTrigger.setTriggerForce(0, 255);
+    PS5.rightTrigger.setTriggerForce(0, 255);
+  }
+  else if (botType == quarterback) {
+    // the bot is a quarterback
+  }
+  else if (botType == kicker) {
+    // the bot is a kicker 
+    kickerbot.setup(windupPin);
+  }
+
 
   delay(1000);
 }
@@ -102,32 +138,44 @@ void loop() {
     // Update the motors based on the inputs from the controller  
     DriveMotors.update();
 
-    if (PS5.getAnalogButton(R2)) {
-        CenterBot.armControl(armStatus::Higher);
-    } else if (PS5.getAnalogButton(L2)) {
-        CenterBot.armControl(armStatus::Lower);
-    } else if (PS5.getButtonPress(TRIANGLE)) {
-        CenterBot.armControl(armStatus::Hold);
-    } else {
-        CenterBot.armControl(armStatus::Stop);
+    if (botType == lineman || botType == receiver) {
+      
+
     }
-    
-    if (PS5.getButtonPress(UP)) {
-        CenterBot.clawControl(clawStatus::Open);
-    } else if (PS5.getButtonPress(DOWN)) {
-        CenterBot.clawControl(clawStatus::Close);
-    } else {
-        CenterBot.clawControl(clawStatus::clawStop);
+    else if (botType == center) {
+      if (PS5.getAnalogButton(R2)) {
+        centerbot.armControl(armStatus::Higher);
+      } else if (PS5.getAnalogButton(L2)) {
+        centerbot.armControl(armStatus::Lower);
+      } else if (PS5.getButtonPress(TRIANGLE)) {
+        centerbot.armControl(armStatus::Hold);
+      } else {
+        centerbot.armControl(armStatus::Stop);
+      }
+      
+      if (PS5.getButtonPress(UP)) {
+        centerbot.clawControl(clawStatus::Open);
+      } else if (PS5.getButtonPress(DOWN)) {
+        centerbot.clawControl(clawStatus::Close);
+      } else {
+        centerbot.clawControl(clawStatus::clawStop);
+      }
     }
-
-
-
+    else if (botType == quarterback) {
+      
+    }
+    else if (botType == kicker) {
+      if (PS5.getButtonPress(SQUARE)) {
+        kickerbot.turn();
+      }
+      else {
+        kickerbot.stop();
+      }
+    }
 
 
   } else { // no response from PS5 controller within last 300 ms, so stop
     // Emergency stop if the controller disconnects
     DriveMotors.emergencyStop();
   }
-
-
 }
