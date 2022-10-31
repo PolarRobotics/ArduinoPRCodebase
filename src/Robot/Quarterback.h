@@ -1,15 +1,218 @@
 #include <Robot/Robot.h>
-#include <Drive/DriveQuick.h>
+#include <Drive/Drive.h>
+#include <Servo.h>
+
+#define SERVO_SPEED_UP 175
+#define SERVO_SPEED_STOP 90 // this should always be 90.
+#define SERVO_SPEED_DOWN 5
+
+#define FLYWHEEL_RIGHT_SPEED_FULL 20 // this should be between 0 and 90.
+#define FLYWHEEL_LEFT_SPEED_FULL 170 // this should be between 90 and 180.
+#define FLYWHEEL_STOP_SPEED 90
 
 /**
  * @brief Quarterback Subclass Header
- * @authors Max Phillips
+ * @authors Rhys Davies
  */
-class Quarterback: public Robot {
+class Quarterback { //: public Robot
     private: 
-        int test;
+        uint8_t m_leftFlywheelPin;
+        uint8_t m_rightFlywheelPin;
+        uint8_t m_conveyorPin;
+        uint8_t m_ElevationPin;
+        Servo leftFWMotor;
+        Servo rightFWMotor;
+        Servo conveyorMotor;
+        Servo elevationMotors;
+        bool flywheelsOn;
+        uint8_t elevation;
     public:
-        Quarterback() {}
-        void initialize();
-        void action();
+        Quarterback(uint8_t rightfwpin, uint8_t leftfwpin, 
+            uint8_t conveyorpin, uint8_t elevationpin);
+        void attachMotors();
+        void aim(int stage);
+        void toggleFlywheels();
 };
+
+Quarterback::Quarterback(uint8_t rightfwpin, uint8_t leftfwpin, 
+            uint8_t conveyorpin, uint8_t elevationpin) {
+    m_leftFlywheelPin = rightfwpin;
+    m_rightFlywheelPin = leftfwpin;
+    m_conveyorPin = conveyorpin;
+    m_ElevationPin = elevationpin;
+    flywheelsOn = true;
+}
+
+void Quarterback::attachMotors() {
+    leftFWMotor.attach(m_leftFlywheelPin);
+    rightFWMotor.attach(m_rightFlywheelPin);
+    conveyorMotor.attach(m_conveyorPin);
+    elevationMotors.attach(m_ElevationPin);
+}
+
+// stage is the difference between the current position and target position, from a value of [-2, 2]
+void Quarterback::aim(int stage) {
+  benchmark = abs(stage) * QB_ELEVATION_INTERVAL;
+  if (stage > 0) { // target position above current position
+    elevationMotors.write(SERVO_SPEED_UP);
+  } else if (stage < 0) { // target position below current position
+    elevationMotors.write(SERVO_SPEED_DOWN);
+  }
+}
+
+void Quarterback::toggleFlywheels() {
+  if (flywheelsOn) {
+    // turn on the flywheels
+    rightFWMotor.write(FLYWHEEL_RIGHT_SPEED_FULL);
+    leftFWMotor.write(FLYWHEEL_LEFT_SPEED_FULL);
+  }
+  else {
+    // turn off the flywheels
+    rightFWMotor.write(FLYWHEEL_STOP_SPEED);
+    leftFWMotor.write(FLYWHEEL_STOP_SPEED);
+  }
+  // toggle the flywheel status
+  flywheelsOn = !flywheelsOn;
+
+    // if (PS3.getButtonClick(SQUARE)) {
+    //     flywheelstate = flywheelstate + 1;
+    //     if (flywheelstate == 1) {
+    //         flywheels.write(100);
+    //     } else if (flywheelstate == 2) {
+    //         flywheels.write(145);
+    //     } else if (flywheelstate==3){
+    //         flywheels.write(93);
+    //         flywheelstate = 0;
+    //     }
+    // }
+}
+
+// Aiming related functions
+
+void Quarterback::aimUp() {
+
+}
+
+void Quarterback::aimDown() {
+    
+}
+
+void Quarterback::stopAiming() { 
+  // turn elevation motor off
+  elevationMotors.write(SERVO_SPEED_STOP);
+}
+
+void Quarterback::passBall() {
+  //turn flywheels on to low: approx 10 power for a light boost
+  rightFlywheelMotor.write(FLYWHEEL_STOP_SPEED - 10);
+  leftFlywheelMotor.write(FLYWHEEL_STOP_SPEED + 10);
+  //once firing mechanism is finished add that in and make it a macro?
+}
+
+// void Quarterback::fireWeapon(String requestedStatus) {
+//   if (requestedStatus == "Fire") {
+//     FireMotor.write(50);
+//   } else if (requestedStatus == "Retract") {
+//     FireMotor.write(130);
+//   } else if (requestedStatus == "Stop") {
+//     FireMotor.write(90);
+//   }
+// }
+
+
+/*
+    Notes:
+
+    IDEA:
+    can have an action where if you hold down on a button
+    and move the left hat you can adjust the elevation of the QB
+    this can allow for better control of the height
+
+*/
+
+/*  OLD MAIN CODE:
+
+    if (PS3.getButtonClick(TRIANGLE) && targetElevation + 1 < 3) {
+      targetElevation = targetElevation + 1;
+    } else if (PS3.getButtonClick(CROSS) && targetElevation - 1 >= 0) {
+      targetElevation = targetElevation - 1;
+    } else if (PS3.getButtonClick(DOWN)) {
+      targetElevation = 0;
+    }
+
+    int maxCounter = 13000;
+
+    if ((counter > maxCounter || counter < 0) && (aimingup == true || aimingdown == true)) {
+      aimingup = false;
+      aimingdown = false;
+      ElevationMotor.write(getSpeedStop());
+      if (counter == -1) {
+        counter = 0;
+      } else {
+        counter = maxCounter;
+      }
+      Serial.println("im stuck");
+    } else if (targetElevation > currentElevation) {
+      ElevationMotor.write(getSpeedUp());
+      currentElevation = targetElevation;
+      aimingup = true;
+      aimingdown = false;
+    } else if (targetElevation < currentElevation) {
+      ElevationMotor.write(getSpeedDown());
+      currentElevation = targetElevation;
+      aimingdown = true;
+      aimingup = false;
+    } else if (aimingup == true) {
+      counter = counter + 1;
+    } else if (aimingdown == true) {
+      counter = counter - 1;
+    }
+
+    if (targetElevation == 1 && counter == maxCounter/2) {
+      aimingup = false;
+      aimingdown = false;
+      ElevationMotor.write(getSpeedStop());
+    }
+
+    if (PS3.getButtonClick(LEFT)) {
+      ElevationMotor.write(getSpeedDown());
+      delay(8000);
+      ElevationMotor.write(getSpeedStop());
+      counter = 0;
+      currentElevation = 0;
+      targetElevation = 0;
+    }
+
+    if (PS3.getButtonPress(CIRCLE)) {
+      conveyor.write(145);
+    } else {
+      conveyor.write(30);
+    }
+
+    // flywheels.write(60);
+    
+    if (PS3.getButtonClick(SQUARE)) {
+      flywheelstate = flywheelstate + 1;
+      if (flywheelstate == 1) {
+        flywheels.write(100);
+        //flywheelstatis = true;
+        //Serial.print("ran line 1");
+        //Serial.println("  ");
+      } else if (flywheelstate == 2) {
+        flywheels.write(145);
+        //flywheelstatis = true;
+        //Serial.print("ran line 1");
+        //Serial.println("  ");
+      } else if (flywheelstate==3){
+        flywheels.write(93);
+        //flywheelstatis = false;
+        flywheelstate = 0;
+        //Serial.print("ran line 2");
+        //Serial.println("  ");
+      }
+        //Serial.print("ran line 3");
+        //Serial.println("  ");
+    }
+
+
+*/

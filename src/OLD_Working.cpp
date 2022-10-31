@@ -5,7 +5,7 @@
 #include <Sabertooth.h>
 #include <EEPROM.h>
 #include <Servo.h>
-#include <TaskScheduler.h>
+// #include <TaskScheduler.h>
 #include "PolarRobotics.h"
 
 

@@ -3,49 +3,40 @@
 
 #include <FastLED.h>
 #define LED_PIN 7
-#define NUM_LEDS 150
-
-// MUHAMMED ENUM PRAISE BE UPON HIM
-enum LEDState {
-  PAIRING,      // nothing and then red
-  PAIRED,       // green then fade out
-  OFFENSE,      // blue
-  DEFENSE,      // green
-  BALL_CARRIER  // flash red
-};
+#define NUM_LEDS 30
 
 class Lights {
 private:
-  LEDState currState;
+  uint8_t currState; //LEDState currState;
   CRGBArray <NUM_LEDS> leds;
   uint8_t iteration;
-  int i, updateCount;
+  // int i, updateCount;
 public:
+  // MUHAMMED ENUM PRAISE BE UPON HIM
+  enum LEDState {
+    PAIRING,      // nothing and then red
+    PAIRED,       // green then fade out
+    OFFENSE,      // blue
+    DEFENSE,      // green
+    BALL_CARRIER  // flash red
+  };
   Lights();
   void setLEDStatus(LEDState status);
   void updateLEDS();
   void runLoop(int count);
 };
-// Global Variables
 
-
-
-/// Function Definitions 
-
+// Function Definitions 
 Lights::Lights() {
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 500); // Power Failsafe
   // Clears LEDs when code is updated
   FastLED.clear();
+
+  currState = PAIRING;
+  updateLEDS();
   FastLED.show();
 }
-
-
-void Lights::runLoop(int count){
-if(count == 20)
-updateLEDS();
-}
-
 
 void Lights::setLEDStatus(LEDState status) {
   currState = status;
@@ -54,6 +45,7 @@ void Lights::setLEDStatus(LEDState status) {
 void Lights::updateLEDS() {
   switch(currState) {
     case PAIRING: {
+      leds = CRGB::Red;
       break;
     }
     case PAIRED: {
@@ -85,6 +77,8 @@ void Lights::updateLEDS() {
   }
   FastLED.show();
 }
+
+
 
 // // Turn lights Flashing Green
 // for(int i = 0; i < NUM_LEDS; i++){ // Flash on
