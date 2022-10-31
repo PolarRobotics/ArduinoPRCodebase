@@ -2,13 +2,21 @@
 #include <Drive/Drive.h>
 #include <Servo.h>
 
-#define SERVO_SPEED_UP 175
-#define SERVO_SPEED_STOP 90 // this should always be 90.
-#define SERVO_SPEED_DOWN 5
-
+// Flywheel defines
 #define FLYWHEEL_RIGHT_SPEED_FULL 20 // this should be between 0 and 90.
 #define FLYWHEEL_LEFT_SPEED_FULL 170 // this should be between 90 and 180.
 #define FLYWHEEL_STOP_SPEED 90
+
+// Elevation (linear actuators) defines
+#define SERVO_SPEED_UP 175
+#define SERVO_SPEED_STOP 90 // this should always be 90.
+#define SERVO_SPEED_DOWN 5
+#define MAX_ELEVATION 100
+#define ELEVATION_PERIOD 25
+
+// Conveyor defines
+#define CONVEYOR_ON 145
+#define CONVEYOR_OFF 30 
 
 /**
  * @brief Quarterback Subclass Header
@@ -24,18 +32,22 @@ class Quarterback { //: public Robot
         Servo rightFWMotor;
         Servo conveyorMotor;
         Servo elevationMotors;
-        bool flywheelsOn;
-        uint8_t elevation;
+        bool flywheelsOn, conveyorOn;
+        // bool raise, lower;
+        uint8_t currentElevation, targetElevation;
+        unsigned long lastElevationTime;
     public:
         Quarterback(uint8_t rightfwpin, uint8_t leftfwpin, 
             uint8_t conveyorpin, uint8_t elevationpin);
         void attachMotors();
-        void aim(int stage);
         void toggleFlywheels();
+        void aimUp();
+        void aimDown();
+        void stopAiming();
+        void toggleConveyor();
 };
 
-Quarterback::Quarterback(uint8_t rightfwpin, uint8_t leftfwpin, 
-            uint8_t conveyorpin, uint8_t elevationpin) {
+Quarterback::Quarterback(uint8_t rightfwpin, uint8_t leftfwpin, uint8_t conveyorpin, uint8_t elevationpin) {
     m_leftFlywheelPin = rightfwpin;
     m_rightFlywheelPin = leftfwpin;
     m_conveyorPin = conveyorpin;
@@ -51,14 +63,14 @@ void Quarterback::attachMotors() {
 }
 
 // stage is the difference between the current position and target position, from a value of [-2, 2]
-void Quarterback::aim(int stage) {
-  benchmark = abs(stage) * QB_ELEVATION_INTERVAL;
-  if (stage > 0) { // target position above current position
-    elevationMotors.write(SERVO_SPEED_UP);
-  } else if (stage < 0) { // target position below current position
-    elevationMotors.write(SERVO_SPEED_DOWN);
-  }
-}
+// void Quarterback::aim(int stage) {
+//     benchmark = abs(stage) * QB_ELEVATION_INTERVAL;
+//     if (stage > 0) { // target position above current position
+//       elevationMotors.write(SERVO_SPEED_UP);
+//     } else if (stage < 0) { // target position below current position
+//       elevationMotors.write(SERVO_SPEED_DOWN);
+//     }
+// }
 
 void Quarterback::toggleFlywheels() {
   if (flywheelsOn) {
@@ -88,26 +100,70 @@ void Quarterback::toggleFlywheels() {
 }
 
 // Aiming related functions
-
+// eventually want to switch to using millis()
 void Quarterback::aimUp() {
+    // move elevation motors up
+    // wait, find the delta t for the time
+    // stop elevation motors
+    if(currentElevation < MAX_ELEVATION) {
+        if(millis() - lastElevationTime >= ELEVATION_PERIOD) {
+            // if the motors need to move up
+            elevationMotors.write(SERVO_SPEED_UP);
+            lastElevationTime = millis();
+            currentElevation++;
+        }
+    }
+    else {
+        //stop the motors if the elevation is at max
+        elevationMotors.write(SERVO_SPEED_STOP);
+    }
 
 }
 
 void Quarterback::aimDown() {
-    
+    if(currentElevation > 0) {
+        if(millis() - lastElevationTime >= ELEVATION_PERIOD) {
+            // if the motors need to move down
+            elevationMotors.write(SERVO_SPEED_DOWN);
+            lastElevationTime = millis();
+            currentElevation--;
+        }
+    }
+    else {
+        //stop the motors if the elevation is at min
+        elevationMotors.write(SERVO_SPEED_STOP);
+    }
 }
 
 void Quarterback::stopAiming() { 
-  // turn elevation motor off
-  elevationMotors.write(SERVO_SPEED_STOP);
+    // turn elevation motor off
+    elevationMotors.write(SERVO_SPEED_STOP);
 }
 
-void Quarterback::passBall() {
-  //turn flywheels on to low: approx 10 power for a light boost
-  rightFlywheelMotor.write(FLYWHEEL_STOP_SPEED - 10);
-  leftFlywheelMotor.write(FLYWHEEL_STOP_SPEED + 10);
-  //once firing mechanism is finished add that in and make it a macro?
+void Quarterback::toggleConveyor() {
+    if (conveyorOn) {
+        // turn on the conveyor
+        conveyorMotor.write(CONVEYOR_ON);
+    }
+    else {
+        // turn off the conveyor
+        conveyorMotor.write(CONVEYOR_OFF);
+    }
+    // toggle the flywheel status
+    conveyorOn = !conveyorOn;
 }
+
+// void Quarterback::passBall() {
+//     //turn flywheels on to low: approx 10 power for a light boost
+//     rightFlywheelMotor.write(FLYWHEEL_STOP_SPEED - 10);
+//     leftFlywheelMotor.write(FLYWHEEL_STOP_SPEED + 10);
+//     //once firing mechanism is finished add that in and make it a macro?
+// }
+
+
+// void Quarterback::update() {
+
+// }
 
 // void Quarterback::fireWeapon(String requestedStatus) {
 //   if (requestedStatus == "Fire") {
