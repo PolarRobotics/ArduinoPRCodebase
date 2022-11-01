@@ -5,7 +5,7 @@
 
 // Custom Polar Robotics Libraries:
 // #include "PolarRobotics.h"
-#include <Robot/Robot.h>
+// #include <Robot/Robot.h>
 #include <Drive/Drive.h>
 #include <Robot/Lights.h>
 
@@ -16,7 +16,7 @@ BTD Btd(&Usb);
 PS5BT PS5(&Btd);
 
 // Robot and Drivebase 
-Robot robot;
+// Robot robot;
 #define lPin 3
 #define rPin 5
 Servo leftMotor;
@@ -25,7 +25,6 @@ uint8_t motorType;
 Drive DriveMotors;
 
 Lights robotLED;
-
 
 /*
    ____    _____   _____   _   _   ____
@@ -48,6 +47,7 @@ void setup() {
   DriveMotors.setServos(leftMotor, rightMotor);
   
   // Set initial LED color state
+  robotLED.setupLEDS();
   robotLED.setLEDStatus(Lights::PAIRING);
 
   if (Usb.Init() == -1) {
@@ -86,8 +86,14 @@ void loop() {
       DriveMotors.setBSN(Drive::boost);
     } else if (PS5.getButtonPress(L1)) {
       DriveMotors.setBSN(Drive::slow);
+      robotLED.setLEDStatus(Lights::BALL_CARRIER);
     } else {
       DriveMotors.setBSN(Drive::normal);
+
+    }
+
+    if(PS5.getButtonPress(UP)){
+      robotLED.togglePosition();
     }
 
     // Update the motors based on the inputs from the controller  

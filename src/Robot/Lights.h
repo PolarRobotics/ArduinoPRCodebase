@@ -10,6 +10,7 @@ private:
   uint8_t currState; //LEDState currState;
   CRGBArray <NUM_LEDS> leds;
   uint8_t iteration;
+  bool m_isOffense;
   // int i, updateCount;
 public:
   // MUHAMMED ENUM PRAISE BE UPON HIM
@@ -21,23 +22,29 @@ public:
     BALL_CARRIER  // turn red and then go back to offense state (testing digital pin signal)
   };
   Lights();
+  void setupLEDS();
   void setLEDStatus(LEDState status);
   void updateLEDS();
-  void runLoop(int count);
+//   void runLoop(int count);
+  void togglePosition();
 };
 
 // Function Definitions
 
 
 Lights::Lights() {
-  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
-  FastLED.setMaxPowerInVoltsAndMilliamps(5, 500); // Power Failsafe
-  // Clears LEDs when code is updated
-  FastLED.clear();
+    currState = PAIRING;
+    m_isOffense = false;
+}
 
-  currState = PAIRING;
-  updateLEDS();
-//   FastLED.show();
+void Lights::setupLEDS() {
+    FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
+    FastLED.setMaxPowerInVoltsAndMilliamps(5, 500); // Power Failsafe
+    // Clears LEDs when code is updated
+    FastLED.clear();
+
+    updateLEDS();
+    FastLED.setBrightness(110);
 }
 
 // To set LED status
@@ -48,84 +55,48 @@ void Lights::setLEDStatus(LEDState status) {
 
 // To change LED color
 void Lights::updateLEDS() {
-  switch(currState) {
+    switch(currState) {
     case PAIRING: {
-      leds = CRGB::Yellow;
-      break;
+        leds = CRGB::Yellow;
+        break;
     }
     case PAIRED: {
-      leds = CRGB::Green;
-      FastLED.setBrightness(iteration);
-      break;
+        leds = CRGB::Green;
+        FastLED.setBrightness(iteration);
+        iteration++;
+        break;
     }
     case OFFENSE: {
-      leds = CRGB::Blue;
-      break;
+        leds = CRGB::Blue;
+        break;
     }
     case DEFENSE: {
-      leds = CRGB::Green;
-      break;
+        leds = CRGB::Green;
+        break;
     }
     case BALL_CARRIER: {
-      if(iteration % 255/16 == 0) {
-        leds = CRGB::Red;
-        FastLED.delay(30);
-      } else {
-        leds = CRGB::Black;
-      }
-      break;
+        if(iteration % 255/16 == 0) {
+            leds = CRGB::Red;
+            // FastLED.delay(30);
+        } else {
+            leds = CRGB::Black;
+        }
+        iteration++;
+        break;   
     }
     default: {
-      leds = CRGB::Red;
-      break;
+        leds = CRGB::Red;
+        break;
     }
-  }
-  FastLED.show();
+    }
+    FastLED.show();
 }
 
-
-
-// // Turn lights Flashing Green
-// for(int i = 0; i < NUM_LEDS; i++){ // Flash on
-//   while(Green2 == true){
-//   leds[i] = CRGB(0, 255, 0);
-//   FastLED.setBrightness(2*i);
-//   FastLED.show();
-//   delay(100);
-//   }
-// }
-// for(int i = NUM_LEDS; i > 0; i--){ // Flash off
-//   while(Green2 == true){
-//   leds[i] = CRGB(0, 255, 0);
-//   FastLED.setBrightness(60-2*i);
-//   FastLED.show();
-//   delay(100);
-//   }
-// }
-
-// // Turn lights Flashing Red
-// for(int i = 0; i < NUM_LEDS; i++){ // Flash on
-//   while(Red == true){
-//   leds[i] = CRGB(255, 0, 0);
-//   FastLED.setBrightness(2*i);
-//   FastLED.show();
-//   delay(100);
-//   }
-// }
-// for(int i = NUM_LEDS; i > 0; i--){ // Flash off
-//   while(Red == true){
-//   leds[i] = CRGB(255, 0, 0);
-//   FastLED.setBrightness(60-2*i);
-//   FastLED.show();
-//   delay(100);
-//   }
-// }
-
-// // Sets all leds to solid green when 'x'
-// if(Green1 == true){ 
-//   leds = CRGB::Green;
-//   }
-
-
-
-
+void Lights::togglePosition() {
+    if(m_isOffense){
+        setLEDStatus(DEFENSE);
+    } else{
+        setLEDStatus(OFFENSE);
+    }
+    m_isOffense = !m_isOffense;
+}
