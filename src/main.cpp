@@ -56,7 +56,7 @@ void setup() {
       delay(5); 
     }
   } else{
-    robotLED.setLEDStatus(robotLED.DEFENSE);
+    robotLED.setLEDStatus(Lights::DEFENSE);
   }
 
   Serial.print(F("\r\nConnected"));
