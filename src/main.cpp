@@ -7,6 +7,7 @@
 // #include "PolarRobotics.h"
 #include <Robot/Robot.h>
 #include <Drive/Drive.h>
+#include <Robot/Lights.h>
 
 // USB, Bluetooth, and Controller variable initialization
 // The USB Host shield uses pins 9 through 13, so don't use those pins
@@ -22,6 +23,8 @@ Servo leftMotor;
 Servo rightMotor;
 uint8_t motorType;
 Drive DriveMotors;
+
+Lights robotLED;
 
 
 /*
@@ -44,11 +47,16 @@ void setup() {
   rightMotor.attach(rPin);
   DriveMotors.setServos(leftMotor, rightMotor);
   
+  // Set initial LED color state
+  robotLED.setLEDStatus(Lights::PAIRING);
+
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nReconnecting..."));
     while (Usb.Init() == -1) { // wait until the controller connects
       delay(5); 
     }
+  } else{
+    robotLED.setLEDStatus(Lights::DEFENSE);
   }
 
   Serial.print(F("\r\nConnected"));
