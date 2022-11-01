@@ -35,7 +35,7 @@ Lights::Lights() {
 
   currState = PAIRING;
   updateLEDS();
-  FastLED.show();
+//   FastLED.show();
 }
 
 void Lights::setLEDStatus(LEDState status) {

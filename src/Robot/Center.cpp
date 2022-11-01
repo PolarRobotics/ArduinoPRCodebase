@@ -13,7 +13,7 @@
     clawControl - Based on what is inputed in main, opens, closes, or stops the claw. 
     armControl - Based on what is inputed in main, raises, lowers, or stops the arm. 
 */
-#include <Center.h>
+#include <Robot/Center.h>
 
 /**
  * Description: Public function that starts the arm and claw motors and sets their starting status to stop. 

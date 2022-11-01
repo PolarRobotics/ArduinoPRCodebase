@@ -7,7 +7,7 @@
 #include <PolarRobotics.h>
 
 // #include <Robot/Robot.h>
-#include <Robot/Quarterback.h>
+// #include <Robot/Quarterback.h>
 #include <Robot/Center.h>
 #include <Robot/Kicker.h>
 
@@ -25,7 +25,7 @@ PS5BT PS5(&Btd);
 uint8_t botType;
 // Lineman lineman;
 // Receiver receiver;
-Quarterback quarterbackbot;
+// Quarterback quarterbackbot;
 
 // Center specific variables  
 Center centerbot;
