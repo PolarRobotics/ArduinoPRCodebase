@@ -14,11 +14,11 @@ private:
 public:
   // MUHAMMED ENUM PRAISE BE UPON HIM
   enum LEDState {
-    PAIRING,      // nothing and then red
+    PAIRING,      // Yellow
     PAIRED,       // green then fade out
-    OFFENSE,      // blue
+    OFFENSE,      // blue (also need green)
     DEFENSE,      // green
-    BALL_CARRIER  // flash red
+    BALL_CARRIER  // turn red and then go back to offense state (testing digital pin signal)
   };
   Lights();
   void setLEDStatus(LEDState status);
@@ -26,7 +26,9 @@ public:
   void runLoop(int count);
 };
 
-// Function Definitions 
+// Function Definitions
+
+
 Lights::Lights() {
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 500); // Power Failsafe
@@ -38,14 +40,17 @@ Lights::Lights() {
   FastLED.show();
 }
 
+// To set LED status
 void Lights::setLEDStatus(LEDState status) {
   currState = status;
+  updateLEDS();
 }
 
+// To change LED color
 void Lights::updateLEDS() {
   switch(currState) {
     case PAIRING: {
-      leds = CRGB::Red;
+      leds = CRGB::Yellow;
       break;
     }
     case PAIRED: {
