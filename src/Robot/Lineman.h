@@ -1,4 +1,7 @@
-#include <Robot/Robot.h>
+#ifndef LINEMAN_H_
+#define LINEMAN_H_
+
+#include "Robot/Robot.h"
 
 /**
  * @brief Lineman Subclass Header
@@ -12,7 +15,11 @@ class Lineman : public Robot {
         // drive pins constants, stored in flash instead of SRAM
         const PROGMEM uint8_t lPin = 3; 
         const PROGMEM uint8_t rPin = 5;
-        Lineman() {};
-        void initialize(); // Override virtual functions
-        void action();
+        Lineman() { Serial.println(F("Creating lineman")); };
+
+        // Override virtual functions
+        void initialize();
+        // void action() override;
 };
+
+#endif

@@ -5,11 +5,10 @@
 
 // Custom Polar Robotics Libraries:
 #include <PolarRobotics.h>
-#include <Robot/Robot.h>
-#include <Drive/Drive.h>
-// #include <Robot/Lights.h>
+#include "Robot/Robot.h"
+#include "Drive/Drive.h"
 
-#include <Robot/Lineman.h>
+#include "Robot/Lineman.h"
 #include <Robot/Quarterback.h>
 
 // USB, Bluetooth, and Controller variable initialization
@@ -56,7 +55,7 @@ void setup() {
   switch (tempType) {
       case quarterback:
           Serial.println("Robot Type: Quarterback");
-          robot = new Quarterback();
+          // robot = new Quarterback();
           break;
       case lineman:
       default:

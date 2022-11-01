@@ -17,7 +17,6 @@ class Robot {
         Drive* drive;
         TYPE type;
     public:
-        Robot() {};
         Drive* getDrive() { return drive; };
         void setDrive(Drive* d) { drive = d; };
         TYPE getType() { return type; };
@@ -26,10 +25,10 @@ class Robot {
 
         // Virtual function that effectively acts like a constructor
         // "virtual" keyword required to enable runtime polymorphism (i.e. actually use overrides)
-        virtual void initialize() = 0;
+        virtual void initialize() {}
 
         // Virtual function to perform any loop actions for special robots
-        virtual void action() = 0; 
+        virtual void action() {}
         
 };
 
