@@ -36,9 +36,13 @@ class Kicker { //: public Robot
         m_windupMotor.write(90); //stop
       }
     }
-    void turn() {
+    void turnfwd() {
       if (m_enabled)
         m_windupMotor.writeMicroseconds(1200);
+    }
+    void turnrev() {
+      if (m_enabled)
+        m_windupMotor.writeMicroseconds(1800);
     }
 
     void stop() {

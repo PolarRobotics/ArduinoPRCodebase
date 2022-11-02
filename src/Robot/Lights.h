@@ -4,33 +4,34 @@
 #include <FastLED.h>
 #define LED_PIN 7
 #define NUM_LEDS 30
+#define TIME_BETWEEN_TOGGLES 25
 
 class Lights {
 private:
-  uint8_t currState; //LEDState currState;
-  CRGBArray <NUM_LEDS> leds;
-  uint8_t iteration;
-  bool m_isOffense;
-  // int i, updateCount;
+    unsigned long lastToggleTime;
+    uint8_t currState; // LEDState currState;
+    CRGBArray<NUM_LEDS> leds;
+    uint8_t iteration;
+    bool m_isOffense;
+    // int i, updateCount;
 public:
-  // MUHAMMED ENUM PRAISE BE UPON HIM
-  enum LEDState {
-    PAIRING,      // Yellow
-    PAIRED,       // green then fade out
-    OFFENSE,      // blue (also need green)
-    DEFENSE,      // green
-    BALL_CARRIER  // turn red and then go back to offense state (testing digital pin signal)
-  };
-  Lights();
-  void setupLEDS();
-  void setLEDStatus(LEDState status);
-  void updateLEDS();
-//   void runLoop(int count);
-  void togglePosition();
+    // MUHAMMED ENUM PRAISE BE UPON HIM
+    enum LEDState {
+        PAIRING,     // Yellow
+        PAIRED,      // green then fade out
+        OFFENSE,     // blue (also need green)
+        DEFENSE,     // green
+        BALL_CARRIER // turn red and then go back to offense state (testing digital pin signal)
+    };
+    Lights();
+    void setupLEDS();
+    void setLEDStatus(LEDState status);
+    void updateLEDS();
+    //   void runLoop(int count);
+    void togglePosition();
 };
 
 // Function Definitions
-
 
 Lights::Lights() {
     currState = PAIRING;
@@ -49,13 +50,13 @@ void Lights::setupLEDS() {
 
 // To set LED status
 void Lights::setLEDStatus(LEDState status) {
-  currState = status;
-  updateLEDS();
+    currState = status;
+    updateLEDS();
 }
 
 // To change LED color
 void Lights::updateLEDS() {
-    switch(currState) {
+    switch (currState) {
     case PAIRING: {
         leds = CRGB::Yellow;
         break;
@@ -75,14 +76,15 @@ void Lights::updateLEDS() {
         break;
     }
     case BALL_CARRIER: {
-        if(iteration % 255/16 == 0) {
+        if (iteration % 255 / 16 == 0) {
             leds = CRGB::Red;
             // FastLED.delay(30);
-        } else {
+        }
+        else {
             leds = CRGB::Black;
         }
         iteration++;
-        break;   
+        break;
     }
     default: {
         leds = CRGB::Red;
@@ -93,10 +95,16 @@ void Lights::updateLEDS() {
 }
 
 void Lights::togglePosition() {
-    if(m_isOffense){
-        setLEDStatus(DEFENSE);
-    } else{
-        setLEDStatus(OFFENSE);
+    // debounce makes sure you cant hold down the button, 
+    // i think the ps5 library already does this we probably should check
+    if (millis() - lastToggleTime >= TIME_BETWEEN_TOGGLES) {
+        if (m_isOffense) {
+            setLEDStatus(DEFENSE);
+        }
+        else {
+            setLEDStatus(OFFENSE);
+        }
+        m_isOffense = !m_isOffense;
+        lastToggleTime = millis();
     }
-    m_isOffense = !m_isOffense;
 }

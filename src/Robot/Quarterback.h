@@ -6,6 +6,7 @@
 #define FLYWHEEL_RIGHT_SPEED_FULL 20 // this should be between 0 and 90.
 #define FLYWHEEL_LEFT_SPEED_FULL 170 // this should be between 90 and 180.
 #define FLYWHEEL_STOP_SPEED 90
+#define FLYWHEEL_PERIOD 50
 
 // Elevation (linear actuators) defines
 #define SERVO_SPEED_UP 175
@@ -33,13 +34,14 @@ class Quarterback { //: public Robot
         Servo conveyorMotor;
         Servo elevationMotors;
         bool flywheelsOn, conveyorOn;
-        // bool raise, lower;
+        bool raise, lower;
         uint8_t currentElevation, targetElevation;
         unsigned long lastElevationTime;
+        unsigned long lastFlywheelToggleTime;
     public:
-        Quarterback(uint8_t rightfwpin, uint8_t leftfwpin, 
+        Quarterback();
+        void attachMotors(uint8_t rightfwpin, uint8_t leftfwpin, 
             uint8_t conveyorpin, uint8_t elevationpin);
-        void attachMotors();
         void toggleFlywheels();
         void aimUp();
         void aimDown();
@@ -47,15 +49,17 @@ class Quarterback { //: public Robot
         void toggleConveyor();
 };
 
-Quarterback::Quarterback(uint8_t rightfwpin, uint8_t leftfwpin, uint8_t conveyorpin, uint8_t elevationpin) {
+Quarterback::Quarterback() {
+    flywheelsOn = true;
+    conveyorOn = true;
+}
+
+void Quarterback::attachMotors(uint8_t rightfwpin, uint8_t leftfwpin, 
+            uint8_t conveyorpin, uint8_t elevationpin) {
     m_leftFlywheelPin = rightfwpin;
     m_rightFlywheelPin = leftfwpin;
     m_conveyorPin = conveyorpin;
     m_ElevationPin = elevationpin;
-    flywheelsOn = true;
-}
-
-void Quarterback::attachMotors() {
     leftFWMotor.attach(m_leftFlywheelPin);
     rightFWMotor.attach(m_rightFlywheelPin);
     conveyorMotor.attach(m_conveyorPin);
@@ -73,38 +77,29 @@ void Quarterback::attachMotors() {
 // }
 
 void Quarterback::toggleFlywheels() {
-  if (flywheelsOn) {
-    // turn on the flywheels
-    rightFWMotor.write(FLYWHEEL_RIGHT_SPEED_FULL);
-    leftFWMotor.write(FLYWHEEL_LEFT_SPEED_FULL);
-  }
-  else {
-    // turn off the flywheels
-    rightFWMotor.write(FLYWHEEL_STOP_SPEED);
-    leftFWMotor.write(FLYWHEEL_STOP_SPEED);
-  }
-  // toggle the flywheel status
-  flywheelsOn = !flywheelsOn;
-
-    // if (PS3.getButtonClick(SQUARE)) {
-    //     flywheelstate = flywheelstate + 1;
-    //     if (flywheelstate == 1) {
-    //         flywheels.write(100);
-    //     } else if (flywheelstate == 2) {
-    //         flywheels.write(145);
-    //     } else if (flywheelstate==3){
-    //         flywheels.write(93);
-    //         flywheelstate = 0;
-    //     }
-    // }
+    if (millis() - lastFlywheelToggleTime >= FLYWHEEL_PERIOD) {
+        if (flywheelsOn) {
+            // turn on the flywheels
+            rightFWMotor.write(FLYWHEEL_RIGHT_SPEED_FULL);
+            leftFWMotor.write(FLYWHEEL_LEFT_SPEED_FULL);
+        }
+        else {
+            // turn off the flywheels
+            rightFWMotor.write(FLYWHEEL_STOP_SPEED);
+            leftFWMotor.write(FLYWHEEL_STOP_SPEED);
+        }
+        // toggle the flywheel status
+        flywheelsOn = !flywheelsOn;
+    }
 }
 
 // Aiming related functions
-// eventually want to switch to using millis()
+
 void Quarterback::aimUp() {
     // move elevation motors up
     // wait, find the delta t for the time
     // stop elevation motors
+    // stage--
     if(currentElevation < MAX_ELEVATION) {
         if(millis() - lastElevationTime >= ELEVATION_PERIOD) {
             // if the motors need to move up

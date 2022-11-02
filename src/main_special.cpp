@@ -7,7 +7,7 @@
 #include <PolarRobotics.h>
 
 // #include <Robot/Robot.h>
-// #include <Robot/Quarterback.h>
+#include <Robot/Quarterback.h>
 #include <Robot/Center.h>
 #include <Robot/Kicker.h>
 
@@ -25,7 +25,6 @@ PS5BT PS5(&Btd);
 uint8_t botType;
 // Lineman lineman;
 // Receiver receiver;
-// Quarterback quarterbackbot;
 
 // Center specific variables  
 Center centerbot;
@@ -33,6 +32,13 @@ Servo centerArm;
 Servo centerClaw;
 #define armPin 6
 #define clawPin 13
+
+// Quarterback specific variables
+Quarterback quarterbackbot;
+#define LEFT_FLYWHEEL_PIN 18
+#define RIGHT_FLYWHEEL_PIN 19
+#define ELEVATION_MOTORS_PIN 16
+#define CONVEYOR_MOTOR_PIN 14
 
 // Kicker specific variables
 Kicker kickerbot;
@@ -102,6 +108,7 @@ void setup() {
   }
   else if (botType == kicker) {
     // the bot is a kicker 
+    DriveMotors.setMotorType(MOTORS::big);
     kickerbot.setup(windupPin);
   }
 
@@ -162,15 +169,18 @@ void loop() {
       }
     }
     else if (botType == quarterback) {
-      
+      if(PS5.getButtonPress(TRIANGLE))
+        quarterbackbot.aimUp();
+      else if (PS5.getButtonPress(CROSS))
+        quarterbackbot.aimDown();
     }
     else if (botType == kicker) {
-      if (PS5.getButtonPress(SQUARE)) {
-        kickerbot.turn();
-      }
-      else {
+      if (PS5.getButtonPress(TRIANGLE))
+        kickerbot.turnfwd();
+      else if (PS5.getButtonPress(SQUARE))
+        kickerbot.turnrev();
+      else
         kickerbot.stop();
-      }
     }
 
 
