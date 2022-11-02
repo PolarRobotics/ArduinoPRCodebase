@@ -86,7 +86,6 @@ void loop() {
       DriveMotors.setBSN(Drive::boost);
     } else if (PS5.getButtonPress(L1)) {
       DriveMotors.setBSN(Drive::slow);
-      robotLED.setLEDStatus(Lights::BALL_CARRIER);
     } else {
       DriveMotors.setBSN(Drive::normal);
 
