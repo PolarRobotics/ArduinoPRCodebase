@@ -55,8 +55,8 @@ class Quarterback { //: public Robot
         void toggleConveyor();
         void changeFWSpeed(speedStatus speed);
         void updateAim();
-        void initialize();
-        void action();
+        void initialize() override;
+        void action() override;
 };
 
 Quarterback::Quarterback() {

@@ -4,9 +4,9 @@
 
 void Lineman::initialize() {
     // this->setDrive(new Drive(3,5));
-    Serial.println("test");
+    Serial.println(F("Lineman initialize"));
 }
 
-// void Lineman::action() {
-//     Serial.println("lineman is a go");
-// }
+void Lineman::action() {
+    Serial.println(F("Lineman action executed"));
+}

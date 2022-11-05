@@ -18,8 +18,8 @@ class Lineman : public Robot {
         Lineman() { Serial.println(F("Creating lineman")); };
 
         // Override virtual functions
-        void initialize();
-        // void action() override;
+        void initialize() override;
+        void action() override;
 };
 
 #endif

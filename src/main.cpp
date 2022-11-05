@@ -4,12 +4,16 @@
 #include <PS5BT.h>
 
 // Custom Polar Robotics Libraries:
-#include <PolarRobotics.h>
-#include "Robot/Robot.h"
+#include "PolarRobotics.h"
 #include "Drive/Drive.h"
-
+#include "Robot/Robot.h"
 #include "Robot/Lineman.h"
-#include <Robot/Quarterback.h>
+
+#if SPECIAL_BOTS_ENV == 1
+#include "Robot/Quarterback.h"
+#else
+#include "Robot/Dummy.h"
+#endif
 
 // USB, Bluetooth, and Controller variable initialization
 // The USB Host shield uses pins 9 through 13, so don't use those pins
@@ -55,7 +59,7 @@ void setup() {
   switch (tempType) {
       case quarterback:
           Serial.println("Robot Type: Quarterback");
-          // robot = new Quarterback();
+          robot = new Quarterback();
           break;
       case lineman:
       default:
@@ -88,7 +92,7 @@ void setup() {
     // robotLED.setLEDStatus(Lights::DEFENSE);
   }
 
-  Serial.print(F("\r\nConnected"));
+  // Serial.print(F("\r\nConnected"));
 
 }
 
@@ -103,7 +107,10 @@ void setup() {
 void loop() {
 
   // clean up the usb registers, allows for new commands to be executed
-  Usb.Task();
+  // Usb.Task();
+
+  robot->action(); // testing for now
+  // Serial.println(F("test"));
 
   // The main looping code, controls driving and any actions during a game
   if ((millis() - PS5.getLastMessageTime()) < 100 && PS5.connected()) { // checks if PS5 is connected, had response within 300 ms
