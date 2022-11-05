@@ -2,7 +2,6 @@
 #include <SPI.h> //Built in
 #include <EEPROM.h> //Built in
 #include <PS5BT.h>
-#include <TaskScheduler.h>
 
 // Custom Polar Robotics Libraries:
 // #include "PolarRobotics.h"
@@ -71,11 +70,14 @@ void loop() {
   Usb.Task();
 
   // The main looping code, controls driving and any actions during a game
-  if ((millis() - PS5.getLastMessageTime()) < 300) { // checks if PS5 is connected, had response within 300 ms
+  if ((millis() - PS5.getLastMessageTime()) < 100 && PS5.connected()) { // checks if PS5 is connected, had response within 300 ms
     DriveMotors.setStickPwr(PS5.getAnalogHat(LeftHatY), PS5.getAnalogHat(RightHatX));
 
     // determine BSN percentage (boost, slow, or normal)
-    if (PS5.getButtonPress(R1)) {
+    if (PS5.isTouching()){
+      DriveMotors.emergencyStop();
+      DriveMotors.setBSN(Drive::brake);
+    } else if (PS5.getButtonPress(R1)) {
       DriveMotors.setBSN(Drive::boost);
     } else if (PS5.getButtonPress(L1)) {
       DriveMotors.setBSN(Drive::slow);
@@ -83,8 +85,13 @@ void loop() {
       DriveMotors.setBSN(Drive::normal);
     }
 
-    // Update the motors based on the inputs from the controller  
-    DriveMotors.update();
+    // Update the motors based on the inputs from the controller
+    if(PS5.getAnalogButton(L2)) {
+      DriveMotors.drift();
+    } else {
+      DriveMotors.update();
+    }
+    
   } else { // no response from PS5 controller within last 300 ms, so stop
     // Emergency stop if the controller disconnects
     DriveMotors.emergencyStop();

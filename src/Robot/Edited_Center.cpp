@@ -38,7 +38,7 @@ void Center::clawControl(clawStatus reqstatus) {
   if(reqstatus == clawStatus::Open) {
     clawmotor.write(96);
   } else if(reqstatus == clawStatus::Close) {
-    clawmotor.write(84);
+    clawmotor.write(87);
   } else if(reqstatus == clawStatus::clawStop) {
     clawmotor.write(93);
   }

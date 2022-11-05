@@ -44,6 +44,8 @@
 #define BIG_NORMAL_PCT 0.4
 // should be a value less than BIG_NORMAL_PCT, to slow down for precision maneuvering
 #define BIG_SLOW_PCT 0.2
+// the value for brake button to slow down the motors at the button press
+#define BRAKE_BUTTON_PCT 0
 
 // BSN for Short/Small Motors
 #define SMALL_BOOST_PCT 0.9
@@ -52,6 +54,8 @@
 
 // Value for the Tank Mode Reduction Factor Percentage
 #define TANK_MODE_PCT 0.5
+// Value for the Drift Mode Reduction Factor Percentage
+#define DRIFT_MODE_PCT 0.75
 
 class Drive {
 private:
@@ -83,7 +87,8 @@ public:
   enum SPEED {
     normal,
     boost,
-    slow
+    slow,
+    brake
   };
   Drive();
   void setServos(Servo&, Servo&);
@@ -94,6 +99,7 @@ public:
   float getMotorPwr(uint8_t mtr);
   void emergencyStop();
   void update();
+  void drift();
   void printDebugInfo();
 };
 

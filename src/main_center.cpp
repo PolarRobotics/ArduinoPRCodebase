@@ -102,19 +102,21 @@ void loop() {
     // Update the motors based on the inputs from the controller  
     DriveMotors.update();
 
+    // Check the what to do with the arm
     if (PS5.getAnalogButton(R2)) {
         CenterBot.armControl(armStatus::Higher);
     } else if (PS5.getAnalogButton(L2)) {
         CenterBot.armControl(armStatus::Lower);
-    } else if (PS5.getButtonPress(TRIANGLE)) {
+    } else if (PS5.getButtonPress(SQUARE)) {
         CenterBot.armControl(armStatus::Hold);
     } else {
         CenterBot.armControl(armStatus::Stop);
     }
     
-    if (PS5.getButtonPress(UP)) {
+    // Check to do with the claw
+    if (PS5.getButtonPress(TRIANGLE)) {
         CenterBot.clawControl(clawStatus::Open);
-    } else if (PS5.getButtonPress(DOWN)) {
+    } else if (PS5.getButtonPress(CROSS)) {
         CenterBot.clawControl(clawStatus::Close);
     } else {
         CenterBot.clawControl(clawStatus::clawStop);
