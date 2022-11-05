@@ -38,7 +38,7 @@ Quarterback quarterbackbot;
 #define LEFT_FLYWHEEL_PIN 18
 #define RIGHT_FLYWHEEL_PIN 19
 #define ELEVATION_MOTORS_PIN 16
-#define CONVEYOR_MOTOR_PIN 14
+#define CONVEYOR_MOTOR_PIN 6 //14
 
 // Kicker specific variables
 Kicker kickerbot;
@@ -74,6 +74,7 @@ void setup() {
   leftMotor.attach(lPin);
   rightMotor.attach(rPin);
   DriveMotors.setServos(leftMotor, rightMotor);
+ 
   
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nReconnecting..."));
@@ -105,6 +106,7 @@ void setup() {
   }
   else if (botType == quarterback) {
     // the bot is a quarterback
+    quarterbackbot.attachMotors(RIGHT_FLYWHEEL_PIN, LEFT_FLYWHEEL_PIN, CONVEYOR_MOTOR_PIN, ELEVATION_MOTORS_PIN);
   }
   else if (botType == kicker) {
     // the bot is a kicker 
@@ -169,10 +171,15 @@ void loop() {
       }
     }
     else if (botType == quarterback) {
-      if(PS5.getButtonPress(TRIANGLE))
+      quarterbackbot.toggleConveyor();
+      if(PS5.getButtonClick(TRIANGLE))
         quarterbackbot.aimUp();
-      else if (PS5.getButtonPress(CROSS))
+      else if (PS5.getButtonClick(CROSS))
         quarterbackbot.aimDown();
+      else if (PS5.getButtonClick(SQUARE))
+        quarterbackbot.toggleConveyor();
+      else if (PS5.getButtonClick(CIRCLE))
+        quarterbackbot.toggleFlywheels();
     }
     else if (botType == kicker) {
       if (PS5.getButtonPress(TRIANGLE))

@@ -51,7 +51,7 @@ class Quarterback { //: public Robot
 
 Quarterback::Quarterback() {
     flywheelsOn = true;
-    conveyorOn = true;
+    conveyorOn = false;
 }
 
 void Quarterback::attachMotors(uint8_t rightfwpin, uint8_t leftfwpin, 
@@ -136,16 +136,16 @@ void Quarterback::stopAiming() {
 }
 
 void Quarterback::toggleConveyor() {
-    if (conveyorOn) {
+     // toggle the flywheel status
+    //conveyorOn = !conveyorOn;
+    //if (conveyorOn) {
         // turn on the conveyor
         conveyorMotor.write(CONVEYOR_ON);
-    }
-    else {
+    //}
+    //else {
         // turn off the conveyor
-        conveyorMotor.write(CONVEYOR_OFF);
-    }
-    // toggle the flywheel status
-    conveyorOn = !conveyorOn;
+        //conveyorMotor.write(CONVEYOR_OFF);
+    //}
 }
 
 // void Quarterback::passBall() {
