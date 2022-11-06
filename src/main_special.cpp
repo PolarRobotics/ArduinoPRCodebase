@@ -35,10 +35,9 @@ Servo centerClaw;
 
 // Quarterback specific variables
 Quarterback quarterbackbot;
-#define LEFT_FLYWHEEL_PIN 18
-#define RIGHT_FLYWHEEL_PIN 19
-#define ELEVATION_MOTORS_PIN 16
-#define CONVEYOR_MOTOR_PIN 6 //14
+#define FLYWHEEL_PIN 7
+#define ELEVATION_MOTORS_PIN 4
+#define CONVEYOR_MOTOR_PIN 6 
 
 // Kicker specific variables
 Kicker kickerbot;
@@ -106,7 +105,7 @@ void setup() {
   }
   else if (botType == quarterback) {
     // the bot is a quarterback
-    quarterbackbot.attachMotors(RIGHT_FLYWHEEL_PIN, LEFT_FLYWHEEL_PIN, CONVEYOR_MOTOR_PIN, ELEVATION_MOTORS_PIN);
+    quarterbackbot.attachMotors(FLYWHEEL_PIN, CONVEYOR_MOTOR_PIN, ELEVATION_MOTORS_PIN);
   }
   else if (botType == kicker) {
     // the bot is a kicker 
@@ -171,15 +170,23 @@ void loop() {
       }
     }
     else if (botType == quarterback) {
-      quarterbackbot.toggleConveyor();
-      if(PS5.getButtonClick(TRIANGLE))
-        quarterbackbot.aimUp();
-      else if (PS5.getButtonClick(CROSS))
-        quarterbackbot.aimDown();
-      else if (PS5.getButtonClick(SQUARE))
+      //quarterbackbot.toggleConveyor();
+      if (PS5.getButtonClick(UP))
+        quarterbackbot.aim(qbAim::aimUp);
+      else if (PS5.getButtonClick(DOWN))
+        quarterbackbot.aim(qbAim::aimDown);
+      
+      quarterbackbot.updateAim();
+
+      if (PS5.getButtonClick(SQUARE))
         quarterbackbot.toggleConveyor();
       else if (PS5.getButtonClick(CIRCLE))
-        quarterbackbot.toggleFlywheels();
+        {quarterbackbot.toggleFlywheels();}
+      
+      if(PS5.getButtonClick(TRIANGLE))
+        quarterbackbot.changeFWSpeed(speedStatus::increase);
+      else if (PS5.getButtonClick(CROSS))
+        quarterbackbot.changeFWSpeed(speedStatus::decrease);
     }
     else if (botType == kicker) {
       if (PS5.getButtonPress(TRIANGLE))
