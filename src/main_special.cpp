@@ -41,8 +41,7 @@ Quarterback quarterbackbot;
 
 // Kicker specific variables
 Kicker kickerbot;
-#define windupPin 9
-Servo kickerMotor;
+#define windupPin 7
 
 // Drive specific variables and objects
 #define lPin 3
@@ -170,28 +169,32 @@ void loop() {
       }
     }
     else if (botType == quarterback) {
-      //quarterbackbot.toggleConveyor();
+      // Update the bools within the class to see if the user wants to go up or down
       if (PS5.getButtonClick(UP))
         quarterbackbot.aim(qbAim::aimUp);
       else if (PS5.getButtonClick(DOWN))
         quarterbackbot.aim(qbAim::aimDown);
       
+      // Update the aim on quarterback to see if we need to stop or not
       quarterbackbot.updateAim();
 
+      // Toogle the Conveyor and Flywheels
       if (PS5.getButtonClick(SQUARE))
         quarterbackbot.toggleConveyor();
       else if (PS5.getButtonClick(CIRCLE))
         {quarterbackbot.toggleFlywheels();}
       
+      // Change the flywheel speed
       if(PS5.getButtonClick(TRIANGLE))
         quarterbackbot.changeFWSpeed(speedStatus::increase);
       else if (PS5.getButtonClick(CROSS))
         quarterbackbot.changeFWSpeed(speedStatus::decrease);
     }
     else if (botType == kicker) {
+      // Control the motor on the kicker
       if (PS5.getButtonPress(TRIANGLE))
         kickerbot.turnfwd();
-      else if (PS5.getButtonPress(SQUARE))
+      else if (PS5.getButtonPress(CROSS))
         kickerbot.turnrev();
       else
         kickerbot.stop();

@@ -58,10 +58,13 @@ class Quarterback { //: public Robot
 };
 
 Quarterback::Quarterback() {
+    // Declare that the flywheels are off
     flywheelsOn = false;
 
+    // Declare the the conveyor is off
     conveyorOn = false;
 
+    // Declare that we are not trying to aim up or down and we are at the current elevation of 0
     aimingUp = false;
     aimingDown = false;
     currentElevation = 0;
@@ -89,17 +92,20 @@ void Quarterback::attachMotors(uint8_t fwpin, uint8_t conveyorpin, uint8_t eleva
 
 
 void Quarterback::toggleFlywheels() {
+    // Toggle the flywheels and use the speed factor to know what speed
     if (!flywheelsOn){
       FWMotor.write(FLYWHEEL_SPEED_FULL + flywheelSpeedFactor);
     } else {
       FWMotor.write(FLYWHEEL_STOP_SPEED);
     }
+    // Toggle the bool so we know if its on or not
     flywheelsOn = !flywheelsOn;
 }
 
 // Aiming related functions
 
 void Quarterback::aim(qbAim dir) {
+  // Check which direction the user wants and turn the other direction off
   switch(dir) {
     case aimUp: aimingUp = true; aimingDown = false; break;
     case aimDown: aimingDown = true; aimingUp = false; break;
@@ -107,33 +113,37 @@ void Quarterback::aim(qbAim dir) {
 }
 
 void Quarterback::updateAim() { 
+    // If it is currently moving then dont go into the loop until it is done moving
     if (millis() - lastElevationTime >= ELEVATION_PERIOD) {
       if (aimingUp && currentElevation < MAX_ELEVATION) {
-
+        // Set the elevation of the top to 50% higher
         elevationMotors.write(SERVO_SPEED_UP);
         currentElevation += 50;
         aimingUp = false;
         lastElevationTime = millis();
 
       } else if (aimingDown && currentElevation > 0) {
-
+        // Set the elevation of the bottom to 50% lower
         elevationMotors.write(SERVO_SPEED_DOWN);
         currentElevation -= 50;
         aimingDown = false;
         lastElevationTime = millis();
 
       } else {
+        // Stop the linear actuators if it is not supposed to move up or down anymore
         elevationMotors.write(SERVO_SPEED_STOP);
       }
     }
 }
 
 void Quarterback::toggleConveyor() {
+    // Toggle the conveyor between on or off
     if (!conveyorOn){
       conveyorMotor.write(CONVEYOR_ON);
     } else {
       conveyorMotor.write(CONVEYOR_OFF);
     }
+    // Toggle the bool so we know which mode it is in
     conveyorOn = !conveyorOn;
 }
 
