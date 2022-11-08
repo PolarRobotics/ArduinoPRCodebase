@@ -3,7 +3,7 @@
 #include <Servo.h>
 
 // Flywheel defines 
-#define FLYWHEEL_SPEED_FULL 60 // this should be between 60 and 90. 
+#define FLYWHEEL_SPEED_FULL 120 // this should be between 60 and 90. 
 #define FLYWHEEL_STOP_SPEED 90
 
 // Elevation (linear actuators) defines
@@ -14,8 +14,8 @@
 #define ELEVATION_PERIOD 3750
 
 // Conveyor defines
-#define CONVEYOR_ON 60
-#define CONVEYOR_OFF 90 
+#define CONVEYOR_ON 150
+#define CONVEYOR_OFF 93 
 
 // Enum for Increasing or Decreasing Flywheel Speed
 enum speedStatus {
