@@ -99,6 +99,10 @@ void Drive::setBSN(SPEED bsn) {
             else /* motorType == MOTORS::small */ BSNscalar = SMALL_SLOW_PCT;
             break;
         }
+        case brake: {
+            BSNscalar = BRAKE_BUTTON_PCT;
+            break;
+        }
     }
 }
 
@@ -112,10 +116,10 @@ void Drive::generateMotionValues() {
     if (fabs(stickForwardRev) < STICK_DEADZONE) { // fwd stick is zero
         if (fabs(stickTurn) < STICK_DEADZONE) { // turn stick is zero
             motorPower[0] = 0, motorPower[1] = 0; // not moving, set motors to zero
-        } else if (stickTurn > STICK_DEADZONE) { // turning right, but not moving forward so use tank mode
+        } else if (stickTurn > STICK_DEADZONE) { // turning right, but not moving forward much so use tank mode
             motorPower[0] = BSNscalar * abs(stickTurn)  * TANK_MODE_PCT;
             motorPower[1] = -BSNscalar * abs(stickTurn) * TANK_MODE_PCT;
-        } else if (stickTurn < -STICK_DEADZONE) { // turning left, but not moving forward so use tank mode
+        } else if (stickTurn < -STICK_DEADZONE) { // turning left, but not moving forward muchso use tank mode
             motorPower[0] = -BSNscalar * abs(stickTurn) * TANK_MODE_PCT;
             motorPower[1] = BSNscalar * abs(stickTurn)  * TANK_MODE_PCT;
         } // no general else since encountered infinite loop
@@ -136,9 +140,15 @@ void Drive::generateMotionValues() {
                 //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
                 motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
                 motorPower[1] = calcTurningMotorValue(stickTurn, lastRampPower[0]); // set the right motor
+                if (lastRampPower[0] < 0.3) { // temporary solution to decrease radius at low speed
+                    motorPower[0] += 0.05;
+                }
             } else if(stickTurn < -STICK_DEADZONE) { // turn Left
                 motorPower[0] = calcTurningMotorValue(stickTurn, lastRampPower[1]); // set the left motor
                 motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
+                if (lastRampPower[1] < 0.3) { // temporary solution to decrease radius at low speed
+                    motorPower[1] += 0.05;
+                }
             }
         }
     }
@@ -362,6 +372,31 @@ void Drive::update() {
     lastRampPower[0] = motorPower[0];
     lastRampPower[1] = motorPower[1];
     
+    M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
+    M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
+}
+
+/**
+ * @brief updates the motors after calling all the functions to generate
+ * turning and scaling motor values, the intention of this is so the
+ * programmer doesnt have to call all the functions, this just handles it,
+ * reducing clutter in the main file.
+ * @author Rhys Davies
+ * Created: 9-12-2022
+ * Updated: 10-11-2020
+*/
+void Drive::drift() {
+    if (stickTurn > STICK_DEADZONE) { // turning right, but not moving forward much so use tank mode
+        motorPower[0] = BSNscalar * abs(stickTurn)  * DRIFT_MODE_PCT;
+        //motorPower[1] = -BSNscalar * abs(stickTurn) * DRIFT_MODE_PCT;
+    } else if (stickTurn < -STICK_DEADZONE) { // turning left, but not moving forward much so use tank mode
+        //motorPower[0] = -BSNscalar * abs(stickTurn) * DRIFT_MODE_PCT;
+        motorPower[1] = BSNscalar * abs(stickTurn)  * DRIFT_MODE_PCT;
+    } else {
+        motorPower[0] = 0;
+        motorPower[1] = 0;
+    }
+
     M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
     M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 }
