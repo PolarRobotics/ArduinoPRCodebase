@@ -4,7 +4,11 @@
 
 // Flywheel defines 
 #define FLYWHEEL_SPEED_FULL 120 // this should be between 60 and 90. 
+<<<<<<< Updated upstream
 #define FLYWHEEL_STOP_SPEED 90
+=======
+#define FLYWHEEL_STOP_SPEED 93
+>>>>>>> Stashed changes
 
 // Elevation (linear actuators) defines
 #define SERVO_SPEED_UP 175
@@ -14,8 +18,13 @@
 #define ELEVATION_PERIOD 3750
 
 // Conveyor defines
+<<<<<<< Updated upstream
 #define CONVEYOR_ON 150
 #define CONVEYOR_OFF 93 
+=======
+#define CONVEYOR_ON 130
+#define CONVEYOR_OFF 90 
+>>>>>>> Stashed changes
 
 // Enum for Increasing or Decreasing Flywheel Speed
 enum speedStatus {
@@ -150,11 +159,11 @@ void Quarterback::toggleConveyor() {
 void Quarterback::changeFWSpeed(speedStatus speed) {
   // Change the speed factor based on whether the user wants to increase or decrease
   switch(speed) {
-    case increase: flywheelSpeedFactor -= 5; break;
-    case decrease: flywheelSpeedFactor += 5; break;
+    case increase: flywheelSpeedFactor += 5; break;
+    case decrease: flywheelSpeedFactor -= 5; break;
   }
   // Cap it so they only have two levels to speed up and two levels to slow down
-  flywheelSpeedFactor = constrain(flywheelSpeedFactor, -10, 10);
+  flywheelSpeedFactor = constrain(flywheelSpeedFactor, -15, 15);
 
   // Update the motors if they are spinning for the new speed
   if (flywheelsOn){
