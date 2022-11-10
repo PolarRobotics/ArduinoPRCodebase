@@ -140,14 +140,14 @@ void Drive::generateMotionValues() {
                 //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
                 motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
                 motorPower[1] = calcTurningMotorValue(stickTurn, lastRampPower[0]); // set the right motor
-                if (lastRampPower[0] < 0.3) { // temporary solution to decrease radius at low speed
-                    motorPower[0] += 0.05;
+                if (abs(lastRampPower[0]) < 0.3) { // temporary solution to decrease radius at low speed
+                    motorPower[0] += copysign(0.05,motorPower[0]);
                 }
             } else if(stickTurn < -STICK_DEADZONE) { // turn Left
                 motorPower[0] = calcTurningMotorValue(stickTurn, lastRampPower[1]); // set the left motor
                 motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
-                if (lastRampPower[1] < 0.3) { // temporary solution to decrease radius at low speed
-                    motorPower[1] += 0.05;
+                if (abs(lastRampPower[1]) < 0.3) { // temporary solution to decrease radius at low speed
+                    motorPower[1] += copysign(0.05,motorPower[1]);
                 }
             }
         }
@@ -315,38 +315,38 @@ void Drive::emergencyStop() {
  * Updated:
 */
 void Drive::printDebugInfo() {
-    // Serial.print(F("Left Input: "));
-    // Serial.print(stickForwardRev);
-    // Serial.print(F("  Right: "));
-    // Serial.print(stickTurn);
+    Serial.print(F("Left Input: "));
+    Serial.print(stickForwardRev);
+    Serial.print(F("  Right: "));
+    Serial.print(stickTurn);
 
-    // Serial.print(F("  |  Turn: "));
-    // Serial.print(lastTurnPwr);
+    Serial.print(F("  |  Turn: "));
+    Serial.print(lastTurnPwr);
 
-    // Serial.print(F("  |  Left ReqPwr: "));
-    // Serial.print(motorPower[0]);
-    // Serial.print(F("  Right ReqPwr: "));
-    // Serial.print(motorPower[1]);
+    Serial.print(F("  |  Left ReqPwr: "));
+    Serial.print(motorPower[0]);
+    Serial.print(F("  Right ReqPwr: "));
+    Serial.print(motorPower[1]);
 
 
     // Serial.print(F("  lastRampTime "));
-    // Serial.print(lastRampTime[mtr]);
+    // Serial.print(lastRampTime[0]);
     // Serial.print(F("  requestedPower "));
     // Serial.print(requestedPower);
     // Serial.print(F("  current "));
-    // Serial.print(currentPower[mtr]);
+    // Serial.print(currentPower[0]);
     // Serial.print(F("  requestedPower - currentPower "));
     // Serial.println(requestedPower - currentPower[mtr], 10);
 
-    // Serial.print(F("  Left Motor: "));
-    // Serial.print(motorPower[0]);
-    // Serial.print(F("  Right: "));
-    // Serial.print(motorPower[1]);
+    Serial.print(F("  Left Motor: "));
+    Serial.print(motorPower[0]);
+    Serial.print(F("  Right: "));
+    Serial.print(motorPower[1]);
 
-    // Serial.print(F("  |  Left Motor: "));
-    // Serial.print(Convert2PWMVal(-motorPower[0]));
-    // Serial.print(F("  Right: "));
-    // Serial.println(Convert2PWMVal(motorPower[1]));
+    Serial.print(F("  |  Left Motor: "));
+    Serial.print(Convert2PWMVal(-motorPower[0]));
+    Serial.print(F("  Right: "));
+    Serial.println(Convert2PWMVal(motorPower[1]));
 
 }
 
@@ -388,9 +388,9 @@ void Drive::update() {
 void Drive::drift() {
     if (stickTurn > STICK_DEADZONE) { // turning right, but not moving forward much so use tank mode
         motorPower[0] = BSNscalar * abs(stickTurn)  * DRIFT_MODE_PCT;
-        //motorPower[1] = -BSNscalar * abs(stickTurn) * DRIFT_MODE_PCT;
+        motorPower[1] = 0;
     } else if (stickTurn < -STICK_DEADZONE) { // turning left, but not moving forward much so use tank mode
-        //motorPower[0] = -BSNscalar * abs(stickTurn) * DRIFT_MODE_PCT;
+        motorPower[0] = 0;
         motorPower[1] = BSNscalar * abs(stickTurn)  * DRIFT_MODE_PCT;
     } else {
         motorPower[0] = 0;
