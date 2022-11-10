@@ -26,6 +26,7 @@ public:
     Lights();
     void setupLEDS();
     void setLEDStatus(LEDState status);
+    // void setLEDColor(uint8_t r, uint8_t g, )
     void updateLEDS();
     //   void runLoop(int count);
     void togglePosition();
