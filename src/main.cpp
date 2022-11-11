@@ -26,6 +26,9 @@ Drive DriveMotors;
 
 // Lights robotLED;
 // unsigned long CURRENTTIME;
+#define ledPin 6
+bool ledOn = false;
+float lastLedTime = 0;
 
 /*
    ____    _____   _____   _   _   ____
@@ -65,7 +68,8 @@ void setup() {
 
   Serial.print(F("\r\nConnected"));
 
-  delay(1000);
+  pinMode(ledPin, OUTPUT);
+
 }
 
 /*
@@ -118,4 +122,17 @@ void loop() {
     // Emergency stop if the controller disconnects
     DriveMotors.emergencyStop();
   }
+  //DriveMotors.printDebugInfo();
+
+  if(millis() - lastLedTime > 250) {
+    lastLedTime = millis();
+    if(!ledOn){
+      digitalWrite(ledPin, HIGH);
+      ledOn = true;
+    } else {
+      digitalWrite(ledPin, LOW);
+      ledOn = false;
+    }
+  }
+
 }

@@ -35,7 +35,7 @@
 #define THRESHOLD 0.00001
 
 // this is 1.0, the maximum power possible to the motors.
-#define BIG_BOOST_PCT 1.0
+#define BIG_BOOST_PCT 0.6
 // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
 #define BIG_NORMAL_PCT 0.4
 // should be a value less than BIG_NORMAL_PCT, to slow down for precision maneuvering
@@ -51,7 +51,7 @@
 // Value for the tank mode speed reduction percentage
 #define TANK_MODE_PCT 0.5
 // Value for the Drift Mode Reduction Factor Percentage
-#define DRIFT_MODE_PCT 0.75
+#define DRIFT_MODE_PCT 0.8
 
 class Drive {
 private:
