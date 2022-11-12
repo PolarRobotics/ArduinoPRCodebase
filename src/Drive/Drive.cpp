@@ -141,13 +141,13 @@ void Drive::generateMotionValues() {
                 motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
                 motorPower[1] = calcTurningMotorValue(stickTurn, lastRampPower[0]); // set the right motor
                 if (abs(lastRampPower[0]) < 0.3) { // temporary solution to decrease radius at low speed
-                    motorPower[0] += copysign(0.05,motorPower[0]);
+                    motorPower[0] += copysign(NORMAL_TURN_CONSTANT,motorPower[0]);
                 }
             } else if(stickTurn < -STICK_DEADZONE) { // turn Left
                 motorPower[0] = calcTurningMotorValue(stickTurn, lastRampPower[1]); // set the left motor
                 motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
                 if (abs(lastRampPower[1]) < 0.3) { // temporary solution to decrease radius at low speed
-                    motorPower[1] += copysign(0.05,motorPower[1]);
+                    motorPower[1] += copysign(NORMAL_TURN_CONSTANT,motorPower[1]);
                 }
             }
         }
