@@ -4,10 +4,10 @@
 #include <PS5BT.h>
 
 // Custom Polar Robotics Libraries:
-// #include "PolarRobotics.h"
-// #include <Robot/Robot.h>
+#include "PolarRobotics.h"
+#include <Robot/Robot.h>
 #include <Drive/Drive.h>
-// #include <Robot/Lights.h>
+#include <Robot/Lights.h>
 
 // USB, Bluetooth, and Controller variable initialization
 // The USB Host shield uses pins 9 through 13, so don't use those pins
@@ -24,8 +24,8 @@ Servo rightMotor;
 uint8_t motorType;
 Drive DriveMotors;
 
-// Lights robotLED;
-// unsigned long CURRENTTIME;
+Lights robotLED;
+unsigned long CURRENTTIME;
 
 /*
    ____    _____   _____   _   _   ____
@@ -51,8 +51,8 @@ void setup() {
   DriveMotors.setServos(leftMotor, rightMotor);
   
   // Set initial LED color state
-//   robotLED.setupLEDS();
-//   robotLED.setLEDStatus(Lights::PAIRING);
+  robotLED.setupLEDS();
+  robotLED.setLEDStatus(Lights::PAIRING);
 
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nReconnecting..."));
@@ -60,7 +60,7 @@ void setup() {
       delay(5); 
     }
   } else{
-    // robotLED.setLEDStatus(Lights::DEFENSE);
+    robotLED.setLEDStatus(Lights::DEFENSE);
   }
 
   Serial.print(F("\r\nConnected"));
@@ -97,9 +97,9 @@ void loop() {
 
     }
 
-    // if(PS5.getButtonPress(UP)){
-    //   robotLED.togglePosition();
-    // }
+    if(PS5.getButtonClick(UP)){
+      robotLED.togglePosition();
+    }
     
     // if (millis() - CURRENTTIME >= 200) {
     //     CURRENTTIME = millis();
