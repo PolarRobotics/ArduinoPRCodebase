@@ -111,9 +111,6 @@ void setup() {
     DriveMotors.setMotorType(MOTORS::big);
     kickerbot.setup(windupPin);
   }
-
-
-  delay(1000);
 }
 
 /*
