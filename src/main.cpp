@@ -82,8 +82,8 @@ void setup() {
   DriveMotors.setServos(leftMotor, rightMotor);
 
   // Set initial LED color state
-//   robotLED.setupLEDS();
-//   robotLED.setLEDStatus(Lights::PAIRING);
+  // robotLED.setupLEDS();
+  // robotLED.setLEDStatus(Lights::PAIRING);
 
   if (Usb.Init() == -1) {
     Serial.print(F("\r\nReconnecting..."));
