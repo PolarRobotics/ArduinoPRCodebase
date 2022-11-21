@@ -52,10 +52,8 @@ private:
   float lastTurnPwr;
   float turnPower;
 
-  Servo M1, M2; //temporary solution, use vector for future
+  Servo M1, M2;
   MOTORS motorType;
-  // vector<Servo> Motors;
-  // motor variables
   uint8_t motorPins[NUM_MOTORS];
   unsigned long lastRampTime[NUM_MOTORS];
   float motorPower[NUM_MOTORS];

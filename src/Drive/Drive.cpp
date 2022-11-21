@@ -6,7 +6,7 @@
  * @brief Drive Class, base class for specialized drive classes, this configuration is intended for the standard linemen.
  * this class takes the the the stick input, scales the turning value for each motor and ramps that value over time,
  * then sets the ramped value to the motors
- * @authors Rhys Davies (@rdavies02), Max Phillips (@RyzenFromFire)
+ * @authors Rhys Davies, Max Phillips
  *
  * @class
  *    2 motor configuration shown below
@@ -15,10 +15,10 @@
  *               | Fwd
  *       _________________
  *      |        _        |
- *      |       |O|       |       O: represents the Omniwheel, a wheel that can turn on 2 axis
- *      |       |_|       |       L: represents the left Wheel, powered by the left motor via a chain
+ *      |       |O|       |       O: Omni-Wheel assembly, a wheel with rollers allowing smooth sideways motion and turning
+ *      |       |_|       |       L: Left Wheel, powered by the left motor via a chain
  *      |  _           _  |            - the left motor would turn ccw to move the bot forward
- *      | |L|         |R| |       R: represents the right Wheel, powered by the right motor via a chain
+ *      | |L|         |R| |       R: Right Wheel, powered by the right motor via a chain
  *      | |_|         |_| |            - the right motor would turn cw to move the bot forward
  *      |_________________|
  *
@@ -58,9 +58,12 @@ void Drive::setMotorType(uint8_t motorType) {
  * @param rightX the left right value from the right stick an unsigned 8-bit float (0 to 255)
 */
 void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
-    // left stick all the way foreward is 0, backward is 255
-    stickForwardRev = (0 - (leftY / 127.5 - 1)); // +: forward, -: backward. needs to be negated so that forward is forward and v.v. subtracting 1 bumps into correct range
-    stickTurn = (rightX / 127.5 - 1); // +: right turn, -: left turn. subtracting 1 bumps into correct range
+    // left stick all the way forward is 0, backward is 255
+    // +: forward, -: backward. needs to be negated so that forward is forward and v.v. subtracting 1 bumps into correct range
+    stickForwardRev = (0 - (leftY / 127.5 - 1));
+
+    // +: right turn, -: left turn. subtracting 1 bumps into correct range
+    stickTurn = (rightX / 127.5 - 1); 
 
     // stick deadzones
     // set to zero (no input) if within the set deadzone
@@ -70,6 +73,7 @@ void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
     if (fabs(stickTurn) < STICK_DEADZONE) {
       stickTurn = 0;
     }
+
     // Ensure the stick values do not go above 1 or below -1
     stickForwardRev = constrain(stickForwardRev, -1, 1);
     stickTurn = constrain(stickTurn, -1, 1);

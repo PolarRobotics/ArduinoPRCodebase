@@ -63,6 +63,7 @@ void setup() {
       robot = new Quarterback();
       break;
     case lineman:
+    case receiver:
     default:
       // Assume lineman
       Serial.println(F("Robot Type: Lineman"));
@@ -89,7 +90,7 @@ void setup() {
     while (Usb.Init() == -1) { // wait until the controller connects
       delay(5);
     }
-  } else{
+  } else {
     // robotLED.setLEDStatus(Lights::DEFENSE);
   }
 

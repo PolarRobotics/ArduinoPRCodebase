@@ -5,23 +5,28 @@ Primary Polar Robotics Codebase
 ```
 src/
 ├ Drive/
-│ ├ Drive.h             Header file for Drive.cpp
-│ └ Drive.cpp           Standard drive code class/object
+│ └ Drive.h             Header file for Drive.cpp
+│   ├ Drive.cpp         Standard drive code class/object
 │   ├ DriveKicker.cpp   Special Drive for Kicker
 │   ├ DriveMecanum.cpp  Special Drive for New Center
 │   └ DriveQuick.cpp    Special Drive for Runningback
 │
 ├ Robot/
-│ └ Robot.cpp           Base Robot Parent Class
-│   ├ Lineman.cpp       Lineman-specific functions, inherits from Robot
-│   │ └ Reciever.cpp    Receiver-specific functions, inherits from Lineman
-│   ├ Runningback.cpp   Runningback-specific functions, inherits from Robot
-│   ├ Quarterback.cpp   Quarterback-specific functions and controls: flywheels, elevation, and conveyor
-│   ├ Kicker.cpp        Kicker-specific functions and controls, incl. winding/release
-│   ├ Center.cpp        Center-specific controls: claw and arm lift
-│   └ CenterNew.cpp     New Center-specific functions, inherits from Robot
+│ ├ Robot.h             Base Robot Parent Class
+│ │ ├ Lineman.h         Derived Class for Linemen and Receiver
+│ │ │ └ Lineman.cpp     Implementations for Lineman-specific functions and controls
+│ │ ├ Runningback.h     Derived Class for Runningback-specific functions and controls
+│ │ │ └ Runningback.cpp Implementations for Runningback
+│ │ ├ Quarterback.h     Derived Class for Quarterback-specific functions and controls
+│ │ │ └ Quarterback.cpp Implementations for flywheels, elevation, conveyor, etc.
+│ │ ├ Kicker.h          Derived Class for Kicker-specific functions and controls
+│ │ │ └ Kicker.cpp      Implementations for winding/release, etc.
+│ │ ├ Center.h          Derived Class for Center-specific functions and controls
+│ │ │ └ Center.cpp      Implementations for claw and arm lift, etc.
+│ │ └ CenterNew.h       New Center-specific functions, inherits from Robot
+│ └ Lights.h            Header file for robot Lights class
+│   └ Lights.cpp        Controls robot LEDs
 │ 
-├ Lights.cpp            Controls robot LEDs
 ├ main.cpp              Contains code that initializes the Robot and Drivebase.
 └ PolarRobotics.h       Contains globally relevant declarations and enums.
 ```
