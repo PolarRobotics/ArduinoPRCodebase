@@ -32,7 +32,7 @@
 #define NORMAL_TURN_CONSTANT 0.05
 
 // Controller Defines
-#define OFFSET -0.4 // the max allowable turning when the bot is traveling at full speed
+#define OFFSET -0.15 // the max allowable turning when the bot is traveling at full speed
 #define STICK_DEADZONE 0.0390625F // 8.0 / 127.0
 #define THRESHOLD 0.00001
 
@@ -48,7 +48,7 @@
 #define SMALL_SLOW_PCT 0.3
 
 // Value for the tank mode speed reduction percentage
-#define TANK_MODE_PCT 0.5
+#define TANK_MODE_PCT 0.75
 // Value for the Drift Mode Reduction Factor Percentage
 #define DRIFT_MODE_PCT 0.8
 
