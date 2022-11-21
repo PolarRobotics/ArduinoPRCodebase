@@ -24,7 +24,7 @@
  *
  * @todo
  *  - add a turning radius parameter, needed for the kicker
- *  - add mechanium driving code, for the new center, needed next semester (Spring 2023)
+ *  - add mecanum driving code, for the new center, needed next semester (Spring 2023)
  *
  * Default configuration:
  * @param leftmotorpin the arduino pin needed for the left motor, needed for servo
@@ -82,7 +82,7 @@ void Drive::setStickPwr(uint8_t leftY, uint8_t rightX) {
  * @author Rhys Davies
  * Created: 9-12-2022
  *
- * @param bsn input speed choice Drive::Boost, Drive::Slow, Drive::Normal
+ * @param bsn input speed choice: Drive::Boost, Drive::Slow, Drive::Normal
 */
 void Drive::setBSN(SPEED bsn) {
     // set the scalar to zero if the requested value is greater than 1, this is not entirely necessary, but is a safety
@@ -314,9 +314,9 @@ void Drive::emergencyStop() {
 
 /**
  * prints the internal variables to the serial monitor in a clean format,
- * this function exists out of pure laziness to not have to comment out all the print statments
- * @author
- * Updated:
+ * this function exists out of pure laziness to not have to comment out all the print statements
+ * "honestly valid" - max
+ * @author (probably rhys)
 */
 void Drive::printDebugInfo() {
     Serial.print(F("Left Input: "));
@@ -360,6 +360,7 @@ void Drive::printDebugInfo() {
  * programmer doesnt have to call all the functions, this just handles it,
  * reducing clutter in the main file.
  * DO NOT CALL THIS FUNCTION UNTIL setStickPwr and setBSN have been called before update
+ * 
  * @author Rhys Davies
  * Created: 9-12-2022
  * Updated: 10-11-2020
@@ -381,13 +382,8 @@ void Drive::update() {
 }
 
 /**
- * @brief updates the motors after calling all the functions to generate
- * turning and scaling motor values, the intention of this is so the
- * programmer doesnt have to call all the functions, this just handles it,
- * reducing clutter in the main file.
- * @author Rhys Davies
- * Created: 9-12-2022
- * Updated: 10-11-2020
+ * @brief ???
+ * @author Kaden?
 */
 void Drive::drift() {
     if (stickTurn > STICK_DEADZONE) { // turning right, but not moving forward much so use tank mode
@@ -405,7 +401,8 @@ void Drive::drift() {
     M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 }
 
-//Old functions
+// Old Functions
+// TODO: Remove these once we determine they are no longer needed...
 
 // if the magnitude of either target power exceeds 1, calculate the difference between it and 1.
 //   if ((fabs(targetPowerLeft) - 1) > THRESHOLD) {

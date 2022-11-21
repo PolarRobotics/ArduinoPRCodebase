@@ -24,14 +24,14 @@ BTD Btd(&Usb);
 PS5BT PS5(&Btd);
 
 // Robot and Drivebase
+// TODO: in the future, retrieve drive pins from specific drive subclass
+uint8_t lPin = 3; // default pin for left motor is 3
+uint8_t rPin = 5; // default pin for right motor is 5
 Robot* robot;
 Drive* drive;
-#define lPin 3
-#define rPin 5
 Servo leftMotor;
 Servo rightMotor;
-uint8_t motorType;
-Drive DriveMotors; // TODO: Replace
+MOTORS motorType;
 
 // Lights robotLED;
 // unsigned long CURRENTTIME;
@@ -46,7 +46,6 @@ Drive DriveMotors; // TODO: Replace
 */
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.print(F("\r\nStarting..."));
 
@@ -54,32 +53,32 @@ void setup() {
   * Robot Type Determination *
   * * * * * * * * * * * * * */
 
-  uint8_t type = EEPROM.read(1);
-  Serial.println("EEPROM: " + static_cast<String>(type));
-  TYPE tempType = (TYPE) type;
+  TYPE type = (TYPE) EEPROM.read(1);
+  Serial.print(F("EEPROM 1: "));
+  Serial.println(static_cast<String>(type));
 
-  switch (tempType) {
-      case quarterback:
-          Serial.println("Robot Type: Quarterback");
-          robot = new Quarterback();
-          break;
-      case lineman:
-      default:
-          // Assume lineman
-          Serial.println("Robot Type: Lineman");
-          robot = new Lineman();
+  switch (type) {
+    case quarterback:
+      Serial.println(F("Robot Type: Quarterback"));
+      robot = new Quarterback();
+      break;
+    case lineman:
+    default:
+      // Assume lineman
+      Serial.println(F("Robot Type: Lineman"));
+      robot = new Lineman();
   }
-  robot->initialize();
 
-  // Motors
-  // TODO: Fix this section
-  type = EEPROM.read(0);
-  drive->setMotorType(type);
-  motorType = EEPROM.read(0);
-  DriveMotors.setMotorType((MOTORS) motorType);
+  robot->initialize();
+  drive = robot->getDrive(); // grab pointer to drive for easier use
+
+  // * Motors
+  motorType = (MOTORS) EEPROM.read(0);
+  drive->setMotorType(motorType);
+  // ! Drive motor servos must be attached in main.cpp, otherwise we get delays
   leftMotor.attach(lPin);
   rightMotor.attach(rPin);
-  DriveMotors.setServos(leftMotor, rightMotor);
+  drive->setServos(leftMotor, rightMotor);
 
   // Set initial LED color state
   // robotLED.setupLEDS();
@@ -106,29 +105,29 @@ void setup() {
   |_|  |_| /_/   \_\ |___| |_| \_|   |_____|  \___/   \___/  |_|
 
 */
+
+// The main looping code, controls driving and any actions during a game
 void loop() {
 
   // clean up the usb registers, allows for new commands to be executed
   // Usb.Task();
 
-  robot->action(); // testing for now
-  // Serial.println(F("test"));
+  
 
-  // The main looping code, controls driving and any actions during a game
-  if ((millis() - PS5.getLastMessageTime()) < 100 && PS5.connected()) { // checks if PS5 is connected, had response within 300 ms
-    DriveMotors.setStickPwr(PS5.getAnalogHat(LeftHatY), PS5.getAnalogHat(RightHatX));
+  // checks if PS5 is connected, had response within 300 ms
+  if ((millis() - PS5.getLastMessageTime()) < 100 && PS5.connected()) { 
+    drive->setStickPwr(PS5.getAnalogHat(LeftHatY), PS5.getAnalogHat(RightHatX));
 
     // determine BSN percentage (boost, slow, or normal)
     if (PS5.isTouching()){
-      DriveMotors.emergencyStop();
-      DriveMotors.setBSN(Drive::brake);
+      drive->emergencyStop();
+      drive->setBSN(Drive::brake);
     } else if (PS5.getButtonPress(R1)) {
-      DriveMotors.setBSN(Drive::boost);
+      drive->setBSN(Drive::boost);
     } else if (PS5.getButtonPress(L1)) {
-      DriveMotors.setBSN(Drive::slow);
+      drive->setBSN(Drive::slow);
     } else {
-      DriveMotors.setBSN(Drive::normal);
-
+      drive->setBSN(Drive::normal);
     }
 
     // if(PS5.getButtonPress(UP)){
@@ -142,16 +141,20 @@ void loop() {
 
     // Update the motors based on the inputs from the controller
     if(PS5.getAnalogButton(L2)) {
-      DriveMotors.drift();
+      drive->drift();
     } else {
-      DriveMotors.update();
+      drive->update();
     }
+
+    // Special Robot Action
+    robot->action();
 
   } else { // no response from PS5 controller within last 300 ms, so stop
     // Emergency stop if the controller disconnects
-    DriveMotors.emergencyStop();
+    drive->emergencyStop();
   }
-//   DriveMotors.printDebugInfo();
-    // robotLED.updateLEDS();
+
+  // DriveMotors.printDebugInfo();
+  // robotLED.updateLEDS();
 
 }

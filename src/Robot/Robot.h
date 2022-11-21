@@ -24,6 +24,7 @@ class Robot {
         void setType(uint8_t t) { type = static_cast<TYPE>(t); };
 
         // Virtual function that effectively acts like a constructor
+        // TODO: we should be able to avoid using this eventually, and instead use the constructor properly
         // "virtual" keyword required to enable runtime polymorphism (i.e. actually use overrides)
         virtual void initialize() = 0;
 

@@ -9,15 +9,8 @@
 // #include <Servo_Hardware_PWM.h>
 
 #ifndef NUM_MOTORS
-// the number of motors associated with driving, usually multiples of 2, default: 2
-#define NUM_MOTORS 2 // 4 for mechanum wheels
+#define NUM_MOTORS 2 
 #endif
-
-// #TODO move this to the robot parent class
-// #ifndef MECHANUM
-// // determine if the motors are in a mechanum configuration or the standard config. default: false
-// #define MECHANUM false
-// #endif
 
 // rate of change of power with respect to time when accelerating %power/10th of sec
 #define ACCELERATION_RATE .0375
@@ -73,7 +66,7 @@ private:
   float calcTurningMotorValue(float stickTrn,  float prevPwr);
   void generateMotionValues();
   float ramp(float requestedPower, uint8_t mtr);
-  // use the inline keywork to ensure the function will get called again as soon as possible
+  // use the inline keyword to ensure the function will get called again as soon as possible
   float Convert2PWMVal(float rampPwr);
   void setMotorPWM(float pwr, byte pin); //__attribute__((always_inline));
 
@@ -97,13 +90,5 @@ public:
   void drift();
   void printDebugInfo();
 };
-
-// // Robot Age Enum
-// // 0 for old robot, 1 for new robot
-// // remove later - deprecated
-// enum AGE {
-//   OLD,
-//   NEW
-// };
 
 #endif /* DRIVE_H */
