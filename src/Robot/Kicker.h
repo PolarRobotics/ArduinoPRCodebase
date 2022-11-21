@@ -18,9 +18,7 @@ class Kicker: public Robot {
     uint8_t m_kickerpin;
     Servo m_windupMotor;
   public:
-    Kicker() {
-      m_enabled = false;
-    }
+    Kicker();
     void initialize() override;
     void action(PS5BT& PS5) override;
     void setup(uint8_t kicker_pin);

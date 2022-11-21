@@ -1,5 +1,10 @@
 #include "Kicker.h"
 
+Kicker::Kicker() {
+    m_enabled = false;
+    setDrive(new Drive()); // TODO: update to whatever the kicker needs
+}
+
 void Kicker::initialize() {
     Serial.println(F("Creating Kicker"));
 }

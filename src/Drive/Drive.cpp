@@ -6,7 +6,7 @@
  * @brief Drive Class, base class for specialized drive classes, this configuration is intended for the standard linemen.
  * this class takes the the the stick input, scales the turning value for each motor and ramps that value over time,
  * then sets the ramped value to the motors
- * @authors Rhys Davies, Max Phillips
+ * @authors Rhys Davies, Grant Brautigam, Kaden Wince, Max Phillips
  *
  * @class
  *    2 motor configuration shown below

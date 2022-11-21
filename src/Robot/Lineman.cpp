@@ -1,6 +1,9 @@
 #include "Robot/Lineman.h"
 
-// Lineman::~Lineman() {}
+Lineman::Lineman() { 
+    Serial.println(F("Creating lineman"));
+    setDrive(new Drive());
+};
 
 void Lineman::initialize() {
     // this->setDrive(new Drive(3,5));

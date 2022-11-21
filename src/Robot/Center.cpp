@@ -21,7 +21,7 @@
  * Date: 9/19/22
 **/
 Center::Center() {
-
+    setDrive(new Drive());
 }
 
 void Center::initialize() {

@@ -1,5 +1,9 @@
 #include "Robot/Quarterback.h"
 
+Quarterback::Quarterback() {
+    setDrive(new Drive());
+}
+
 void Quarterback::initialize() {
     // this->setDrive(new Drive(3,5));
     Serial.println(F("Creating QB"));
