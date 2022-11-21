@@ -114,6 +114,7 @@ void setup() {
 
   robot->initialize();
   drive = robot->getDrive(); // grab pointer to drive for easier use
+  // note that we can't just create a new Drive here because each robot might use a different subclass of Drive
 
   // * Motors
   

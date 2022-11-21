@@ -2,6 +2,17 @@
 
 Quarterback::Quarterback() {
     setDrive(new Drive());
+
+    // Declare that the flywheels are off
+    flywheelsOn = false;
+
+    // Declare the the conveyor is off
+    conveyorOn = false;
+
+    // Declare that we are not trying to aim up or down and we are at the current elevation of 0
+    aimingUp = false;
+    aimingDown = false;
+    currentElevation = 0;
 }
 
 void Quarterback::initialize() {
@@ -31,19 +42,6 @@ void Quarterback::action(PS5BT& PS5) {
       changeFWSpeed(speedStatus::increase);
     else if (PS5.getButtonClick(CROSS))
       changeFWSpeed(speedStatus::decrease);
-}
-
-Quarterback::Quarterback() {
-    // Declare that the flywheels are off
-    flywheelsOn = false;
-
-    // Declare the the conveyor is off
-    conveyorOn = false;
-
-    // Declare that we are not trying to aim up or down and we are at the current elevation of 0
-    aimingUp = false;
-    aimingDown = false;
-    currentElevation = 0;
 }
 
 void Quarterback::attachMotors(uint8_t fwpin, uint8_t conveyorpin, uint8_t elevationpin) {
