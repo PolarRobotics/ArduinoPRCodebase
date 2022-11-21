@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include <SPI.h> //Built in
-#include <EEPROM.h> //Built in
+#include <SPI.h> // Built in
+#include <EEPROM.h> // Built in
 #include <PS5BT.h>
 
 // Custom Polar Robotics Libraries:
@@ -9,7 +9,9 @@
 #include "Robot/Robot.h"
 #include "Robot/Lineman.h"
 
-#if SPECIAL_BOTS_ENV == 1
+// Special Robot Libraries
+// This build flag is set by the selected environment (see platformio.ini)
+#if INCLUDE_SPECIAL == 1
 #include "Robot/Quarterback.h"
 #else
 #include "Robot/Dummy.h"
