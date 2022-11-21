@@ -1,14 +1,32 @@
-#ifndef QUARTERBACK_H_
 #include "Robot/Quarterback.h"
-#endif
 
 void Quarterback::initialize() {
     // this->setDrive(new Drive(3,5));
     Serial.println(F("Creating QB"));
 }
 
-void Quarterback::action() {
+void Quarterback::action(PS5BT& PS5) {
     Serial.println(F("Actual QB Action Executed"));
+    // Update the bools within the class to see if the user wants to go up or down
+    if (PS5.getButtonClick(UP))
+      aim(qbAim::aimUp);
+    else if (PS5.getButtonClick(DOWN))
+      aim(qbAim::aimDown);
+    
+    // Update the aim on quarterback to see if we need to stop or not
+    updateAim();
+
+    // Toogle the Conveyor and Flywheels
+    if (PS5.getButtonClick(SQUARE))
+      toggleConveyor();
+    else if (PS5.getButtonClick(CIRCLE))
+      {toggleFlywheels();}
+    
+    // Change the flywheel speed
+    if(PS5.getButtonClick(TRIANGLE))
+      changeFWSpeed(speedStatus::increase);
+    else if (PS5.getButtonClick(CROSS))
+      changeFWSpeed(speedStatus::decrease);
 }
 
 Quarterback::Quarterback() {
@@ -149,92 +167,5 @@ void Quarterback::changeFWSpeed(speedStatus speed) {
     can have an action where if you hold down on a button
     and move the left hat you can adjust the elevation of the QB
     this can allow for better control of the height
-
-*/
-
-/*  OLD MAIN CODE:
-
-    if (PS3.getButtonClick(TRIANGLE) && targetElevation + 1 < 3) {
-      targetElevation = targetElevation + 1;
-    } else if (PS3.getButtonClick(CROSS) && targetElevation - 1 >= 0) {
-      targetElevation = targetElevation - 1;
-    } else if (PS3.getButtonClick(DOWN)) {
-      targetElevation = 0;
-    }
-
-    int maxCounter = 13000;
-
-    if ((counter > maxCounter || counter < 0) && (aimingup == true || aimingdown == true)) {
-      aimingup = false;
-      aimingdown = false;
-      ElevationMotor.write(getSpeedStop());
-      if (counter == -1) {
-        counter = 0;
-      } else {
-        counter = maxCounter;
-      }
-      Serial.println("im stuck");
-    } else if (targetElevation > currentElevation) {
-      ElevationMotor.write(getSpeedUp());
-      currentElevation = targetElevation;
-      aimingup = true;
-      aimingdown = false;
-    } else if (targetElevation < currentElevation) {
-      ElevationMotor.write(getSpeedDown());
-      currentElevation = targetElevation;
-      aimingdown = true;
-      aimingup = false;
-    } else if (aimingup == true) {
-      counter = counter + 1;
-    } else if (aimingdown == true) {
-      counter = counter - 1;
-    }
-
-    if (targetElevation == 1 && counter == maxCounter/2) {
-      aimingup = false;
-      aimingdown = false;
-      ElevationMotor.write(getSpeedStop());
-    }
-
-    if (PS3.getButtonClick(LEFT)) {
-      ElevationMotor.write(getSpeedDown());
-      delay(8000);
-      ElevationMotor.write(getSpeedStop());
-      counter = 0;
-      currentElevation = 0;
-      targetElevation = 0;
-    }
-
-    if (PS3.getButtonPress(CIRCLE)) {
-      conveyor.write(145);
-    } else {
-      conveyor.write(30);
-    }
-
-    // flywheels.write(60);
-
-    if (PS3.getButtonClick(SQUARE)) {
-      flywheelstate = flywheelstate + 1;
-      if (flywheelstate == 1) {
-        flywheels.write(100);
-        //flywheelstatis = true;
-        //Serial.print("ran line 1");
-        //Serial.println("  ");
-      } else if (flywheelstate == 2) {
-        flywheels.write(145);
-        //flywheelstatis = true;
-        //Serial.print("ran line 1");
-        //Serial.println("  ");
-      } else if (flywheelstate==3){
-        flywheels.write(93);
-        //flywheelstatis = false;
-        flywheelstate = 0;
-        //Serial.print("ran line 2");
-        //Serial.println("  ");
-      }
-        //Serial.print("ran line 3");
-        //Serial.println("  ");
-    }
-
 
 */

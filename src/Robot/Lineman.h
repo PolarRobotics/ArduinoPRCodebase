@@ -8,7 +8,7 @@
  * @authors Max Phillips
  */
 
-class Lineman : public Robot {
+class Lineman: public Robot {
     private: 
         uint8_t test;
     public:
@@ -19,7 +19,7 @@ class Lineman : public Robot {
 
         // Override virtual functions
         void initialize() override;
-        void action() override;
+        void action(PS5BT& PS5) override;
 };
 
 #endif

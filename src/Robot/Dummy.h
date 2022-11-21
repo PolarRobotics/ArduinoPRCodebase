@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef DUMMY_H_
 #define DUMMY_H_
 
@@ -13,8 +15,21 @@ class Quarterback: public Robot {
     public:
         Quarterback() {};
         void initialize() {}
-        void action() { Serial.println(F("Dummy QB Action Executed")); }
+        void action(PS5BT& PS5) { Serial.println(F("Dummy QB Action Executed")); }
 };
 
+class Center: public Robot {
+    public:
+        Center() {};
+        void initialize() {}
+        void action(PS5BT& PS5) { Serial.println(F("Dummy Center Action Executed")); }
+};
+
+class Kicker: public Robot {
+    public:
+        Kicker() {};
+        void initialize() {}
+        void action(PS5BT& PS5) { Serial.println(F("Dummy Kicker Action Executed")); }
+};
 
 #endif

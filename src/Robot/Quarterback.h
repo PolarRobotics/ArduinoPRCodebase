@@ -36,7 +36,7 @@ enum qbAim {
  * @brief Quarterback Subclass Header
  * @authors Rhys Davies
  */
-class Quarterback : public Robot {
+class Quarterback: public Robot {
     private:
         uint8_t m_FlywheelPin;
         uint8_t m_conveyorPin;
@@ -61,7 +61,7 @@ class Quarterback : public Robot {
         void changeFWSpeed(speedStatus speed);
         void updateAim();
         void initialize() override;
-        void action() override;
+        void action(PS5BT& PS5) override;
 };
 
 #endif // QUARTERBACK_H_

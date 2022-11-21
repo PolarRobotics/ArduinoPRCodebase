@@ -7,6 +7,6 @@ void Lineman::initialize() {
     Serial.println(F("Lineman initialize"));
 }
 
-void Lineman::action() {
+void Lineman::action(PS5BT& PS5) {
     Serial.println(F("Lineman action executed"));
 }

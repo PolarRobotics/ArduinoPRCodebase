@@ -13,7 +13,7 @@
     clawControl - Based on what is inputed in main, opens, closes, or stops the claw. 
     armControl - Based on what is inputed in main, raises, lowers, or stops the arm. 
 */
-#include <Robot/Center.h>
+#include "Robot/Center.h"
 
 /**
  * Description: Public function that starts the arm and claw motors and sets their starting status to stop. 
@@ -22,6 +22,32 @@
 **/
 Center::Center() {
 
+}
+
+void Center::initialize() {
+    // this->setDrive(new Drive(3,5));
+    Serial.println(F("Creating Center"));
+}
+
+void Center::action(PS5BT& PS5) {
+    Serial.println(F("Actual Center Action Executed"));
+    if (PS5.getAnalogButton(R2)) {
+      armControl(armStatus::Higher);
+    } else if (PS5.getAnalogButton(L2)) {
+      armControl(armStatus::Lower);
+    } else if (PS5.getButtonPress(TRIANGLE)) {
+      armControl(armStatus::Hold);
+    } else {
+      armControl(armStatus::Stop);
+    }
+    
+    if (PS5.getButtonPress(UP)) {
+      clawControl(clawStatus::Open);
+    } else if (PS5.getButtonPress(DOWN)) {
+      clawControl(clawStatus::Close);
+    } else {
+      clawControl(clawStatus::clawStop);
+    }
 }
 
 void Center::setServos(Servo& armPin, Servo& clawPin) {

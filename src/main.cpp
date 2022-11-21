@@ -13,6 +13,8 @@
 // This build flag is set by the selected environment (see platformio.ini)
 #if INCLUDE_SPECIAL == 1
 #include "Robot/Quarterback.h"
+#include "Robot/Center.h"
+#include "Robot/Kicker.h"
 #else
 #include "Robot/Dummy.h"
 #endif
@@ -33,6 +35,22 @@ Servo leftMotor;
 Servo rightMotor;
 MOTORS motorType;
 
+#if INCLUDE_SPECIAL == 1
+// QB
+#define FLYWHEEL_PIN 7
+#define ELEVATION_MOTORS_PIN 4
+#define CONVEYOR_MOTOR_PIN 6 
+
+// Center
+Servo centerArm;
+Servo centerClaw;
+#define armPin 6
+#define clawPin 13
+
+// Kicker
+#define windupPin 7
+#endif
+
 // Lights robotLED;
 // unsigned long CURRENTTIME;
 
@@ -52,15 +70,39 @@ void setup() {
   /* * * * * * * * * * * * * *
   * Robot Type Determination *
   * * * * * * * * * * * * * */
-
-  TYPE type = (TYPE) EEPROM.read(1);
+  
+  MOTORS motorType = (MOTORS) EEPROM.read(0);
+  TYPE robotType = (TYPE) EEPROM.read(1);
   Serial.print(F("EEPROM 1: "));
-  Serial.println(static_cast<String>(type));
+  Serial.println(static_cast<String>(robotType));
 
-  switch (type) {
+  switch (robotType) {
     case quarterback:
       Serial.println(F("Robot Type: Quarterback"));
       robot = new Quarterback();
+      #if INCLUDE_SPECIAL == 1
+        // TODO: Decide on a universal way to do this: are servos stored here or in the subclass?
+        ((Quarterback*) robot)->attachMotors(FLYWHEEL_PIN, CONVEYOR_MOTOR_PIN, ELEVATION_MOTORS_PIN);
+      #endif
+      break;
+    case center:
+      Serial.println(F("Robot Type: Center"));
+      robot = new Center();
+      #if INCLUDE_SPECIAL == 1
+        centerArm.attach(armPin);
+        centerClaw.attach(clawPin);
+        ((Center*) robot)->setServos(centerArm, centerClaw); // downcast and call member method
+        PS5.leftTrigger.setTriggerForce(0, 255);
+        PS5.rightTrigger.setTriggerForce(0, 255);
+      #endif
+      break;
+    case kicker:
+      Serial.println(F("Robot Type: Kicker"));
+      robot = new Kicker();
+      motorType = MOTORS::big; // direct override evidently
+      #if INCLUDE_SPECIAL == 1
+        ((Kicker*) robot)->setup(windupPin);
+      #endif
       break;
     case lineman:
     case receiver:
@@ -74,7 +116,7 @@ void setup() {
   drive = robot->getDrive(); // grab pointer to drive for easier use
 
   // * Motors
-  motorType = (MOTORS) EEPROM.read(0);
+  
   drive->setMotorType(motorType);
   // ! Drive motor servos must be attached in main.cpp, otherwise we get delays
   leftMotor.attach(lPin);
@@ -148,7 +190,7 @@ void loop() {
     }
 
     // Special Robot Action
-    robot->action();
+    robot->action(PS5);
 
   } else { // no response from PS5 controller within last 300 ms, so stop
     // Emergency stop if the controller disconnects

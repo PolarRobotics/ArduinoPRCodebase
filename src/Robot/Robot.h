@@ -4,8 +4,9 @@
 #define ROBOT_H_
 
 #include <Arduino.h>
-#include <PolarRobotics.h>
-#include <Drive/Drive.h>
+#include <PS5BT.h>
+#include "PolarRobotics.h"
+#include "Drive/Drive.h"
 
 /**
  * @brief Robot Base Class Header File
@@ -29,7 +30,7 @@ class Robot {
         virtual void initialize() = 0;
 
         // Virtual function to perform any loop actions for special robots
-        virtual void action() = 0;
+        virtual void action(PS5BT& PS5) = 0;
         
 };
 
