@@ -111,6 +111,10 @@ void setup() {
     DriveMotors.setMotorType(MOTORS::big);
     kickerbot.setup(windupPin);
   }
+
+  // Reset PWM on startup
+  analogWrite(lPin, 0);
+  analogWrite(rPin, 0);
 }
 
 /*
