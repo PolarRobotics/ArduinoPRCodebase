@@ -64,6 +64,8 @@ void setup() {
   }
 
   Serial.print(F("\r\nConnected"));
+  analogWrite(lPin, 0);
+  analogWrite(rPin, 0);
 
 }
 
