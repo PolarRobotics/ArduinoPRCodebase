@@ -45,6 +45,10 @@
 // Value for the Drift Mode Reduction Factor Percentage
 #define DRIFT_MODE_PCT 0.8
 
+// Default Pins
+#define DEFAULT_LEFT_PIN 3
+#define DEFAULT_RIGHT_PIN 5
+
 class Drive {
 private:
   float stickForwardRev, stickTurn;
@@ -52,7 +56,9 @@ private:
   float lastTurnPwr;
   float turnPower;
 
-  Servo M1, M2;
+  uint8_t lPin = DEFAULT_LEFT_PIN; // default pin for left motor is 3
+  uint8_t rPin = DEFAULT_RIGHT_PIN; // default pin for right motor is 5
+  Servo leftMotor, rightMotor;
   MOTORS motorType;
   uint8_t motorPins[NUM_MOTORS];
   unsigned long lastRampTime[NUM_MOTORS];
@@ -76,6 +82,9 @@ public:
     brake
   };
   Drive();
+  Drive(MOTORS motorType);
+  Drive(uint8_t leftPin, uint8_t rightPin);
+  Drive(MOTORS motorType, uint8_t leftPin, uint8_t rightPin);
   void setServos(Servo&, Servo&);
   void setMotorType(MOTORS motorType);
   void setMotorType(uint8_t motorType);

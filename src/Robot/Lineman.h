@@ -12,7 +12,7 @@ class Lineman: public Robot {
     private: 
         uint8_t test;
     public:
-        // drive pins constants, stored in flash instead of SRAM
+        // drive pin constants, stored in flash instead of SRAM
         const PROGMEM uint8_t lPin = 3; 
         const PROGMEM uint8_t rPin = 5;
     

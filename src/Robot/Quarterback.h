@@ -7,8 +7,13 @@
 #include "Drive/Drive.h"
 #include <Servo.h>
 
+// Pins
+#define FLYWHEEL_PIN 7
+#define ELEVATION_PIN 4
+#define CONVEYOR_PIN 6 
+
 // Flywheel defines
-#define FLYWHEEL_SPEED_FULL 120 // this should be between 90 and 140.
+#define FLYWHEEL_SPEED_BASE 120 // this should be between 90 and 140.
 #define FLYWHEEL_STOP_SPEED 93
 
 // Elevation (linear actuators) defines
@@ -38,11 +43,8 @@ enum qbAim {
  */
 class Quarterback: public Robot {
     private:
-        uint8_t m_FlywheelPin;
-        uint8_t m_conveyorPin;
-        uint8_t m_ElevationPin;
-        Servo FWMotor;
-        Servo conveyorMotor;
+        Servo flywheelMotors;
+        Servo conveyorMotors;
         Servo elevationMotors;
         bool flywheelsOn, conveyorOn;
         bool aimingUp, aimingDown;
@@ -53,12 +55,10 @@ class Quarterback: public Robot {
         float flywheelSpeedFactor;
     public:
         Quarterback();
-        void attachMotors(uint8_t fwpin,
-            uint8_t conveyorpin, uint8_t elevationpin);
         void toggleFlywheels();
         void aim(qbAim dir);
         void toggleConveyor();
-        void changeFWSpeed(speedStatus speed);
+        void changeFlywheelSpeed(speedStatus speed);
         void updateAim();
         void initialize() override;
         void action(PS5BT& PS5) override;

@@ -1,22 +1,31 @@
 #include "Robot/Quarterback.h"
 
 Quarterback::Quarterback() {
-    setDrive(new Drive());
+    this->setType(TYPE::quarterback);
+    this->setDrive(new Drive(MOTORS::small));
 
-    // Declare that the flywheels are off
+    // Attach the motors to their respective pins
+    flywheelMotors.attach(FLYWHEEL_PIN);
+    conveyorMotors.attach(CONVEYOR_PIN);
+    elevationMotors.attach(ELEVATION_PIN);
+
+    // Set initial rest state, all mechanisms off
     flywheelsOn = false;
+    flywheelMotors.write(FLYWHEEL_STOP_SPEED);
 
-    // Declare the the conveyor is off
     conveyorOn = false;
+    conveyorMotors.write(CONVEYOR_OFF);
 
-    // Declare that we are not trying to aim up or down and we are at the current elevation of 0
+    // lower linear actuators to lowest elevation
     aimingUp = false;
     aimingDown = false;
     currentElevation = 0;
+    elevationMotors.write(SERVO_SPEED_DOWN);
+    delay(8000);
+    elevationMotors.write(SERVO_SPEED_STOP);
 }
 
 void Quarterback::initialize() {
-    // this->setDrive(new Drive(3,5));
     Serial.println(F("Creating QB"));
 }
 
@@ -39,38 +48,17 @@ void Quarterback::action(PS5BT& PS5) {
     
     // Change the flywheel speed
     if(PS5.getButtonClick(TRIANGLE))
-      changeFWSpeed(speedStatus::increase);
+      changeFlywheelSpeed(speedStatus::increase);
     else if (PS5.getButtonClick(CROSS))
-      changeFWSpeed(speedStatus::decrease);
+      changeFlywheelSpeed(speedStatus::decrease);
 }
-
-void Quarterback::attachMotors(uint8_t fwpin, uint8_t conveyorpin, uint8_t elevationpin) {
-    // Label the pins inside the class
-    m_FlywheelPin = fwpin;
-    m_conveyorPin = conveyorpin;
-    m_ElevationPin = elevationpin;
-
-    // Attach the motors inside the class to their respective pins
-    FWMotor.attach(m_FlywheelPin);
-    conveyorMotor.attach(m_conveyorPin);
-    elevationMotors.attach(m_ElevationPin);
-
-    // Set the motor to zero so it doesnt spin on startup
-    conveyorMotor.write(CONVEYOR_OFF);
-
-    // Lower the Linear Actuators at start up so they are in the bottom position
-    elevationMotors.write(SERVO_SPEED_DOWN);
-    delay(8000);
-    elevationMotors.write(SERVO_SPEED_STOP);
-}
-
 
 void Quarterback::toggleFlywheels() {
     // Toggle the flywheels and use the speed factor to know what speed
     if (!flywheelsOn){
-      FWMotor.write(FLYWHEEL_SPEED_FULL + flywheelSpeedFactor);
+      flywheelMotors.write(FLYWHEEL_SPEED_BASE + flywheelSpeedFactor);
     } else {
-      FWMotor.write(FLYWHEEL_STOP_SPEED);
+      flywheelMotors.write(FLYWHEEL_STOP_SPEED);
     }
     // Toggle the bool so we know if its on or not
     flywheelsOn = !flywheelsOn;
@@ -113,15 +101,15 @@ void Quarterback::updateAim() {
 void Quarterback::toggleConveyor() {
     // Toggle the conveyor between on or off
     if (!conveyorOn){
-      conveyorMotor.write(CONVEYOR_ON);
+      conveyorMotors.write(CONVEYOR_ON);
     } else {
-      conveyorMotor.write(CONVEYOR_OFF);
+      conveyorMotors.write(CONVEYOR_OFF);
     }
     // Toggle the bool so we know which mode it is in
     conveyorOn = !conveyorOn;
 }
 
-void Quarterback::changeFWSpeed(speedStatus speed) {
+void Quarterback::changeFlywheelSpeed(speedStatus speed) {
   // Change the speed factor based on whether the user wants to increase or decrease
   switch(speed) {
     case increase: flywheelSpeedFactor += 5; break;
@@ -132,9 +120,9 @@ void Quarterback::changeFWSpeed(speedStatus speed) {
 
   // Update the motors if they are spinning for the new speed
   if (flywheelsOn){
-      FWMotor.write(FLYWHEEL_SPEED_FULL + flywheelSpeedFactor);
+      flywheelMotors.write(FLYWHEEL_SPEED_BASE + flywheelSpeedFactor);
     } else {
-      FWMotor.write(FLYWHEEL_STOP_SPEED);
+      flywheelMotors.write(FLYWHEEL_STOP_SPEED);
     }
 
 }
@@ -145,22 +133,6 @@ void Quarterback::changeFWSpeed(speedStatus speed) {
 //     leftFlywheelMotor.write(FLYWHEEL_STOP_SPEED + 10);
 //     //once firing mechanism is finished add that in and make it a macro?
 // }
-
-
-// void Quarterback::update() {
-
-// }
-
-// void Quarterback::fireWeapon(String requestedStatus) {
-//   if (requestedStatus == "Fire") {
-//     FireMotor.write(50);
-//   } else if (requestedStatus == "Retract") {
-//     FireMotor.write(130);
-//   } else if (requestedStatus == "Stop") {
-//     FireMotor.write(90);
-//   }
-// }
-
 
 /*
     Notes:

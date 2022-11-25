@@ -1,6 +1,6 @@
 #include "Drive/Drive.h"
 #include <Arduino.h>
-#include <Servo.h> //Built in
+#include <Servo.h> // Built in
 
 /**
  * @brief Drive Class, base class for specialized drive classes, this configuration is intended for the standard linemen.
@@ -25,18 +25,41 @@
  * @todo
  *  - add a turning radius parameter, needed for the kicker
  *  - add mecanum driving code, for the new center, needed next semester (Spring 2023)
+ *      this will be in the subclass DriveMecanum
  *
  * Default configuration:
- * @param leftmotorpin the arduino pin needed for the left motor, needed for servo
- * @param rightmotorpin the arduino pin needed for the right motor, needed for servo
+ * @param leftPin the arduino pin needed for the left motor, needed for servo
+ * @param rightPin the arduino pin needed for the right motor, needed for servo
 */
-Drive::Drive() {
-    this->motorType = MOTORS::big; // default to long motors
+
+// Full Default Constructor, Big Motors, Pins 3 & 5
+Drive::Drive() : Drive::Drive(MOTORS::big, DEFAULT_LEFT_PIN, DEFAULT_RIGHT_PIN) {};
+
+// Custom Motor Type, Default Pins 3 & 5
+Drive::Drive(MOTORS motorType) : Drive::Drive(motorType, DEFAULT_LEFT_PIN, DEFAULT_RIGHT_PIN) {};
+
+// Default Big Motors, Custom Pins
+Drive::Drive(uint8_t leftPin, uint8_t rightPin) : Drive::Drive(MOTORS::big, leftPin, rightPin) {};
+
+// Primary Constructor, manual arguments
+Drive::Drive(MOTORS motorType, uint8_t leftPin, uint8_t rightPin) {
+    this->motorType = motorType;
+
+    // avoid unnecessary assignments, may take slightly longer but less memory writes done
+    if (leftPin != DEFAULT_LEFT_PIN) 
+        this->lPin = leftPin;
+    if (rightPin != DEFAULT_RIGHT_PIN)
+        this->rPin = rightPin;
+
+    // ! servos must be attached in constructor, which is called within main.cpp/setup()
+    leftMotor.attach(lPin);
+    rightMotor.attach(rPin);
 }
 
+// Deprecated
 void Drive::setServos(Servo& left, Servo& right) {
-    M1 = left;
-    M2 = right;
+    leftMotor = left;
+    rightMotor = right;
 }
 
 void Drive::setMotorType(MOTORS motorType) {
@@ -283,8 +306,8 @@ float Drive::Convert2PWMVal(float rampPwr) {
  * @param pin the motor to be set (0 for left, 1 for right)
 */
 void Drive::setMotorPWM(float pwr, byte pin) {
-    // M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
-    // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
+    // leftMotor.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
+    // rightMotor.writeMicroseconds(Convert2PWMVal(motorPower[1]));
     digitalWrite(motorPins[pin], HIGH);
     delayMicroseconds(Convert2PWMVal(pwr) - 40);
     digitalWrite(motorPins[pin], LOW);
@@ -309,8 +332,8 @@ float Drive::getMotorPwr(uint8_t mtr) {
 }
 
 void Drive::emergencyStop() {
-    M1.writeMicroseconds(1500); // change to new function
-    M2.writeMicroseconds(1500); // change to new function
+    leftMotor.writeMicroseconds(1500); // change to new function
+    rightMotor.writeMicroseconds(1500); // change to new function
     // setMotorPWM(0, motorPins[0]);
     // setMotorPWM(0, motorPins[1]);
     // // while(1);
@@ -381,8 +404,8 @@ void Drive::update() {
     lastRampPower[0] = motorPower[0];
     lastRampPower[1] = motorPower[1];
     
-    M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
-    M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
+    leftMotor.writeMicroseconds(Convert2PWMVal(motorPower[0]));
+    rightMotor.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 }
 
 /**
@@ -401,8 +424,8 @@ void Drive::drift() {
         motorPower[1] = 0;
     }
 
-    M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
-    M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
+    leftMotor.writeMicroseconds(Convert2PWMVal(motorPower[0]));
+    rightMotor.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 }
 
 // Old Functions

@@ -26,14 +26,8 @@ BTD Btd(&Usb);
 PS5BT PS5(&Btd);
 
 // Robot and Drivebase
-// TODO: in the future, retrieve drive pins from specific drive subclass
-uint8_t lPin = 3; // default pin for left motor is 3
-uint8_t rPin = 5; // default pin for right motor is 5
-Robot* robot;
-Drive* drive;
-Servo leftMotor;
-Servo rightMotor;
-MOTORS motorType;
+Robot* robot = nullptr;
+Drive* drive = nullptr;
 
 #if INCLUDE_SPECIAL == 1
 // QB
@@ -80,10 +74,6 @@ void setup() {
     case quarterback:
       Serial.println(F("Robot Type: Quarterback"));
       robot = new Quarterback();
-      #if INCLUDE_SPECIAL == 1
-        // TODO: Decide on a universal way to do this: are servos stored here or in the subclass?
-        ((Quarterback*) robot)->attachMotors(FLYWHEEL_PIN, CONVEYOR_MOTOR_PIN, ELEVATION_MOTORS_PIN);
-      #endif
       break;
     case center:
       Serial.println(F("Robot Type: Center"));
@@ -119,10 +109,6 @@ void setup() {
   // * Motors
   
   drive->setMotorType(motorType);
-  // ! Drive motor servos must be attached in main.cpp, otherwise we get delays
-  leftMotor.attach(lPin);
-  rightMotor.attach(rPin);
-  drive->setServos(leftMotor, rightMotor);
 
   // Set initial LED color state
   // robotLED.setupLEDS();

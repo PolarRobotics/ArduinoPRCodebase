@@ -2,7 +2,8 @@
 
 Lineman::Lineman() { 
     Serial.println(F("Creating lineman"));
-    setDrive(new Drive());
+    this->setType(TYPE::lineman);
+    this->setDrive(new Drive(this->lPin, this->rPin));
 };
 
 void Lineman::initialize() {
