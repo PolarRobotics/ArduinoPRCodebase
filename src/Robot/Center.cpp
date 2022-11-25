@@ -10,8 +10,8 @@
 /** Center Code
     --- Functions List ---
     Center
-    clawControl - Based on what is inputed in main, opens, closes, or stops the claw. 
-    armControl - Based on what is inputed in main, raises, lowers, or stops the arm. 
+    clawControl - Based on inputs from main, opens, closes, or stops the claw. 
+    armControl - Based on inputs from main, raises, lowers, or stops the arm. 
 */
 #include "Robot/Center.h"
 
@@ -21,38 +21,39 @@
  * Date: 9/19/22
 **/
 Center::Center() {
-    setDrive(new Drive());
+    this->setType(TYPE::center);
+    this->setDrive(new Drive(MOTORS::small));
+
+    armMotor.attach(ARM_PIN);
+    armControl(ArmStatus::STOP);
+    
+    clawMotor.attach(CLAW_PIN);
+    clawControl(ClawStatus::STOP);
 }
 
 void Center::initialize() {
-    // this->setDrive(new Drive(3,5));
     Serial.println(F("Creating Center"));
 }
 
 void Center::action(PS5BT& PS5) {
     Serial.println(F("Actual Center Action Executed"));
     if (PS5.getAnalogButton(R2)) {
-      armControl(armStatus::Higher);
+      armControl(ArmStatus::HIGHER);
     } else if (PS5.getAnalogButton(L2)) {
-      armControl(armStatus::Lower);
+      armControl(ArmStatus::LOWER);
     } else if (PS5.getButtonPress(TRIANGLE)) {
-      armControl(armStatus::Hold);
+      armControl(ArmStatus::HOLD);
     } else {
-      armControl(armStatus::Stop);
+      armControl(ArmStatus::STOP);
     }
     
     if (PS5.getButtonPress(UP)) {
-      clawControl(clawStatus::Open);
+      clawControl(ClawStatus::OPEN);
     } else if (PS5.getButtonPress(DOWN)) {
-      clawControl(clawStatus::Close);
+      clawControl(ClawStatus::CLOSE);
     } else {
-      clawControl(clawStatus::clawStop);
+      clawControl(ClawStatus::STOP);
     }
-}
-
-void Center::setServos(Servo& armPin, Servo& clawPin) {
-  armmotor=armPin;
-  clawmotor=clawPin;
 }
 
 /**
@@ -60,14 +61,17 @@ void Center::setServos(Servo& armPin, Servo& clawPin) {
  * Author: @ n-johnson.3
  * Date: 9/19/22
  **/
-void Center::clawControl(clawStatus reqstatus) {
-  if(reqstatus == clawStatus::Open) {
-    clawmotor.write(96);
-  } else if(reqstatus == clawStatus::Close) {
-    clawmotor.write(84);
-  } else if(reqstatus == clawStatus::clawStop) {
-    clawmotor.write(93);
-  }
+void Center::clawControl(ClawStatus target) {
+  switch (target) {
+    case ClawStatus::OPEN:
+        clawMotor.write(CLAW_SPEED_OPEN);
+        break;
+    case ClawStatus::CLOSE:
+        clawMotor.write(CLAW_SPEED_CLOSE);
+        break;
+    case ClawStatus::STOP:
+        clawMotor.write(CLAW_SPEED_STOP);
+  } 
 }
 
 /**
@@ -75,15 +79,19 @@ void Center::clawControl(clawStatus reqstatus) {
  * Author: @ n-johnson.3
  * Date: 9/19/22
  **/
-void Center::armControl(armStatus reqstatus) {
-  if (reqstatus == armStatus::Lower) {
-    armmotor.write(98);
-  } else if (reqstatus == armStatus::Higher) {
-    armmotor.write(87);
-  } else if (reqstatus == armStatus::Stop) {
-    armmotor.write(93);
-  } else if (reqstatus == armStatus::Hold) {
-    armmotor.write(90);
+void Center::armControl(ArmStatus target) {
+  switch (target) {
+    case ArmStatus::LOWER:
+        armMotor.write(ARM_SPEED_LOWER);
+        break;
+    case ArmStatus::HIGHER:
+        armMotor.write(ARM_SPEED_HIGHER);
+        break;
+    case ArmStatus::HOLD:
+        armMotor.write(ARM_SPEED_HOLD);
+        break;
+    case ArmStatus::STOP:
+        armMotor.write(ARM_SPEED_STOP);
   }
 
 }

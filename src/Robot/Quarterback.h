@@ -17,9 +17,9 @@
 #define FLYWHEEL_STOP_SPEED 93
 
 // Elevation (linear actuators) defines
-#define SERVO_SPEED_UP 175
-#define SERVO_SPEED_STOP 90 // this should always be 90.
-#define SERVO_SPEED_DOWN 5
+#define ELEVATION_SPEED_UP 175
+#define ELEVATION_SPEED_STOP 90 // this should always be 90.
+#define ELEVATION_SPEED_DOWN 5
 #define MAX_ELEVATION 100
 #define ELEVATION_PERIOD 3750
 
@@ -28,13 +28,13 @@
 #define CONVEYOR_OFF 93
 
 // Enum for Increasing or Decreasing Flywheel Speed
-enum speedStatus {
-  increase, decrease
+enum SpeedStatus {
+  INCREASE, DECREASE
 };
 
 // Enum for whether to aim up or aim down
-enum qbAim {
-  aimUp, aimDown
+enum QBAim {
+  AIM_UP, AIM_DOWN // can't use "UP" or "DOWN" due to PS5 controller, unless we want to hard specify that
 };
 
 /**
@@ -56,9 +56,9 @@ class Quarterback: public Robot {
     public:
         Quarterback();
         void toggleFlywheels();
-        void aim(qbAim dir);
+        void aim(QBAim dir);
         void toggleConveyor();
-        void changeFlywheelSpeed(speedStatus speed);
+        void changeFlywheelSpeed(SpeedStatus speed);
         void updateAim();
         void initialize() override;
         void action(PS5BT& PS5) override;

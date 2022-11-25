@@ -1,9 +1,14 @@
 #include "Kicker.h"
 
 Kicker::Kicker() {
-    m_enabled = false;
-    setDrive(new Drive()); // TODO: update to whatever the kicker needs
+    kickerEnabled = false;
+    setDrive(new Drive(MOTORS::big)); // TODO: update to use new derived class
+    windupMotor.attach(WINDUP_PIN);
 }
+
+void Kicker::enable() { kickerEnabled = true; }
+
+void Kicker::disable() { kickerEnabled = false; }
 
 void Kicker::initialize() {
     Serial.println(F("Creating Kicker"));
@@ -11,44 +16,40 @@ void Kicker::initialize() {
 
 void Kicker::action(PS5BT& PS5) {
     Serial.println(F("Actual Kicker Action Executed"));
+    
     // Control the motor on the kicker
     if (PS5.getButtonPress(TRIANGLE))
-        turnfwd();
+        windFwd();
     else if (PS5.getButtonPress(CROSS))
-        turnrev();
+        windRev();
     else
-        stop();
+        windStop();
 }
 
-void Kicker::setup(uint8_t kicker_pin) {
-    m_enabled = true;
-    m_kickerpin = kicker_pin;
-    m_windupMotor.attach(kicker_pin); //! were we having issues with this causing delay?
+void Kicker::windFwd() {
+    if (kickerEnabled)
+        windupMotor.write(WIND_FWD_SPEED);
 }
 
-void Kicker::Test() {
-    if (m_enabled) {
-    m_windupMotor.write(50); //clockwise
-    delay(3000);
-    m_windupMotor.write(90); //stop
-    delay(1000);
-    m_windupMotor.write(130); //counter-clockwise
-    delay(3000);
-    m_windupMotor.write(90); //stop
+void Kicker::windRev() {
+    if (kickerEnabled)
+        windupMotor.write(WIND_REV_SPEED);
+}
+
+void Kicker::windStop() {
+    if (kickerEnabled)
+        windupMotor.write(WIND_STOP_SPEED);
+}
+
+// TODO: remove if not needed
+void Kicker::test() {
+    if (kickerEnabled) {
+        windupMotor.write(50); //clockwise
+        delay(3000);
+        windupMotor.write(90); //stop
+        delay(1000);
+        windupMotor.write(130); //counter-clockwise
+        delay(3000);
+        windupMotor.write(90); //stop
     }
-}
-
-void Kicker::turnfwd() {
-    if (m_enabled)
-    m_windupMotor.write(70);
-}
-
-void Kicker::turnrev() {
-    if (m_enabled)
-    m_windupMotor.write(110);
-}
-
-void Kicker::stop() {
-    if (m_enabled)
-    m_windupMotor.write(90);
 }

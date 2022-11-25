@@ -29,22 +29,6 @@ PS5BT PS5(&Btd);
 Robot* robot = nullptr;
 Drive* drive = nullptr;
 
-#if INCLUDE_SPECIAL == 1
-// QB
-#define FLYWHEEL_PIN 7
-#define ELEVATION_MOTORS_PIN 4
-#define CONVEYOR_MOTOR_PIN 6 
-
-// Center
-Servo centerArm;
-Servo centerClaw;
-#define armPin 6
-#define clawPin 13
-
-// Kicker
-#define windupPin 7
-#endif
-
 // Lights robotLED;
 // unsigned long CURRENTTIME;
 
@@ -78,21 +62,12 @@ void setup() {
     case center:
       Serial.println(F("Robot Type: Center"));
       robot = new Center();
-      #if INCLUDE_SPECIAL == 1
-        centerArm.attach(armPin);
-        centerClaw.attach(clawPin);
-        ((Center*) robot)->setServos(centerArm, centerClaw); // downcast and call member method
-        PS5.leftTrigger.setTriggerForce(0, 255);
-        PS5.rightTrigger.setTriggerForce(0, 255);
-      #endif
+      PS5.leftTrigger.setTriggerForce(0, 255);
+      PS5.rightTrigger.setTriggerForce(0, 255);
       break;
     case kicker:
       Serial.println(F("Robot Type: Kicker"));
       robot = new Kicker();
-      motorType = MOTORS::big; // direct override evidently
-      #if INCLUDE_SPECIAL == 1
-        ((Kicker*) robot)->setup(windupPin);
-      #endif
       break;
     case lineman:
     case receiver:
@@ -124,6 +99,9 @@ void setup() {
   }
 
   // Serial.print(F("\r\nConnected"));
+  if (robotType == kicker) {
+    ((Kicker*) robot)->enable();
+  }
 
 }
 
@@ -182,6 +160,9 @@ void loop() {
   } else { // no response from PS5 controller within last 300 ms, so stop
     // Emergency stop if the controller disconnects
     drive->emergencyStop();
+    if (robot->getType() == kicker) {
+      ((Kicker*) robot)->disable();
+    }
   }
 
   // DriveMotors.printDebugInfo();

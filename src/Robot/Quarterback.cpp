@@ -20,9 +20,9 @@ Quarterback::Quarterback() {
     aimingUp = false;
     aimingDown = false;
     currentElevation = 0;
-    elevationMotors.write(SERVO_SPEED_DOWN);
+    elevationMotors.write(ELEVATION_SPEED_DOWN);
     delay(8000);
-    elevationMotors.write(SERVO_SPEED_STOP);
+    elevationMotors.write(ELEVATION_SPEED_STOP);
 }
 
 void Quarterback::initialize() {
@@ -33,9 +33,9 @@ void Quarterback::action(PS5BT& PS5) {
     Serial.println(F("Actual QB Action Executed"));
     // Update the bools within the class to see if the user wants to go up or down
     if (PS5.getButtonClick(UP))
-      aim(qbAim::aimUp);
+      aim(QBAim::AIM_UP);
     else if (PS5.getButtonClick(DOWN))
-      aim(qbAim::aimDown);
+      aim(QBAim::AIM_DOWN);
     
     // Update the aim on quarterback to see if we need to stop or not
     updateAim();
@@ -48,9 +48,9 @@ void Quarterback::action(PS5BT& PS5) {
     
     // Change the flywheel speed
     if(PS5.getButtonClick(TRIANGLE))
-      changeFlywheelSpeed(speedStatus::increase);
+      changeFlywheelSpeed(SpeedStatus::INCREASE);
     else if (PS5.getButtonClick(CROSS))
-      changeFlywheelSpeed(speedStatus::decrease);
+      changeFlywheelSpeed(SpeedStatus::DECREASE);
 }
 
 void Quarterback::toggleFlywheels() {
@@ -66,11 +66,11 @@ void Quarterback::toggleFlywheels() {
 
 // Aiming related functions
 
-void Quarterback::aim(qbAim dir) {
+void Quarterback::aim(QBAim dir) {
   // Check which direction the user wants and turn the other direction off
   switch(dir) {
-    case aimUp: aimingUp = true; aimingDown = false; break;
-    case aimDown: aimingDown = true; aimingUp = false; break;
+    case AIM_UP: aimingUp = true; aimingDown = false; break;
+    case AIM_DOWN: aimingDown = true; aimingUp = false; break;
   }
 }
 
@@ -79,21 +79,21 @@ void Quarterback::updateAim() {
     if (millis() - lastElevationTime >= ELEVATION_PERIOD) {
       if (aimingUp && currentElevation < MAX_ELEVATION) {
         // Set the elevation of the top to 50% higher
-        elevationMotors.write(SERVO_SPEED_UP);
+        elevationMotors.write(ELEVATION_SPEED_UP);
         currentElevation += 50;
         aimingUp = false;
         lastElevationTime = millis();
 
       } else if (aimingDown && currentElevation > 0) {
         // Set the elevation of the bottom to 50% lower
-        elevationMotors.write(SERVO_SPEED_DOWN);
+        elevationMotors.write(ELEVATION_SPEED_DOWN);
         currentElevation -= 50;
         aimingDown = false;
         lastElevationTime = millis();
 
       } else {
         // Stop the linear actuators if it is not supposed to move up or down anymore
-        elevationMotors.write(SERVO_SPEED_STOP);
+        elevationMotors.write(ELEVATION_SPEED_STOP);
       }
     }
 }
@@ -109,11 +109,11 @@ void Quarterback::toggleConveyor() {
     conveyorOn = !conveyorOn;
 }
 
-void Quarterback::changeFlywheelSpeed(speedStatus speed) {
+void Quarterback::changeFlywheelSpeed(SpeedStatus speed) {
   // Change the speed factor based on whether the user wants to increase or decrease
   switch(speed) {
-    case increase: flywheelSpeedFactor += 5; break;
-    case decrease: flywheelSpeedFactor -= 5; break;
+    case INCREASE: flywheelSpeedFactor += 5; break;
+    case DECREASE: flywheelSpeedFactor -= 5; break;
   }
   // Cap it so they only have two levels to speed up and two levels to slow down
   flywheelSpeedFactor = constrain(flywheelSpeedFactor, -15, 15);

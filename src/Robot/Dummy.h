@@ -30,6 +30,8 @@ class Kicker: public Robot {
         Kicker() {};
         void initialize() {}
         void action(PS5BT& PS5) { Serial.println(F("Dummy Kicker Action Executed")); }
+        void enable() {}
+        void disable() {}
 };
 
 #endif
