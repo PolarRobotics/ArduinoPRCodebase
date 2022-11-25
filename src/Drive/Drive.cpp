@@ -56,12 +56,6 @@ Drive::Drive(MOTORS motorType, uint8_t leftPin, uint8_t rightPin) {
     rightMotor.attach(rPin);
 }
 
-// Deprecated
-void Drive::setServos(Servo& left, Servo& right) {
-    leftMotor = left;
-    rightMotor = right;
-}
-
 void Drive::setMotorType(MOTORS motorType) {
     this->motorType = motorType;
 }

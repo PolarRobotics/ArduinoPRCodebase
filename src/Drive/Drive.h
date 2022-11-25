@@ -5,7 +5,7 @@
 
 #include <Arduino.h>
 #include <Servo.h>
-#include <PolarRobotics.h>
+#include "PolarRobotics.h"
 // #include <Servo_Hardware_PWM.h>
 
 #ifndef NUM_MOTORS
@@ -29,7 +29,9 @@
 #define STICK_DEADZONE 0.0390625F // 8.0 / 127.0
 #define THRESHOLD 0.00001
 
-// this is 1.0, the maximum power possible to the motors.
+// TODO: refactor to allow custom BSN values? this would probably be good for kicker
+
+// 1.0 is the maximum power possible to the motors.
 #define BIG_BOOST_PCT 0.5  // default: 0.6, this is the typical percentage of power out of the motors' range that is used (to ensure they don't do seven wheelies)
 #define BIG_NORMAL_PCT 0.3 // should be a value less than BIG_NORMAL_PCT, to slow down for precision maneuvering
 #define BIG_SLOW_PCT 0.2   // the value for brake button to slow down the motors at the button press
@@ -85,10 +87,8 @@ public:
   Drive(MOTORS motorType);
   Drive(uint8_t leftPin, uint8_t rightPin);
   Drive(MOTORS motorType, uint8_t leftPin, uint8_t rightPin);
-  void setServos(Servo&, Servo&);
   void setMotorType(MOTORS motorType);
   void setMotorType(uint8_t motorType);
-  void attach();
   void setStickPwr(uint8_t leftY, uint8_t rightX);
   void setBSN(SPEED bsn); //(float powerMultiplier);
   float getMotorPwr(uint8_t mtr);
