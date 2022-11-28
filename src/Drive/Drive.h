@@ -32,7 +32,7 @@
 #define NORMAL_TURN_CONSTANT 0.05
 
 // Controller Defines
-#define OFFSET -0.15 // the max allowable turning when the bot is traveling at full speed
+#define OFFSET 0.2 // the max allowable turning when the bot is traveling at full speed
 #define STICK_DEADZONE 0.0390625F // 8.0 / 127.0
 #define THRESHOLD 0.00001
 
@@ -70,7 +70,8 @@ private:
   float lastRampPower[NUM_MOTORS];
   // float inputPower[NUM_MOTORS];
   // float rampedPower[NUM_MOTORS];
-  float calcTurningMotorValue(float stickTrn,  float prevPwr);
+  void calcTurningMotorValues(float stickTrn,  float prevPwr, int dir);
+  float turnMotorValues[2] = {0,0};
   void generateMotionValues();
   float ramp(float requestedPower, uint8_t mtr);
   // use the inline keywork to ensure the function will get called again as soon as possible

@@ -121,7 +121,8 @@ void loop() {
     // Emergency stop if the controller disconnects
     DriveMotors.emergencyStop();
   }
-//   DriveMotors.printDebugInfo();
+  
+  DriveMotors.printDebugInfo();
     // robotLED.updateLEDS();
 
 }

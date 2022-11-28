@@ -137,18 +137,13 @@ void Drive::generateMotionValues() {
             some value less than 1, this value is determined by the function calcTurningMotorValue
             */
             if(stickTurn > STICK_DEADZONE) { // turn Right
-                //shorthand if else: variable = (condition) ? expressionTrue : expressionFalse;
-                motorPower[0] = stickForwardRev * BSNscalar;// set the left motor
-                motorPower[1] = calcTurningMotorValue(stickTurn, lastRampPower[0]); // set the right motor
-                if (abs(lastRampPower[0]) < 0.3) { // temporary solution to decrease radius at low speed
-                    motorPower[0] += copysign(NORMAL_TURN_CONSTANT,motorPower[0]);
-                }
+                calcTurningMotorValues(stickTurn, lastRampPower[0], 1);
+                motorPower[0] = turnMotorValues[0];
+                motorPower[1] = turnMotorValues[1];
             } else if(stickTurn < -STICK_DEADZONE) { // turn Left
-                motorPower[0] = calcTurningMotorValue(stickTurn, lastRampPower[1]); // set the left motor
-                motorPower[1] = stickForwardRev * BSNscalar; // set the right motor
-                if (abs(lastRampPower[1]) < 0.3) { // temporary solution to decrease radius at low speed
-                    motorPower[1] += copysign(NORMAL_TURN_CONSTANT,motorPower[1]);
-                }
+                calcTurningMotorValues(stickTurn, lastRampPower[1], 0);
+                motorPower[0] = turnMotorValues[1];
+                motorPower[1] = turnMotorValues[0];
             }
         }
     }
@@ -156,11 +151,12 @@ void Drive::generateMotionValues() {
 
 
 /**
- * @brief calcTurningMotorValue generates a value to be set to the turning motor, the motor that corresponds to the direction of travel
+ * @brief Work in progress! as of 11/27 stuffs changin' calcTurningMotorValue generates a value to be set to the turning motor, the motor that corresponds to the direction of travel
  * @authors Grant Brautigam, Rhys Davies
  * Created: 9-12-2022
- *
+ * updated: 11-27-22
  * Mathematical model:
+ *  NOT REALLY TRUE ANYMORE
  *  TurningMotor = TurnStickNumber(1-offset)(CurrentPwrFwd)^2+(1-TurnStickNumber)*CurrentPwrFwd
  *   *Note: CurrentPwrFwd is the current power, not the power from the stick
  *
@@ -168,16 +164,20 @@ void Drive::generateMotionValues() {
  * @param prevPwr the non-turning motor value from the previous loop, which was actually sent to the motor
  * @return float - the value to get set to the turning motor (the result of the function mention above)
  */
-float Drive::calcTurningMotorValue(float stickTrn, float prevPwr) {
+void Drive::calcTurningMotorValues(float stickTrn, float prevPwr, int dir) {
     
-    // float TurnMax = (OFFSET - 1)*(prevPwr) + 1;
-    // float TurnFactor = abs(stickTrn)*TurnMax;
-    // turnPower = prevPwr - prevPwr*TurnFactor;
+    float TurnMax = (OFFSET - 1)*(prevPwr) + 1;
+    float TurnDifference = abs(stickTrn)*TurnMax;
 
-    turnPower = abs(stickTrn) * (1 - OFFSET) * pow(prevPwr, 2) + (1-abs(stickTrn)) * abs(prevPwr);
-    turnPower = copysign(turnPower, prevPwr);
-    lastTurnPwr = turnPower;
-    return turnPower;
+    if ((lastRampPower[dir]-TurnDifference) <= 0){
+        turnMotorValues[0] = prevPwr + abs(lastRampPower[dir]-TurnDifference);
+        turnMotorValues[1] = 0;
+    } else {
+        turnMotorValues[0] = prevPwr;
+        turnMotorValues[1] = lastRampPower[dir]-TurnDifference;
+    }
+
+    lastTurnPwr = TurnDifference;
 }
 
 
