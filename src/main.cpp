@@ -162,7 +162,7 @@ void loop() {
     }
   }
 
-  // DriveMotors.printDebugInfo();
+   drive->printDebugInfo();
   // robotLED.updateLEDS();
 
 }
