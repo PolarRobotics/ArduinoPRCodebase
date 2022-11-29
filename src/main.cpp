@@ -118,9 +118,7 @@ void setup() {
 void loop() {
 
   // clean up the usb registers, allows for new commands to be executed
-  // Usb.Task();
-
-  
+  Usb.Task();
 
   // checks if PS5 is connected, had response within 300 ms
   if ((millis() - PS5.getLastMessageTime()) < 100 && PS5.connected()) { 
