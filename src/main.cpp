@@ -102,11 +102,6 @@ void setup() {
   if (robotType == kicker) {
     ((Kicker*) robot)->enable();
   }
-
-  // Reset PWM on startup
-  analogWrite(lPin, 0);
-  analogWrite(rPin, 0);
-
 }
 
 /*

@@ -54,6 +54,9 @@ Drive::Drive(MOTORS motorType, uint8_t leftPin, uint8_t rightPin) {
     // ! servos must be attached in constructor, which is called within main.cpp/setup()
     leftMotor.attach(lPin);
     rightMotor.attach(rPin);
+
+    analogWrite(lPin, 0);
+    analogWrite(rPin, 0);
 }
 
 void Drive::setMotorType(MOTORS motorType) {
