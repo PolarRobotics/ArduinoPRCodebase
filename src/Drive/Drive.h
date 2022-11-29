@@ -38,7 +38,7 @@
 #define BRAKE_BUTTON_PCT 0
 
 // BSN for Short/Small Motors
-#define SMALL_BOOST_PCT 0.9
+#define SMALL_BOOST_PCT 0.55
 #define SMALL_NORMAL_PCT 0.55
 #define SMALL_SLOW_PCT 0.3
 
