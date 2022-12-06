@@ -6,21 +6,21 @@
  * @brief Drive Class, base class for specialized drive classes, this configuration is intended for the standard linemen.
  * this class takes the the the stick input, scales the turning value for each motor and ramps that value over time,
  * then sets the ramped value to the motors
- * @authors Rhys Davies (@rdavies02), Max Phillips (@RyzenFromFire)
+ * @authors Rhys Davies (@rdavies02), Max Phillips (@RyzenFromFire), Kaden Wince (@k-wince)
  *
  * @class
  *    2 motor configuration shown below
  *
- *               ^
- *               | Fwd
- *       _________________
- *      |        _        |
- *      |       |O|       |       O: represents the Omniwheel, a wheel that can turn on 2 axis
- *      |       |_|       |       L: represents the left Wheel, powered by the left motor via a chain
- *      |  _           _  |            - the left motor would turn ccw to move the bot forward
- *      | |L|         |R| |       R: represents the right Wheel, powered by the right motor via a chain
- *      | |_|         |_| |            - the right motor would turn cw to move the bot forward
- *      |_________________|
+ *                ^
+ *                | Fwd
+ *        _________________
+ *       |        _        |
+ *       |       |O|       |       O: represents the Omniwheel, a wheel that can turn on 2 axis
+ *       |       |_|       |       L: represents the left Wheel, powered by the left motor via a chain
+ *       |  _           _  |            - the left motor would turn ccw to move the bot forward
+ *       | |L|         |R| |       R: represents the right Wheel, powered by the right motor via a chain
+ *       | |_|         |_| |            - the right motor would turn cw to move the bot forward
+ *       |_________________|
  *
  * @todo
  *  - add a turning radius parameter, needed for the kicker
@@ -257,100 +257,6 @@ float Drive::Convert2PWMVal(float rampPwr) {
 
 
 /**
- * alternate for servos writeMicroseconds, a function to set the motors based on a power input (-1 to 1),
- * manually sets the motor high for the pwm time.
- * @author Rhys Davies
- * Created: 10-5-2022
- * Updated: 10-29-2022
- *
- * Set the motors by outputting a pulse with a period corresponding to the motor power,
- * determined by Convert2PWMVal. These calculations can not be put into a function,
- * because it confuses the compiler as these are time critical tasks.
- * 
- * FUTURE: write this so both pins are HIGH at the same time, and the one that goes low first is called,
- * because the beginning of the pulse is at the same time for both pins, but this isnt entirely necessary
- * considering both motors operate independently on the sabertooth
- *
- * @param pwr the motor power to be set
- * @param pin the motor to be set (0 for left, 1 for right)
-*/
-void Drive::setMotorPWM(float pwr, byte pin) {
-    // M1.writeMicroseconds(Convert2PWMVal(-motorPower[0]));
-    // M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
-    digitalWrite(motorPins[pin], HIGH);
-    delayMicroseconds(Convert2PWMVal(pwr) - 40);
-    digitalWrite(motorPins[pin], LOW);
-    delayMicroseconds(2000 - Convert2PWMVal(pwr) - 40); //-170
-    // digitalWrite(motorPins[0], HIGH);
-    // delayMicroseconds(Convert2PWMVal(motorPower[0]) - 40);
-    // digitalWrite(motorPins[0], LOW);
-    // // delayMicroseconds(2000 - Convert2PWMVal(motorPower[0]) - 40); //-170
-    // digitalWrite(motorPins[1], HIGH);
-    // delayMicroseconds(Convert2PWMVal(motorPower[1]) - 40);
-    // digitalWrite(motorPins[1], LOW);
-    // delayMicroseconds(2000 - Convert2PWMVal(motorPower[1]) - 40); //-170
-}
-
-/**
- * returns the stored motor value in the class
- * @param mtr the motor number to get, an array index, so 0 -> mtr 1, etc...
- * @return returns the stored motor power for a given motor
-*/
-float Drive::getMotorPwr(uint8_t mtr) {
-    return motorPower[mtr];
-}
-
-void Drive::emergencyStop() {
-    M1.writeMicroseconds(1500); // change to new function
-    M2.writeMicroseconds(1500); // change to new function
-    // setMotorPWM(0, motorPins[0]);
-    // setMotorPWM(0, motorPins[1]);
-    // // while(1);
-}
-
-/**
- * prints the internal variables to the serial monitor in a clean format,
- * this function exists out of pure laziness to not have to comment out all the print statments
- * @author
- * Updated:
-*/
-void Drive::printDebugInfo() {
-    Serial.print(F("Left Input: "));
-    Serial.print(stickForwardRev);
-    Serial.print(F("  Right: "));
-    Serial.print(stickTurn);
-
-    Serial.print(F("  |  Turn: "));
-    Serial.print(lastTurnPwr);
-
-    Serial.print(F("  |  Left ReqPwr: "));
-    Serial.print(motorPower[0]);
-    Serial.print(F("  Right ReqPwr: "));
-    Serial.print(motorPower[1]);
-
-
-    // Serial.print(F("  lastRampTime "));
-    // Serial.print(lastRampTime[0]);
-    // Serial.print(F("  requestedPower "));
-    // Serial.print(requestedPower);
-    // Serial.print(F("  current "));
-    // Serial.print(currentPower[0]);
-    // Serial.print(F("  requestedPower - currentPower "));
-    // Serial.println(requestedPower - currentPower[mtr], 10);
-
-    Serial.print(F("  Left Motor: "));
-    Serial.print(motorPower[0]);
-    Serial.print(F("  Right: "));
-    Serial.print(motorPower[1]);
-
-    Serial.print(F("  |  Left Motor: "));
-    Serial.print(Convert2PWMVal(-motorPower[0]));
-    Serial.print(F("  Right: "));
-    Serial.println(Convert2PWMVal(motorPower[1]));
-
-}
-
-/**
  * @brief updates the motors after calling all the functions to generate
  * turning and scaling motor values, the intention of this is so the
  * programmer doesnt have to call all the functions, this just handles it,
@@ -377,22 +283,20 @@ void Drive::update() {
 }
 
 /**
- * @brief updates the motors after calling all the functions to generate
- * turning and scaling motor values, the intention of this is so the
- * programmer doesnt have to call all the functions, this just handles it,
- * reducing clutter in the main file.
- * @author Rhys Davies
- * Created: 9-12-2022
- * Updated: 10-11-2020
+ * @brief Turns on drift mode for the motors so that only one of the wheels spin
+ * to allow for better control of the robot at high speeds. This is accomplished by setting it
+ * to stickTurn value to figure out how much they want to drift.
+ * @author Kaden Wince
+ * Created: 11-14-2022
 */
 void Drive::drift() {
-    if (stickTurn > STICK_DEADZONE) { // turning right, but not moving forward much so use tank mode
+    if (stickTurn > STICK_DEADZONE) { // turning right
         motorPower[0] = BSNscalar * abs(stickTurn)  * DRIFT_MODE_PCT;
         motorPower[1] = 0;
-    } else if (stickTurn < -STICK_DEADZONE) { // turning left, but not moving forward much so use tank mode
+    } else if (stickTurn < -STICK_DEADZONE) { // turning left
         motorPower[0] = 0;
         motorPower[1] = BSNscalar * abs(stickTurn)  * DRIFT_MODE_PCT;
-    } else {
+    } else { // not turning 
         motorPower[0] = 0;
         motorPower[1] = 0;
     }
@@ -400,27 +304,3 @@ void Drive::drift() {
     M1.writeMicroseconds(Convert2PWMVal(motorPower[0]));
     M2.writeMicroseconds(Convert2PWMVal(motorPower[1]));
 }
-
-//Old functions
-
-// if the magnitude of either target power exceeds 1, calculate the difference between it and 1.
-//   if ((fabs(targetPowerLeft) - 1) > THRESHOLD) {
-//     powerDelta = 1 - targetPowerLeft;
-//   } else if ((fabs(targetPowerRight) - 1) > THRESHOLD) {
-//     powerDelta = 1 - targetPowerRight;
-//   } else {
-//     powerDelta = 0;
-//   }
-
-
-// this section keeps the ratio between powers the same when scaling down
-//   if (stickTurnPower > (0 + THRESHOLD)) {
-//     scaledBoostedPowerLeft = targetPowerLeft + (fwdSign * powerDelta);
-//     scaledBoostedPowerRight = targetPowerRight + (fwdSign * powerDelta * (targetPowerRight / targetPowerLeft));
-//   } else if (stickTurnPower < (0 - THRESHOLD)) {
-//     scaledBoostedPowerLeft = targetPowerLeft + (fwdSign * powerDelta * (targetPowerLeft / targetPowerRight));
-//     scaledBoostedPowerRight = targetPowerRight + (fwdSign * powerDelta);
-//   } else {
-//     scaledBoostedPowerLeft = targetPowerLeft;
-//     scaledBoostedPowerRight = targetPowerRight;
-//   }

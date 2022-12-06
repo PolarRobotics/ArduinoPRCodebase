@@ -98,7 +98,6 @@ void loop() {
       DriveMotors.setBSN(Drive::slow);
     } else {
       DriveMotors.setBSN(Drive::normal);
-
     }
 
     // if(PS5.getButtonPress(UP)){
